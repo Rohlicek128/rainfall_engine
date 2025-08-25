@@ -27,6 +27,13 @@ LightComponent::LightComponent(const light_type& t, const glm::vec3& a, const gl
     }
 }
 
+LightComponent::~LightComponent()
+{
+    delete[] amb_edit_;
+    delete[] dif_edit_;
+    delete[] spe_edit_;
+}
+
 void LightComponent::set_uniforms(Program* program, const int index, const TransformComponent* transform)
 {
     const std::string dir_lights = "dir_lights[" + std::to_string(index);
@@ -34,12 +41,14 @@ void LightComponent::set_uniforms(Program* program, const int index, const Trans
     switch (type)
     {
         case DIRECTIONAL:
+            program->set_uniform((dir_lights + "].is_lighting").c_str(), is_enabled);
             program->set_uniform((dir_lights + "].direction").c_str(), transform->rotation);
             program->set_uniform((dir_lights + "].ambient").c_str(), ambient);
             program->set_uniform((dir_lights + "].diffuse").c_str(), diffuse * intensity);
             program->set_uniform((dir_lights + "].specular").c_str(), specular);
             break;
         case POINT:
+            program->set_uniform((point_lights + "].is_lighting").c_str(), is_enabled);
             program->set_uniform((point_lights + "].position").c_str(), transform->position);
             program->set_uniform((point_lights + "].ambient").c_str(), ambient * intensity);
             program->set_uniform((point_lights + "].diffuse").c_str(), diffuse * intensity);

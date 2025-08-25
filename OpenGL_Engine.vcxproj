@@ -93,7 +93,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="includes\stb\stb_image.cpp" />
-    <ClCompile Include="Source Files\glad.c">
+    <ClCompile Include="Source Files\Glad\glad.c">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <Optimization>Disabled</Optimization>
@@ -256,6 +256,8 @@
     <ClCompile Include="Source Files\Rendering\Buffers\IBindable.cpp" />
     <ClCompile Include="Source Files\Rendering\Buffers\IndexBuffer.cpp" />
     <ClCompile Include="Source Files\Rendering\Buffers\Mesh.cpp" />
+    <ClCompile Include="Source Files\Rendering\Buffers\Screen\Framebuffer.cpp" />
+    <ClCompile Include="Source Files\Rendering\Buffers\Screen\Renderbuffer.cpp" />
     <ClCompile Include="Source Files\Rendering\Buffers\Textures\Texture.cpp" />
     <ClCompile Include="Source Files\Rendering\Buffers\Textures\TextureManager.cpp" />
     <ClCompile Include="Source Files\Rendering\Buffers\VertexArray.cpp" />
@@ -367,6 +369,8 @@
     <ClInclude Include="Source Files\Rendering\Buffers\IBindable.h" />
     <ClInclude Include="Source Files\Rendering\Buffers\IndexBuffer.h" />
     <ClInclude Include="Source Files\Rendering\Buffers\Mesh.h" />
+    <ClInclude Include="Source Files\Rendering\Buffers\Screen\Framebuffer.h" />
+    <ClInclude Include="Source Files\Rendering\Buffers\Screen\Renderbuffer.h" />
     <ClInclude Include="Source Files\Rendering\Buffers\Textures\Texture.h" />
     <ClInclude Include="Source Files\Rendering\Buffers\Textures\TextureManager.h" />
     <ClInclude Include="Source Files\Rendering\Buffers\VertexArray.h" />
@@ -392,6 +396,8 @@
     <Content Include="lib\glfw3.lib" />
     <Content Include="lib\glfw3dll.lib" />
     <Content Include="lib\glfw3_mt.lib" />
+    <Content Include="Source Files\Rendering\Shaders\GLSL\Screen\screen.frag" />
+    <Content Include="Source Files\Rendering\Shaders\GLSL\Screen\screen.vert" />
     <Content Include="Source Files\Rendering\Shaders\GLSL\shader.frag" />
     <Content Include="Source Files\Rendering\Shaders\GLSL\shader.vert" />
   </ItemGroup>

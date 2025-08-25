@@ -69,6 +69,7 @@ unsigned int TextureManager::select_texture_gui()
             ImGui::Text(textures_.at(i)->get_path().c_str());
             if (textures_.at(i)->get_handle() != 3)
             {
+                ImGui::Text("Handle: %i", textures_.at(i)->get_handle());
                 ImGui::Text("Width: %i", textures_.at(i)->get_width());
                 ImGui::Text("Height: %i", textures_.at(i)->get_height());
                 ImGui::Text("Channels: %i", textures_.at(i)->get_nr_channels());

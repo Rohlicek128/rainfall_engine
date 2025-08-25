@@ -27,7 +27,7 @@ public:
     glm::vec3 attenuation_params;
     
     LightComponent(const light_type&, const glm::vec3&, const glm::vec3&, const glm::vec3&, float = 1.0f, const glm::vec3& = glm::vec3(1.0f, 0.14f, 0.07f));
-    ~LightComponent() override = default;
+    ~LightComponent() override;
     void set_uniforms(Program*, int, const TransformComponent*);
     void set_gui() override;
 };

@@ -18,8 +18,10 @@ public:
     float far_plane;
     float speed;
     float clear_color[4];
+
+    bool is_wireframe;
     
-    CameraComponent(TransformComponent*);
+    CameraComponent(TransformComponent*, ImVec4 = {0.1f, 0.1f, 0.1f, 1.0f});
     ~CameraComponent() override = default;
     
     void move(GLFWwindow*, float);

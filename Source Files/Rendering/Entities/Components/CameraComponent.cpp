@@ -5,7 +5,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-CameraComponent::CameraComponent(TransformComponent* transform)
+CameraComponent::CameraComponent(TransformComponent* transform, const ImVec4 clear)
 {
     transform_ = transform;
     up = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -19,10 +19,12 @@ CameraComponent::CameraComponent(TransformComponent* transform)
 
     speed = 5.0f;
 
-    clear_color[0] = 0.1f;
-    clear_color[1] = 0.1f;
-    clear_color[2] = 0.1f;
-    clear_color[3] = 1.0f;
+    is_wireframe = false;
+
+    clear_color[0] = clear.x;
+    clear_color[1] = clear.y;
+    clear_color[2] = clear.z;
+    clear_color[3] = clear.w;
 }
 
 void CameraComponent::move(GLFWwindow* window, const float delta_time)
@@ -46,9 +48,9 @@ void CameraComponent::mouse_move(Mouse& mouse, const float delta_time)
         mouse.last_y = mouse.pos_y;
         mouse.first_move = false;
     }
-    
-    float offset_x = (mouse.pos_x - mouse.last_x) * mouse.sensitivity * delta_time;
-    float offset_y = (mouse.last_y - mouse.pos_y) * mouse.sensitivity * delta_time;
+
+    const float offset_x = (mouse.pos_x - mouse.last_x) * mouse.sensitivity / 100.0f;
+    const float offset_y = (mouse.last_y - mouse.pos_y) * mouse.sensitivity / 100.0f;
     mouse.last_x = mouse.pos_x;
     mouse.last_y = mouse.pos_y;
 
@@ -83,6 +85,7 @@ glm::mat4 CameraComponent::get_projection_matrix(const float ratio)
 
 void CameraComponent::set_gui()
 {
+    ImGui::Checkbox("Wireframe", &is_wireframe);
     ImGui::SeparatorText("Clear Color");
     ImGui::ColorEdit4("##ClearColor", clear_color);
     

@@ -49,7 +49,7 @@ void Program::unbind()
 }
 
 
-void Program::draw(Mesh* mesh, const std::vector<std::shared_ptr<Entity>>& lights, const Entity* camera, const GLint* viewport)
+void Program::draw(Mesh* mesh, const std::vector<std::shared_ptr<Entity>>& lights, const Entity* camera, const int width, const int height)
 {
     bind();
     mesh->bind();
@@ -82,7 +82,7 @@ void Program::draw(Mesh* mesh, const std::vector<std::shared_ptr<Entity>>& light
 
     //Entities
     int offset = 0;
-    for (std::shared_ptr<Entity>& entity : mesh->entities)
+    for (const std::shared_ptr<Entity>& entity : mesh->entities)
     {
         if (entity->mesh == nullptr) continue;
         if (!entity->is_visible)
@@ -90,11 +90,12 @@ void Program::draw(Mesh* mesh, const std::vector<std::shared_ptr<Entity>>& light
             offset += entity->mesh->inds_lenght; 
             continue;
         }
-        
-        set_uniform("model", entity->transform->get_model_matrix());
-        set_uniform("inverse_model", glm::mat3(transpose(inverse(entity->transform->get_model_matrix()))));
+
+        glm::mat4 model = entity->get_model_matrix();
+        set_uniform("model", model);
+        set_uniform("inverse_model", glm::mat3(transpose(inverse(model))));
         set_uniform("view", camera_component->get_view_matrix());
-        set_uniform("projection", camera_component->get_projection_matrix((float)viewport[0] / (float)viewport[1]));
+        set_uniform("projection", camera_component->get_projection_matrix((float)width / (float)height));
         
         if (entity->component_exists(TEXTURE))
             dynamic_cast<TextureComponent*>(entity->components->at(TEXTURE))->active_bind(0);
@@ -130,6 +131,32 @@ void Program::draw(Mesh* mesh, const std::vector<std::shared_ptr<Entity>>& light
             set_uniform("is_light", 0);
         }
         
+        glDrawElements(entity->mesh->primitive_type, entity->mesh->inds_lenght, GL_UNSIGNED_INT, (void*)(offset * sizeof(GLuint)));
+        offset += entity->mesh->inds_lenght; 
+    }
+
+    mesh->unbind();
+    unbind();
+}
+
+void Program::draw_screen(Mesh* mesh, const unsigned int texture_handle)
+{
+    bind();
+    mesh->bind();
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture_handle);
+    set_uniform("screen_texture", 0);
+
+    int offset = 0;
+    for (std::shared_ptr<Entity>& entity : mesh->entities)
+    {
+        if (entity->mesh == nullptr) continue;
+        if (!entity->is_visible)
+        {
+            offset += entity->mesh->inds_lenght; 
+            continue;
+        }
         glDrawElements(entity->mesh->primitive_type, entity->mesh->inds_lenght, GL_UNSIGNED_INT, (void*)(offset * sizeof(GLuint)));
         offset += entity->mesh->inds_lenght; 
     }

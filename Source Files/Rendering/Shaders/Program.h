@@ -1,6 +1,7 @@
 #pragma once
 #include "Shader.h"
 #include "../Buffers/Mesh.h"
+#include "../Buffers/Textures/Texture.h"
 #include "glm/vec3.hpp"
 #include "glm/mat4x4.hpp"
 #include "glm/mat3x3.hpp"
@@ -13,7 +14,8 @@ public:
     void bind() override;
     void unbind() override;
 
-    void draw(Mesh*, const std::vector<std::shared_ptr<Entity>>&, const Entity*, const GLint*);
+    void draw(Mesh*, const std::vector<std::shared_ptr<Entity>>&, const Entity*, int, int);
+    void draw_screen(Mesh*, unsigned int);
     
     void set_uniform(const char*, int);
     void set_uniform(const char*, float);

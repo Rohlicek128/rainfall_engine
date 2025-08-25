@@ -12,7 +12,7 @@ public:
     float shininess;
     
     MaterialComponent(glm::vec4, float = 32.0f);
-    ~MaterialComponent() override = default;
+    ~MaterialComponent() override;
     void set_uniforms(Program*);
     void set_gui() override;
 };

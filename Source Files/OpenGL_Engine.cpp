@@ -33,6 +33,7 @@ GLFWwindow* init_window(const int width, const int height, const char* window_na
         throw "Create GLFW Window: FAILED";
     }
     glfwMakeContextCurrent(window);
+    glfwSwapInterval(0);
 
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))

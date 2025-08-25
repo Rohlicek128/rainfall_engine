@@ -1,6 +1,7 @@
 #version 460 core
 
 struct DirLight {
+	bool is_lighting;
     vec3 direction;
     
     vec3 ambient;
@@ -9,6 +10,7 @@ struct DirLight {
 };
 
 struct PointLight {
+	bool is_lighting;
 	vec3 position;
 
 	vec3 ambient;
@@ -87,10 +89,10 @@ void main(){
 	
 	vec3 result = vec3(0.0);
 	for (int i = 0; i < NR_DIRECTIONAL_LIGHTS; ++i){
-		result += CalcDirLight(dir_lights[i], view_dir, albedo, specular, normal);
+		if (dir_lights[i].is_lighting) result += CalcDirLight(dir_lights[i], view_dir, albedo, specular, normal);
 	}
 	for (int i = 0; i < NR_POINT_LIGHTS; ++i){
-		result += CalcPointLight(point_lights[i], view_dir, albedo, specular, normal);
+		if (point_lights[i].is_lighting) result += CalcPointLight(point_lights[i], view_dir, albedo, specular, normal);
 	}
 	
     pixel_color = vec4(result, 1.0);

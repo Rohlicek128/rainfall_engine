@@ -12,6 +12,8 @@ Entity::Entity(const std::string& name, TransformComponent* transform, MeshCompo
     this->name = name;
     is_visible = true;
 
+    parent = nullptr;
+
     this->transform = transform;
     this->mesh = mesh;
 
@@ -34,6 +36,19 @@ bool Entity::component_exists(const components_ids id)
     return components->count(id) && components->at(id)->is_enabled;
 }
 
+void Entity::add_child(const std::shared_ptr<Entity>& child)
+{
+    if (child.get() == this) return;
+    child->parent = std::make_shared<Entity>(*this);
+    children.push_back(child);
+}
+
+glm::mat4 Entity::get_model_matrix()
+{
+    if (parent != nullptr) return parent->get_model_matrix() * transform->get_model_matrix();
+    return transform->get_model_matrix();
+}
+
 void Entity::set_gui()
 {
     ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * 2.0f);
@@ -50,10 +65,15 @@ void Entity::set_gui()
     bool is_opened;
     for (const auto component : *components)
     {
+        ImGui::Checkbox(("##Enabled" + std::to_string(component.first)).c_str(), &component.second->is_enabled);
+        ImGui::SameLine();
+        
         is_opened = true;
         if (ImGui::CollapsingHeader(to_string(component.first), &is_opened, ImGuiTreeNodeFlags_DefaultOpen))
         {
+            if (!component.second->is_enabled) ImGui::BeginDisabled();
             component.second->set_gui();
+            if (!component.second->is_enabled) ImGui::EndDisabled();
         }
         if (!is_opened && component.first != MESH)
         {

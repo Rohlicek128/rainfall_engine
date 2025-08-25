@@ -21,9 +21,6 @@ void TextureComponent::active_bind(const unsigned int index)
 
 void TextureComponent::set_gui()
 {
-    ImGui::Checkbox("Enabled ##TEXTURE", &is_enabled);
-    if (!is_enabled) ImGui::BeginDisabled();
-    
     //Diffuse
     ImGui::SeparatorText("Diffuse Map");
     texture_gui(&diffuse_handle_, "Diffuse");
@@ -31,8 +28,6 @@ void TextureComponent::set_gui()
     //Specular
     ImGui::SeparatorText("Specular Map");
     texture_gui(&specular_handle_, "Specular");
-
-    if (!is_enabled) ImGui::EndDisabled();
 }
 
 void TextureComponent::texture_gui(unsigned int* handle, const std::string& id_name)
