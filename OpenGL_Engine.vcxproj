@@ -349,6 +349,7 @@
     <ClCompile Include="Source Files\Rendering\Gui\EditorManager.cpp" />
     <ClCompile Include="Source Files\Rendering\Shaders\Program.cpp" />
     <ClCompile Include="Source Files\Rendering\Shaders\Shader.cpp" />
+    <ClCompile Include="Source Files\Rendering\World\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\glad\glad.h" />
@@ -390,6 +391,7 @@
     <ClInclude Include="Source Files\Rendering\Gui\IGui.h" />
     <ClInclude Include="Source Files\Rendering\Shaders\Program.h" />
     <ClInclude Include="Source Files\Rendering\Shaders\Shader.h" />
+    <ClInclude Include="Source Files\Rendering\World\Scene.h" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="lib\glfw3.dll" />

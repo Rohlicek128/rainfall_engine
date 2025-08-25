@@ -29,4 +29,5 @@ public:
     int get_stride();
     void add_entity(Entity&);
     void add_entity(std::shared_ptr<Entity>);
+    Entity* find_entity_by_id(unsigned int);
 };

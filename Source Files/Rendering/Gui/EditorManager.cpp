@@ -56,22 +56,38 @@ void EditorManager::set_main_dockspace()
     }
 }
 
-void EditorManager::set_graph_children(const std::vector<std::shared_ptr<Entity>>& children, int* selected, int* count, const bool is_root)
+void EditorManager::set_graph_children(const std::vector<std::shared_ptr<Entity>>& children, std::weak_ptr<Entity>& selected, const bool is_root)
 {
     for (int i = 0; i < children.size(); ++i)
     {
-        if (is_root && children.at(i)->parent != nullptr) continue;
+        if (is_root && children.at(i)->parent.lock()) continue;
         
         ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_DrawLinesFull | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
-        if (*selected == *count) node_flags |= ImGuiTreeNodeFlags_Selected;
+        if (selected.lock() == children.at(i)) node_flags |= ImGuiTreeNodeFlags_Selected;
         if (children.at(i)->children.empty()) node_flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet;
         
         const bool opened = ImGui::TreeNodeEx((children.at(i)->name + "##ENTITY" + std::to_string(i)).c_str(), node_flags);
-        if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen()) *selected = *count;
-        (*count)++;
+        if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen()) selected = children.at(i)->weak_from_this();
+
+        if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
+        {
+            ImGui::SetDragDropPayload("CHILD_DND", &selected, sizeof(std::weak_ptr<Entity>));
+            ImGui::Text(selected.lock()->name.c_str());
+            ImGui::EndDragDropSource();
+        }
+        if (ImGui::BeginDragDropTarget())
+        {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CHILD_DND"))
+            {
+                IM_ASSERT(payload->DataSize == sizeof(std::weak_ptr<Entity>));
+                std::weak_ptr<Entity> payload_entity = *(std::weak_ptr<Entity>*)payload->Data;
+                if (std::shared_ptr<Entity> old_payload = payload_entity.lock()) children.at(i)->add_child(old_payload);
+            }
+            ImGui::EndDragDropTarget();
+        }
         if (opened)
         {
-            set_graph_children(children.at(i)->children, selected, count, false);
+            set_graph_children(children.at(i)->children, selected, false);
             ImGui::TreePop();
         }
     }

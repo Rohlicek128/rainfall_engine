@@ -22,7 +22,7 @@ public:
     ~EditorManager() = default;
     void init_imgui(GLFWwindow*);
     void set_main_dockspace();
-    void set_graph_children(const std::vector<std::shared_ptr<Entity>>&, int*, int*, bool = true);
+    void set_graph_children(const std::vector<std::shared_ptr<Entity>>&, std::weak_ptr<Entity>&, bool = true);
     void new_frame();
     void render();
 };

@@ -53,7 +53,7 @@ class Engine
     bool fullscreen_toggle_;
     bool can_escape_;
     
-    int entity_select_;
+    std::weak_ptr<Entity> entity_selected_;
 
     void update_delta_time();
     void set_icon(GLFWwindow*, const std::string&);

@@ -221,7 +221,6 @@ Engine::Engine(const EngineArgs& args) : fps_plot_{}
     fullscreen_toggle_ = true;
     camera_toggle_ = true;
     can_escape_ = true;
-    entity_select_ = 0;
 
     delta_time_ = 0.0f;
     last_time_ = 0.0;
@@ -455,14 +454,33 @@ void Engine::render(const EngineArgs& args)
         if (ImGui::Begin("Entity Inspector ##Inspector"))
         {
             ImGui::PushStyleColor(ImGuiCol_ChildBg, ImGui::GetStyleColorVec4(ImGuiCol_FrameBg));
-            ImGui::BeginChild("##Entities", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing()), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeY);
-            int count = 0;
-            editor_->set_graph_children(mesh_->entities, &entity_select_, &count);
-            ImGui::EndChild();
+            if (ImGui::BeginChild("##Entities", ImVec2(0, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_AlwaysAutoResize | ImGuiChildFlags_AutoResizeY))
+            {
+                ImGui::SeparatorText("Scene #1");
+                if (ImGui::BeginChild("##EntitiesInner", {-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing()}, ImGuiChildFlags_ResizeY))
+                {
+                    editor_->set_graph_children(mesh_->entities, entity_selected_);
+                    ImGui::EndChild();
+                }
+                ImGui::Button("Root", {-FLT_MIN, ImGui::GetTextLineHeightWithSpacing()});
+                if (ImGui::BeginDragDropTarget())
+                {
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CHILD_DND"))
+                    {
+                        IM_ASSERT(payload->DataSize == sizeof(std::weak_ptr<Entity>));
+                        const std::weak_ptr<Entity> payload_entity = *(std::weak_ptr<Entity>*)payload->Data;
+                        if (const std::shared_ptr<Entity> old_payload = payload_entity.lock())
+                            if (const std::shared_ptr<Entity> old_parent = old_payload->parent.lock())
+                                old_parent->remove_child(old_payload);
+                    }
+                    ImGui::EndDragDropTarget();
+                }
+                ImGui::EndChild();
+            }
             ImGui::PopStyleColor();
         
             ImGui::BeginChild("##EntityInspect", {0, 0}, ImGuiChildFlags_Borders);
-            mesh_->entities.at(entity_select_)->set_gui();
+            if (const std::shared_ptr<Entity> old_entity = entity_selected_.lock()) old_entity->set_gui();
             ImGui::EndChild();
         }
         ImGui::End();

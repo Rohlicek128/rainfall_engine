@@ -7,12 +7,13 @@
 #include "Components/MaterialComponent.h"
 #include "Components/TextureComponent.h"
 
+unsigned int Entity::global_id_ = 0;
+
 Entity::Entity(const std::string& name, TransformComponent* transform, MeshComponent* mesh)
 {
+    id = ++global_id_;
     this->name = name;
     is_visible = true;
-
-    parent = nullptr;
 
     this->transform = transform;
     this->mesh = mesh;
@@ -22,8 +23,14 @@ Entity::Entity(const std::string& name, TransformComponent* transform, MeshCompo
     //name.copy(name_edit_, std::size(name_edit_));
 }
 
-//Entity::~Entity()
-//= default;
+Entity::~Entity()
+= default;
+
+Entity& Entity::operator=(const Entity& other)
+{
+    id = other.id;
+    return *this;
+}
 
 bool Entity::add_component(components_ids id, Component* component)
 {
@@ -36,16 +43,33 @@ bool Entity::component_exists(const components_ids id)
     return components->count(id) && components->at(id)->is_enabled;
 }
 
-void Entity::add_child(const std::shared_ptr<Entity>& child)
+bool Entity::add_child(const std::shared_ptr<Entity>& child)
 {
-    if (child.get() == this) return;
-    child->parent = std::make_shared<Entity>(*this);
+    if (child.get() == this) return false;
+    if (const std::shared_ptr<Entity> old_parent = child->parent.lock()) old_parent->remove_child(child);
+    
+    child->parent = shared_from_this();
     children.push_back(child);
+    return true;
+}
+
+bool Entity::remove_child(const std::shared_ptr<Entity>& child)
+{
+    for (int i = 0; i < children.size(); ++i)
+    {
+        if (children.at(i) == child)
+        {
+            children.erase(children.begin() + i);
+            child->parent.reset();
+            return true;
+        }
+    }
+    return false;
 }
 
 glm::mat4 Entity::get_model_matrix()
 {
-    if (parent != nullptr) return parent->get_model_matrix() * transform->get_model_matrix();
+    if (const std::shared_ptr<Entity> old_parent = parent.lock()) return old_parent->get_model_matrix() * transform->get_model_matrix();
     return transform->get_model_matrix();
 }
 
@@ -56,6 +80,9 @@ void Entity::set_gui()
     //ImGui::InputText("Name ##InputName", name_edit_, std::size(name_edit_));
     //name = name_edit_;
     ImGui::PopFont();
+    ImGui::TextDisabled("ID: %i", id);
+
+    ImGui::Separator();
     
     ImGui::Checkbox("Is Visible", &is_visible);
 

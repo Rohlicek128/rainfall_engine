@@ -54,6 +54,15 @@ void Mesh::add_entity(std::shared_ptr<Entity> entity)
     entities.push_back(std::move(entity));
 }
 
+Entity* Mesh::find_entity_by_id(const unsigned int id)
+{
+    for (int i = 0; i < entities.size(); ++i)
+    {
+        if (entities.at(i)->id == id) return entities.at(i).get();
+    }
+    return nullptr;
+}
+
 float* Mesh::concat_vertices()
 {
     int size = 0;
