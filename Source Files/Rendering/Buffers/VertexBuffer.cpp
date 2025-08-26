@@ -6,7 +6,7 @@ VertexBuffer::VertexBuffer(float data[], const unsigned int length)
 {
     data_length = length;
     glGenBuffers(1, &handle_);
-
+    
     VertexBuffer::bind();
     glBufferData(GL_ARRAY_BUFFER, length * sizeof(float), data, GL_STATIC_DRAW);
     VertexBuffer::unbind();

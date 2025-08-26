@@ -6,6 +6,7 @@
 #include "Entities/Components/CameraComponent.h"
 #include "Entities/Components/LightComponent.h"
 #include "Entities/Components/MaterialComponent.h"
+#include "Entities/Components/MeshComponent.h"
 #include "Entities/Components/TextureComponent.h"
 
 Engine::Engine(const EngineArgs& args) : fps_plot_{}
@@ -15,8 +16,6 @@ Engine::Engine(const EngineArgs& args) : fps_plot_{}
 
     viewport_ = new GLint[2]{args.width, args.height};
     mouse_ = new Mouse(viewport_[0], viewport_[1], 5.0f);
-
-    lights_ = {};
 
     set_icon(args.window, "Icon/green_tick.png");
 
@@ -31,84 +30,82 @@ Engine::Engine(const EngineArgs& args) : fps_plot_{}
     textures_->add_texture(new Texture("test_fail.png", GL_RGBA));
     textures_->add_texture(new Texture("black_hole.jpg", GL_RGB));
 
-    float vertices_cube[] = {
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, // A 0
-        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f, // B 1
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f, // C 2
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f, // D 3
+    
+    //Scene
+    const VertexAttribute position("Position", 3);
+    const VertexAttribute tex_coord("TexCoord", 2);
+    const VertexAttribute normal("Normal", 3);
+    VertexAttribute attributes[] = {position, tex_coord, normal};
+    scene_ = std::make_unique<Scene>("Test Scene", Mesh(attributes, std::size(attributes)));
 
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, // E 4
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, // F 5
-        0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, // G 6
-        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // H 7
+    set_models_to_mesh(scene_->mesh.get());
+    scene_->mesh->compile();
 
-        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, // D 8
-        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f, // A 9
-        -0.5f, -0.5f, 0.5f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f, // E 10
-        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, // H 11
+    //Entities
+    std::unique_ptr<Entity> player_camera = std::make_unique<Entity>("Player camera",
+        new TransformComponent(glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(0.3f))
+    );
+    player_camera->add_component(CAMERA, new CameraComponent(player_camera->transform));
+    player_camera->add_component(MESH, new MeshComponent(5));
+    player_camera_ = player_camera.get();
 
-        0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // B 12
-        0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, // C 13
-        0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, // G 14
-        0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, // F 15
+    std::unique_ptr<Entity> obj1 = std::make_unique<Entity>("Cube",
+        new TransformComponent(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f))
+    );
+    obj1->add_component(MESH, new MeshComponent(0));
+    obj1->add_component(MATERIAL, new MaterialComponent(glm::vec4(1.0, 1.0, 1.0, 1.0)));
+    obj1->add_component(TEXTURE, new TextureComponent(textures_->get_texture(4)->get_handle(),textures_->get_texture(5)->get_handle()));
 
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, // A 16
-        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f, // B 17
-        0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f, // F 18
-        -0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f, // E 19
+    std::unique_ptr<Entity> obj2 = std::make_unique<Entity>("Cube #2",
+        new TransformComponent(glm::vec3(3.0f, 1.0f, 3.0f), glm::vec3(0.0f), glm::vec3(3.0f))
+    );
+    obj2->add_component(MESH, new MeshComponent(0));
+    obj2->add_component(TEXTURE, new TextureComponent(textures_->get_texture(3)->get_handle(), 1));
+    obj1->add_child(obj2.get());
 
-        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, // C 20
-        -0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, // D 21
-        -0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, // H 22
-        0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f // G 23
-    };
-    unsigned int indices_cube[] = {
-        // front and back
-        0, 3, 2,
-        2, 1, 0,
-        4, 5, 6,
-        6, 7, 4,
-        // left and right
-        11, 8, 9,
-        9, 10, 11,
-        12, 13, 14,
-        14, 15, 12,
-        // bottom and top
-        16, 17, 18,
-        18, 19, 16,
-        20, 21, 22,
-        22, 23, 20
-    };
+    std::unique_ptr<Entity> obj3 = std::make_unique<Entity>("Paper plane #2",
+        new TransformComponent(glm::vec3(-2.0f, 1.0f, -2.0f), glm::vec3(0.0f), glm::vec3(0.5f))
+    );
+    obj3->add_component(MATERIAL, new MaterialComponent(glm::vec4(0.0, 0.0, 1.0, 1.0)));
+    obj2->add_child(obj3.get());
 
-    float vertices_plane[] = {
-        0.0f, 0.0f, 1.0f, 0.5f, 1.0f, 0.0f, 1.0f, 0.0f, // 0
-        -1.0f, -0.1f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, // 1
-        1.0f, -0.1f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, // 2
-        0.0f, 0.2f, -1.0f, 0.5f, 0.2f, 0.0f, 1.0f, 0.0f, // 3
-        -0.2f, 0.0f, -1.0f, 0.3f, 0.0f, 0.0f, 1.0f, 0.0f, // 4
-        0.2f, 0.0f, -1.0f, 0.7f, 0.0f, 0.0f, 1.0f, 0.0f // 5
-    };
-    unsigned int indices_plane[] = {
-        0, 4, 5,
-        0, 3, 4,
-        0, 5, 3,
-        1, 4, 3,
-        1, 3, 0,
-        2, 3, 5,
-        2, 0, 3
-    };
+    std::unique_ptr<Entity> floor = std::make_unique<Entity>("Floor",
+        new TransformComponent(glm::vec3(0.0f, -0.501f, 0.0f), glm::vec3(0.0f), glm::vec3(50.0f))
+    );
+    floor->add_component(MESH, new MeshComponent(1));
+    floor->add_component(MATERIAL, new MaterialComponent(glm::vec4(0.15, 0.15, 0.15, 1.0)));
 
-    float vertices_floor[] = {
-        1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-        1.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-        -1.0f, 0.0f, -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-        -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f
-    };
-    unsigned int indices_floor[] = {
-        0, 1, 2,
-        2, 3, 0
-    };
+    std::unique_ptr<Entity> dir_light = std::make_unique<Entity>("Sun",
+        new TransformComponent(glm::vec3(0.0f, 20.0f, 0.0f), glm::vec3(-6.0f, -10, 6.0f), glm::vec3(0.5f))
+    );
+    dir_light->add_component(MESH, new MeshComponent(0));
+    dir_light->add_component(LIGHT, new LightComponent(DIRECTIONAL, glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(0.8f)));
 
+    std::unique_ptr<Entity> point_light = std::make_unique<Entity>("Bulb",
+        new TransformComponent(glm::vec3(3.0f, 5.0f, 1.0f), glm::vec3(0.0f), glm::vec3(0.35f))
+    );
+    point_light->add_component(MESH, new MeshComponent(0));
+    point_light->add_component(LIGHT, new LightComponent(POINT, glm::vec3(0.2f), glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0.8f)));
+    obj1->add_child(point_light.get());
+    
+    scene_->add_entity(std::move(player_camera));
+    scene_->add_entity(std::move(obj1));
+    scene_->add_entity(std::move(obj2));
+    scene_->add_entity(std::move(obj3));
+    scene_->add_entity(std::move(floor));
+    
+    scene_->add_entity(std::move(dir_light), true);
+    scene_->add_entity(std::move(point_light), true);
+
+
+    const Shader vert("shader.vert", GL_VERTEX_SHADER);
+    const Shader frag("shader.frag", GL_FRAGMENT_SHADER);
+    Shader shaders[]{vert, frag};
+    program_ = new Program(shaders);
+    
+
+    //Screen Mesh
+    VertexAttribute screen_attributes[] = {VertexAttribute("PosTex", 4)};
     float vertices_quad[] = {
         -1.0f, 1.0f, 0.0f, 1.0f,
         -1.0f, -1.0f, 0.0f, 0.0f,
@@ -119,85 +116,10 @@ Engine::Engine(const EngineArgs& args) : fps_plot_{}
         0, 1, 2,
         0, 2, 3
     };
-
-    //Mesh
-    player_camera_ = std::make_shared<Entity>("Player camera",
-        new TransformComponent(glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(0.3f)),
-        new MeshComponent(vertices_cube, indices_cube,std::size(vertices_cube),std::size(indices_cube))
-    );
-    player_camera_->add_component(CAMERA, new CameraComponent(player_camera_->transform, {0.07f, 0.07f, 0.07f, 1.0f}));
-
-    std::shared_ptr<Entity> obj1 = std::make_shared<Entity>("Cube",
-        new TransformComponent(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f)),
-        new MeshComponent(vertices_cube, indices_cube, std::size(vertices_cube), std::size(indices_cube))
-    );
-    obj1->add_component(MATERIAL, new MaterialComponent(glm::vec4(1.0, 1.0, 1.0, 1.0)));
-    obj1->add_component(TEXTURE, new TextureComponent(textures_->get_texture(4)->get_handle(),textures_->get_texture(5)->get_handle()));
-
-    std::shared_ptr<Entity> obj2 = std::make_shared<Entity>("Cube #2",
-        new TransformComponent(glm::vec3(3.0f, 1.0f, 3.0f), glm::vec3(0.0f), glm::vec3(3.0f)),
-        new MeshComponent(vertices_cube, indices_cube, std::size(vertices_cube), std::size(indices_cube))
-    );
-    obj2->add_component(TEXTURE, new TextureComponent(textures_->get_texture(3)->get_handle(), 1));
-    obj1->add_child(obj2);
-
-    std::shared_ptr<Entity> obj3 = std::make_shared<Entity>("Paper plane #2",
-        new TransformComponent(glm::vec3(-2.0f, 1.0f, -2.0f), glm::vec3(0.0f), glm::vec3(0.5f))
-        //new MeshComponent(vertices_plane, indices_plane, std::size(vertices_plane), std::size(indices_plane))
-    );
-    obj3->add_component(MATERIAL, new MaterialComponent(glm::vec4(0.0, 0.0, 1.0, 1.0)));
-    obj2->add_child(obj3);
-
-    std::shared_ptr<Entity> floor = std::make_shared<Entity>("Floor",
-        new TransformComponent(glm::vec3(0.0f, -0.501f, 0.0f), glm::vec3(0.0f), glm::vec3(50.0f)),
-        new MeshComponent(vertices_floor, indices_floor, std::size(vertices_floor), std::size(indices_floor))
-    );
-    floor->add_component(MATERIAL, new MaterialComponent(glm::vec4(0.15, 0.15, 0.15, 1.0)));
-
-    std::shared_ptr<Entity> dir_light = std::make_shared<Entity>("Sun",
-        new TransformComponent(glm::vec3(0.0f, 20.0f, 0.0f), glm::vec3(-6.0f, -10, 6.0f), glm::vec3(0.5f)),
-        new MeshComponent(vertices_cube, indices_cube, std::size(vertices_cube), std::size(indices_cube))
-    );
-    dir_light->add_component(LIGHT, new LightComponent(DIRECTIONAL, glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(0.8f)));
-    lights_.push_back(dir_light);
-
-    std::shared_ptr<Entity> point_light = std::make_shared<Entity>("Bulb",
-        new TransformComponent(glm::vec3(3.0f, 5.0f, 1.0f), glm::vec3(0.0f), glm::vec3(0.35f)),
-        new MeshComponent(vertices_cube, indices_cube, std::size(vertices_cube), std::size(indices_cube))
-    );
-    point_light->add_component(LIGHT, new LightComponent(POINT, glm::vec3(0.2f), glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0.8f)));
-    lights_.push_back(point_light);
-    obj1->add_child(point_light);
-
-    const VertexAttribute position("Position", 3);
-    const VertexAttribute tex_coord("TexCoord", 2);
-    const VertexAttribute normal("Normal", 3);
-    VertexAttribute attributes[] = {position, tex_coord, normal};
-
-    mesh_ = new Mesh(attributes, std::size(attributes));
-    mesh_->add_entity(player_camera_);
-    mesh_->add_entity(obj1);
-    mesh_->add_entity(obj2);
-    mesh_->add_entity(obj3);
-    mesh_->add_entity(floor);
-    for (const std::shared_ptr<Entity>& light : lights_) mesh_->add_entity(light);
-    mesh_->compile();
-
-
-    const Shader vert("shader.vert", GL_VERTEX_SHADER);
-    const Shader frag("shader.frag", GL_FRAGMENT_SHADER);
-    Shader shaders[]{vert, frag};
-    program_ = new Program(shaders);
-
-
-    //Screen Mesh
-    VertexAttribute screen_attributes[] = {VertexAttribute("PosTex", 4)};
     screen_mesh_ = new Mesh(screen_attributes, std::size(screen_attributes));
-    Entity screen("Screen",
-                  new TransformComponent(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f)),
-                  new MeshComponent(vertices_quad, indices_quad, std::size(vertices_quad), std::size(indices_quad)));
-    screen_mesh_->add_entity(screen);
+    screen_mesh_->add_model("Quad", vertices_quad, std::size(vertices_quad), indices_quad, std::size(indices_quad));
     screen_mesh_->compile();
+    
 
     const Shader vert_screen("Screen/screen.vert", GL_VERTEX_SHADER);
     const Shader frag_screen("Screen/screen.frag", GL_FRAGMENT_SHADER);
@@ -212,10 +134,11 @@ Engine::Engine(const EngineArgs& args) : fps_plot_{}
     screen_fbo_->attach_texture_2d(screen_texture_, GL_COLOR_ATTACHMENT0);
     screen_fbo_->attach_renderbuffer(screen_rbo_, GL_DEPTH_STENCIL_ATTACHMENT);
     screen_fbo_->check_completeness();
-    textures_->add_texture(screen_fbo_->attached_textures.at(0).get());
+    //textures_->add_texture(screen_fbo_->attached_textures.at(0).get());
 
 
-    current_camera_ = editor_->is_visible ? editor_->camera : player_camera_.get();
+    current_camera_ = editor_->is_visible ? editor_->camera : player_camera_;
+    entity_selected_ = nullptr;
     
     is_fullscreen_ = false;
     fullscreen_toggle_ = true;
@@ -340,7 +263,7 @@ void Engine::update(const EngineArgs& args)
     {
         camera_toggle_ = false;
         if (current_camera_ != editor_->camera) current_camera_ = editor_->camera;
-        else if (current_camera_ != player_camera_.get()) current_camera_ = player_camera_.get();
+        else if (current_camera_ != player_camera_) current_camera_ = player_camera_;
     }
     else if (!camera_toggle_ && glfwGetKey(args.window, GLFW_KEY_INSERT) == GLFW_RELEASE) camera_toggle_ = true;
     
@@ -378,7 +301,7 @@ void Engine::render(const EngineArgs& args)
     //Draw
     if (cur_camera_comp->is_wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     
-    program_->draw(mesh_, lights_, current_camera_, cur_width, cur_height);
+    program_->draw(scene_.get(), current_camera_, cur_width, cur_height);
     
     if (cur_camera_comp->is_wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     screen_fbo_->unbind();
@@ -390,7 +313,7 @@ void Engine::render(const EngineArgs& args)
     if (!editor_->is_visible)
     {
         glDisable(GL_DEPTH_TEST);
-        screen_program->draw_screen(screen_mesh_, screen_fbo_->attached_textures.at(0)->get_handle()); //static_cast<unsigned int>(cur_camera_comp->clear_color[0] * 255)
+        screen_program->draw_screen(screen_mesh_, 0, screen_fbo_->attached_textures.at(0)->get_handle()); //static_cast<unsigned int>(cur_camera_comp->clear_color[0] * 255)
         glEnable(GL_DEPTH_TEST);
     }
     
@@ -399,16 +322,37 @@ void Engine::render(const EngineArgs& args)
     {
         editor_->set_main_dockspace();
 
+        //Viewport
         const ImVec4 old_bg = ImGui::GetStyle().Colors[2];
-        if (current_camera_ == player_camera_.get()) ImGui::GetStyle().Colors[2] = {0.5f, 0.2f, 0.2f, 0.7f};
+        if (current_camera_ == player_camera_) ImGui::GetStyle().Colors[2] = {0.5f, 0.2f, 0.2f, 0.7f};
         ImGui::Begin("Viewport");
         screen_fbo_->set_gui();
         ImVec2 pos = ImGui::GetWindowPos();
         pos.x += ImGui::GetWindowContentRegionMin().x + 10;
         pos.y += ImGui::GetWindowContentRegionMin().y + 10;
         ImGui::End();
-        if (current_camera_ == player_camera_.get()) ImGui::GetStyle().Colors[2] = old_bg;
+        if (current_camera_ == player_camera_) ImGui::GetStyle().Colors[2] = old_bg;
 
+        ImGui::Begin("Editor Camera");
+        dynamic_cast<CameraComponent*>(editor_->camera->components->at(CAMERA))->set_gui();
+        ImGui::End();
+        
+        mouse_->set_gui();
+
+        //Scene
+        if (ImGui::Begin("Scene Graph ##ENTITIES_GRAPH"))
+        {
+            editor_->set_scene_graph(scene_.get());
+        }
+        ImGui::End();
+        //Inspector
+        if (ImGui::Begin("Inspector ##ENTITIES_EDITOR"))
+        {
+            editor_->set_entity_inspector();
+        }
+        ImGui::End();
+
+        //Statistics
         if (editor_->show_statistics)
         {
             ImGui::SetNextWindowPos(pos, ImGuiCond_Always);
@@ -428,62 +372,9 @@ void Engine::render(const EngineArgs& args)
                     ImGui::Text("Viewport W: %i, H: %i", cur_width, cur_height);
                     ImGui::TreePop();
                 }
-                ImGui::End();
             }
+            ImGui::End();
         }
-
-        /*if (current_camera_ == player_camera_.get())
-        {
-            //ImGui::SetNextWindowPos(pos, ImGuiCond_Always);
-            ImGui::SetNextWindowBgAlpha(0.35f);
-            if (ImGui::Begin("InGame", &editor_->show_statistics, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
-            {
-                ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * 2.0f);
-                ImGui::Text("  IN GAME  ");
-                ImGui::PopFont();
-                ImGui::End();
-            }
-        }*/
-
-        ImGui::Begin("Editor Camera");
-        dynamic_cast<CameraComponent*>(editor_->camera->components->at(CAMERA))->set_gui();
-        ImGui::End();
-        
-        mouse_->set_gui();
-
-        if (ImGui::Begin("Entity Inspector ##Inspector"))
-        {
-            ImGui::PushStyleColor(ImGuiCol_ChildBg, ImGui::GetStyleColorVec4(ImGuiCol_FrameBg));
-            if (ImGui::BeginChild("##Entities", ImVec2(0, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_AlwaysAutoResize | ImGuiChildFlags_AutoResizeY))
-            {
-                ImGui::SeparatorText("Scene #1");
-                if (ImGui::BeginChild("##EntitiesInner", {-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing()}, ImGuiChildFlags_ResizeY))
-                {
-                    editor_->set_graph_children(mesh_->entities, entity_selected_);
-                    ImGui::EndChild();
-                }
-                ImGui::Button("Root", {-FLT_MIN, ImGui::GetTextLineHeightWithSpacing()});
-                if (ImGui::BeginDragDropTarget())
-                {
-                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CHILD_DND"))
-                    {
-                        IM_ASSERT(payload->DataSize == sizeof(std::weak_ptr<Entity>));
-                        const std::weak_ptr<Entity> payload_entity = *(std::weak_ptr<Entity>*)payload->Data;
-                        if (const std::shared_ptr<Entity> old_payload = payload_entity.lock())
-                            if (const std::shared_ptr<Entity> old_parent = old_payload->parent.lock())
-                                old_parent->remove_child(old_payload);
-                    }
-                    ImGui::EndDragDropTarget();
-                }
-                ImGui::EndChild();
-            }
-            ImGui::PopStyleColor();
-        
-            ImGui::BeginChild("##EntityInspect", {0, 0}, ImGuiChildFlags_Borders);
-            if (const std::shared_ptr<Entity> old_entity = entity_selected_.lock()) old_entity->set_gui();
-            ImGui::EndChild();
-        }
-        ImGui::End();
         
         if (editor_->show_imgui_demo) ImGui::ShowDemoWindow();
     }
@@ -491,4 +382,89 @@ void Engine::render(const EngineArgs& args)
     
     glfwSwapBuffers(args.window);
     glfwPollEvents();
+}
+
+
+void Engine::set_models_to_mesh(Mesh* mesh)
+{
+    float vertices_cube[] = {
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, // A 0
+        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f, // B 1
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f, // C 2
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f, // D 3
+
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, // E 4
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, // F 5
+        0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, // G 6
+        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // H 7
+
+        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, // D 8
+        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f, // A 9
+        -0.5f, -0.5f, 0.5f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f, // E 10
+        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, // H 11
+
+        0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // B 12
+        0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, // C 13
+        0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, // G 14
+        0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, // F 15
+
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, // A 16
+        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f, // B 17
+        0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f, // F 18
+        -0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f, // E 19
+
+        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, // C 20
+        -0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, // D 21
+        -0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, // H 22
+        0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f // G 23
+    };
+    unsigned int indices_cube[] = {
+        // front and back
+        0, 3, 2,
+        2, 1, 0,
+        4, 5, 6,
+        6, 7, 4,
+        // left and right
+        11, 8, 9,
+        9, 10, 11,
+        12, 13, 14,
+        14, 15, 12,
+        // bottom and top
+        16, 17, 18,
+        18, 19, 16,
+        20, 21, 22,
+        22, 23, 20
+    };
+    mesh->add_model("Cube", vertices_cube, std::size(vertices_cube), indices_cube, std::size(indices_cube));
+
+    float vertices_plane[] = {
+        1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        1.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        -1.0f, 0.0f, -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+        -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f
+    };
+    unsigned int indices_plane[] = {
+        0, 1, 2,
+        2, 3, 0
+    };
+    mesh->add_model("Plane", vertices_plane, std::size(vertices_plane), indices_plane, std::size(indices_plane));
+    
+    float vertices_paper[] = {
+        0.0f, 0.0f, 1.0f, 0.5f, 1.0f, 0.0f, 1.0f, 0.0f, // 0
+        -1.0f, -0.1f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, // 1
+        1.0f, -0.1f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, // 2
+        0.0f, 0.2f, -1.0f, 0.5f, 0.2f, 0.0f, 1.0f, 0.0f, // 3
+        -0.2f, 0.0f, -1.0f, 0.3f, 0.0f, 0.0f, 1.0f, 0.0f, // 4
+        0.2f, 0.0f, -1.0f, 0.7f, 0.0f, 0.0f, 1.0f, 0.0f // 5
+    };
+    unsigned int indices_paper[] = {
+        0, 4, 5,
+        0, 3, 4,
+        0, 5, 3,
+        1, 4, 3,
+        1, 3, 0,
+        2, 3, 5,
+        2, 0, 3
+    };
+    mesh->add_model("Paper plane", vertices_paper, std::size(vertices_paper), indices_paper, std::size(indices_paper));
 }

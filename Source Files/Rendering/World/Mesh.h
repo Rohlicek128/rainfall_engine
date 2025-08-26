@@ -2,8 +2,9 @@
 #include <memory>
 #include <vector>
 
-#include "IndexBuffer.h"
-#include "VertexArray.h"
+#include "ModelData.h"
+#include "../Buffers/IndexBuffer.h"
+#include "../Buffers/VertexArray.h"
 #include "../Entities/Entity.h"
 
 class Mesh
@@ -17,7 +18,7 @@ class Mesh
     unsigned int get_vertices_length();
     unsigned int get_indices_length();
 public:
-    std::vector<std::shared_ptr<Entity>> entities;
+    std::vector<std::unique_ptr<ModelData>> models;
     VertexAttribute* attributes;
     int attrib_lenght;
     
@@ -26,8 +27,7 @@ public:
     void unbind();
     void compile();
 
+    int get_model_indices_offset(int);
     int get_stride();
-    void add_entity(Entity&);
-    void add_entity(std::shared_ptr<Entity>);
-    Entity* find_entity_by_id(unsigned int);
+    void add_model(const std::string&, float[], int, unsigned int[], int);
 };

@@ -170,6 +170,7 @@
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
     <ClCompile Include="Source Files\Imgui\imgui.cpp" />
+    <ClCompile Include="Source Files\Imgui\ImGuizmo.cpp" />
     <ClCompile Include="Source Files\Imgui\imgui_demo.cpp" />
     <ClCompile Include="Source Files\Imgui\imgui_draw.cpp" />
     <ClCompile Include="Source Files\Imgui\imgui_impl_glfw.cpp" />
@@ -255,7 +256,6 @@
     <ClCompile Include="Source Files\Rendering\Buffers\Attributes\VertexAttribute.cpp" />
     <ClCompile Include="Source Files\Rendering\Buffers\IBindable.cpp" />
     <ClCompile Include="Source Files\Rendering\Buffers\IndexBuffer.cpp" />
-    <ClCompile Include="Source Files\Rendering\Buffers\Mesh.cpp" />
     <ClCompile Include="Source Files\Rendering\Buffers\Screen\Framebuffer.cpp" />
     <ClCompile Include="Source Files\Rendering\Buffers\Screen\Renderbuffer.cpp" />
     <ClCompile Include="Source Files\Rendering\Buffers\Textures\Texture.cpp" />
@@ -349,6 +349,82 @@
     <ClCompile Include="Source Files\Rendering\Gui\EditorManager.cpp" />
     <ClCompile Include="Source Files\Rendering\Shaders\Program.cpp" />
     <ClCompile Include="Source Files\Rendering\Shaders\Shader.cpp" />
+    <ClCompile Include="Source Files\Rendering\World\Mesh.cpp">
+      <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <Optimization>Disabled</Optimization>
+      <SupportJustMyCode>true</SupportJustMyCode>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerListingLocation>OpenGL_Engine\x64\Debug\</AssemblerListingLocation>
+      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+      <BrowseInformation>false</BrowseInformation>
+      <BrowseInformationFile>OpenGL_Engine\x64\Debug\</BrowseInformationFile>
+      <CompileAs>Default</CompileAs>
+      <UseDynamicDebugging>false</UseDynamicDebugging>
+      <ConformanceMode>true</ConformanceMode>
+      <DiagnosticsFormat>Column</DiagnosticsFormat>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <ErrorReporting>Prompt</ErrorReporting>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <EnableASAN>false</EnableASAN>
+      <EnableFuzzer>false</EnableFuzzer>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <EnableVectorLength>NotSet</EnableVectorLength>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <GenerateModuleDependencies>false</GenerateModuleDependencies>
+      <GenerateSourceDependencies>false</GenerateSourceDependencies>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <LanguageStandard>Default</LanguageStandard>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ModuleDependenciesFile>OpenGL_Engine\x64\Debug\</ModuleDependenciesFile>
+      <ModuleOutputFile>OpenGL_Engine\x64\Debug\</ModuleOutputFile>
+      <OmitDefaultLibName>false</OmitDefaultLibName>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <ObjectFileName>OpenGL_Engine\x64\Debug\</ObjectFileName>
+      <CallingConvention>Cdecl</CallingConvention>
+      <ProgramDataBaseFileName>OpenGL_Engine\x64\Debug\vc143.pdb</ProgramDataBaseFileName>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>OpenGL_Engine\x64\Debug\OpenGL_Engine.pch</PrecompiledHeaderOutputFile>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <RemoveUnreferencedCodeData>true</RemoveUnreferencedCodeData>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+      <ShowIncludes>false</ShowIncludes>
+      <SourceDependenciesFile>OpenGL_Engine\x64\Debug\</SourceDependenciesFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <SpectreMitigation>false</SpectreMitigation>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <TrackerLogDirectory>OpenGL_Engine\x64\Debug\OpenGL_Engine.tlog\</TrackerLogDirectory>
+      <TranslateIncludes>false</TranslateIncludes>
+      <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <UseFullPaths>true</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <XMLDocumentationFileName>OpenGL_Engine\x64\Debug\</XMLDocumentationFileName>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <IntelJCCErratum>false</IntelJCCErratum>
+      <BuildStlModules>false</BuildStlModules>
+      <TreatAngleIncludeAsExternal>false</TreatAngleIncludeAsExternal>
+      <ExternalWarningLevel>InheritWarningLevel</ExternalWarningLevel>
+      <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
+      <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <LinkCompiled>true</LinkCompiled>
+    </ClCompile>
     <ClCompile Include="Source Files\Rendering\World\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -359,6 +435,7 @@
     <ClInclude Include="includes\stb\stb_image.h" />
     <ClInclude Include="Source Files\Imgui\imconfig.h" />
     <ClInclude Include="Source Files\Imgui\imgui.h" />
+    <ClInclude Include="Source Files\Imgui\ImGuizmo.h" />
     <ClInclude Include="Source Files\Imgui\imgui_impl_glfw.h" />
     <ClInclude Include="Source Files\Imgui\imgui_impl_opengl3.h" />
     <ClInclude Include="Source Files\Imgui\imgui_impl_opengl3_loader.h" />
@@ -369,7 +446,6 @@
     <ClInclude Include="Source Files\Rendering\Buffers\Attributes\VertexAttribute.h" />
     <ClInclude Include="Source Files\Rendering\Buffers\IBindable.h" />
     <ClInclude Include="Source Files\Rendering\Buffers\IndexBuffer.h" />
-    <ClInclude Include="Source Files\Rendering\Buffers\Mesh.h" />
     <ClInclude Include="Source Files\Rendering\Buffers\Screen\Framebuffer.h" />
     <ClInclude Include="Source Files\Rendering\Buffers\Screen\Renderbuffer.h" />
     <ClInclude Include="Source Files\Rendering\Buffers\Textures\Texture.h" />
@@ -391,6 +467,8 @@
     <ClInclude Include="Source Files\Rendering\Gui\IGui.h" />
     <ClInclude Include="Source Files\Rendering\Shaders\Program.h" />
     <ClInclude Include="Source Files\Rendering\Shaders\Shader.h" />
+    <ClInclude Include="Source Files\Rendering\World\Mesh.h" />
+    <ClInclude Include="Source Files\Rendering\World\ModelData.h" />
     <ClInclude Include="Source Files\Rendering\World\Scene.h" />
   </ItemGroup>
   <ItemGroup>

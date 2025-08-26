@@ -17,12 +17,12 @@
 
 #include "Entities/Mouse.h"
 #include "Gui/EditorManager.h"
+#include "World/Scene.h"
 
 class Engine
 {
+    std::unique_ptr<Scene> scene_;
     Program* program_;
-    Mesh* mesh_;
-    std::vector<std::shared_ptr<Entity>> lights_;
 
     Program* screen_program;
     Mesh* screen_mesh_;
@@ -30,7 +30,7 @@ class Engine
     std::unique_ptr<Framebuffer> screen_fbo_;
     std::shared_ptr<Renderbuffer> screen_rbo_;
 
-    std::shared_ptr<Entity> player_camera_;
+    Entity* player_camera_;
     Entity* current_camera_;
     bool camera_toggle_;
     Mouse* mouse_;
@@ -53,10 +53,11 @@ class Engine
     bool fullscreen_toggle_;
     bool can_escape_;
     
-    std::weak_ptr<Entity> entity_selected_;
+    Entity* entity_selected_;
 
     void update_delta_time();
     void set_icon(GLFWwindow*, const std::string&);
+    void set_models_to_mesh(Mesh*);
 public:
     Engine(const EngineArgs&);
     ~Engine();

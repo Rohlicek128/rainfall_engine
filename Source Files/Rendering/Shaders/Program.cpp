@@ -6,6 +6,7 @@
 #include "../Entities/Components/CameraComponent.h"
 #include "../Entities/Components/LightComponent.h"
 #include "../Entities/Components/MaterialComponent.h"
+#include "../Entities/Components/MeshComponent.h"
 #include "../Entities/Components/TextureComponent.h"
 
 class MaterialComponent;
@@ -49,15 +50,15 @@ void Program::unbind()
 }
 
 
-void Program::draw(Mesh* mesh, const std::vector<std::shared_ptr<Entity>>& lights, const Entity* camera, const int width, const int height)
+void Program::draw(const Scene* scene, const Entity* camera, const int width, const int height)
 {
     bind();
-    mesh->bind();
+    scene->mesh->bind();
 
     //Lights
     int dir_index = 0;
     int point_index = 0;
-    for (const std::shared_ptr<Entity>& light : lights)
+    for (const Entity* light : scene->lights)
     {
         LightComponent* component = dynamic_cast<LightComponent*>(light->components->at(LIGHT));
         switch (component->type)
@@ -76,26 +77,20 @@ void Program::draw(Mesh* mesh, const std::vector<std::shared_ptr<Entity>>& light
     //Camera
     CameraComponent* camera_component = dynamic_cast<CameraComponent*>(camera->components->at(CAMERA));
     set_uniform("view_pos", camera->transform->position);
+    set_uniform("view", camera_component->get_view_matrix());
+    set_uniform("projection", camera_component->get_projection_matrix((float)width / (float)height));
     
     set_uniform("material.diffuse_map", 0);
     set_uniform("material.specular_map", 1);
 
     //Entities
-    int offset = 0;
-    for (const std::shared_ptr<Entity>& entity : mesh->entities)
+    for (const std::unique_ptr<Entity>& entity : scene->entities)
     {
-        if (entity->mesh == nullptr) continue;
-        if (!entity->is_visible)
-        {
-            offset += entity->mesh->inds_lenght; 
-            continue;
-        }
+        if (!entity->is_visible || !entity->component_exists(MESH)) continue;
 
-        glm::mat4 model = entity->get_model_matrix();
+        const glm::mat4 model = entity->get_model_matrix();
         set_uniform("model", model);
         set_uniform("inverse_model", glm::mat3(transpose(inverse(model))));
-        set_uniform("view", camera_component->get_view_matrix());
-        set_uniform("projection", camera_component->get_projection_matrix((float)width / (float)height));
         
         if (entity->component_exists(TEXTURE))
             dynamic_cast<TextureComponent*>(entity->components->at(TEXTURE))->active_bind(0);
@@ -130,16 +125,18 @@ void Program::draw(Mesh* mesh, const std::vector<std::shared_ptr<Entity>>& light
             set_uniform("material.shininess", 32.0f);
             set_uniform("is_light", 0);
         }
-        
-        glDrawElements(entity->mesh->primitive_type, entity->mesh->inds_lenght, GL_UNSIGNED_INT, (void*)(offset * sizeof(GLuint)));
-        offset += entity->mesh->inds_lenght; 
+
+        const MeshComponent* mesh = dynamic_cast<MeshComponent*>(entity->components->at(MESH));
+        if (mesh->model_index < 0 || mesh->model_index >= scene->mesh->models.size()) continue;
+        glDrawElements(mesh->primitive_type, scene->mesh->models.at(mesh->model_index)->indices_length,
+            GL_UNSIGNED_INT, (void*)(scene->mesh->get_model_indices_offset(mesh->model_index) * sizeof(GLuint)));
     }
 
-    mesh->unbind();
+    scene->mesh->unbind();
     unbind();
 }
 
-void Program::draw_screen(Mesh* mesh, const unsigned int texture_handle)
+void Program::draw_screen(Mesh* mesh, const int quad_index, const unsigned int texture_handle)
 {
     bind();
     mesh->bind();
@@ -148,18 +145,8 @@ void Program::draw_screen(Mesh* mesh, const unsigned int texture_handle)
     glBindTexture(GL_TEXTURE_2D, texture_handle);
     set_uniform("screen_texture", 0);
 
-    int offset = 0;
-    for (std::shared_ptr<Entity>& entity : mesh->entities)
-    {
-        if (entity->mesh == nullptr) continue;
-        if (!entity->is_visible)
-        {
-            offset += entity->mesh->inds_lenght; 
-            continue;
-        }
-        glDrawElements(entity->mesh->primitive_type, entity->mesh->inds_lenght, GL_UNSIGNED_INT, (void*)(offset * sizeof(GLuint)));
-        offset += entity->mesh->inds_lenght; 
-    }
+    glDrawElements(GL_TRIANGLES, mesh->models.at(quad_index)->indices_length,
+            GL_UNSIGNED_INT, (void*)(mesh->get_model_indices_offset(quad_index) * sizeof(GLuint)));
 
     mesh->unbind();
     unbind();

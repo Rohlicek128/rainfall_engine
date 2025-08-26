@@ -5,7 +5,8 @@
 #include "../../Imgui/imgui_impl_opengl3.h"
 
 #include "../Entities/Entity.h"
-#include "../Buffers/Mesh.h"
+#include "../World/Mesh.h"
+#include "../World/Scene.h"
 
 class EditorManager
 {
@@ -17,12 +18,18 @@ public:
 
     Entity* camera;
     ImGuiIO* imgui_io;
+
+    Entity* selected_entity;
     
     EditorManager(bool);
     ~EditorManager() = default;
     void init_imgui(GLFWwindow*);
     void set_main_dockspace();
-    void set_graph_children(const std::vector<std::shared_ptr<Entity>>&, std::weak_ptr<Entity>&, bool = true);
+    
+    void set_scene_graph(Scene*);
+    void set_entity_inspector();
+    void set_graph_children(const std::vector<Entity*>&, Entity*&);
+    
     void new_frame();
     void render();
 };

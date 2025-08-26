@@ -9,18 +9,18 @@
 
 unsigned int Entity::global_id_ = 0;
 
-Entity::Entity(const std::string& name, TransformComponent* transform, MeshComponent* mesh)
+Entity::Entity(const std::string& name, TransformComponent* transform)
 {
     id = ++global_id_;
     this->name = name;
     is_visible = true;
+    is_root = false;
 
     this->transform = transform;
-    this->mesh = mesh;
 
     components = new std::map<components_ids, Component*>();
     add_selected_ = -1;
-    //name.copy(name_edit_, std::size(name_edit_));
+    name.copy(name_edit_, std::size(name_edit_));
 }
 
 Entity::~Entity()
@@ -43,24 +43,24 @@ bool Entity::component_exists(const components_ids id)
     return components->count(id) && components->at(id)->is_enabled;
 }
 
-bool Entity::add_child(const std::shared_ptr<Entity>& child)
+bool Entity::add_child(Entity* child)
 {
-    if (child.get() == this) return false;
-    if (const std::shared_ptr<Entity> old_parent = child->parent.lock()) old_parent->remove_child(child);
+    if (child == this) return false;
+    if (child->parent != nullptr) child->parent->remove_child(child);
     
-    child->parent = shared_from_this();
+    child->parent = this;
     children.push_back(child);
     return true;
 }
 
-bool Entity::remove_child(const std::shared_ptr<Entity>& child)
+bool Entity::remove_child(Entity* child)
 {
     for (int i = 0; i < children.size(); ++i)
     {
         if (children.at(i) == child)
         {
             children.erase(children.begin() + i);
-            child->parent.reset();
+            child->parent = nullptr;
             return true;
         }
     }
@@ -69,17 +69,21 @@ bool Entity::remove_child(const std::shared_ptr<Entity>& child)
 
 glm::mat4 Entity::get_model_matrix()
 {
-    if (const std::shared_ptr<Entity> old_parent = parent.lock()) return old_parent->get_model_matrix() * transform->get_model_matrix();
+    if (!parent->is_root && parent != nullptr) return parent->get_model_matrix() * transform->get_model_matrix();
     return transform->get_model_matrix();
 }
 
 void Entity::set_gui()
 {
     ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * 2.0f);
-    ImGui::Text(name.c_str());
-    //ImGui::InputText("Name ##InputName", name_edit_, std::size(name_edit_));
-    //name = name_edit_;
+    ImGui::Selectable(name.c_str());
     ImGui::PopFont();
+    if (ImGui::BeginPopupContextItem())
+    {
+        ImGui::InputText("##InputName", name_edit_, std::size(name_edit_));
+        if (ImGui::Button("Rename")) name = name_edit_;
+        ImGui::EndPopup();
+    }
     ImGui::TextDisabled("ID: %i", id);
 
     ImGui::Separator();
@@ -87,7 +91,6 @@ void Entity::set_gui()
     ImGui::Checkbox("Is Visible", &is_visible);
 
     transform->set_gui();
-    if (mesh != nullptr) mesh->set_gui();
 
     bool is_opened;
     for (const auto component : *components)
@@ -102,7 +105,7 @@ void Entity::set_gui()
             component.second->set_gui();
             if (!component.second->is_enabled) ImGui::EndDisabled();
         }
-        if (!is_opened && component.first != MESH)
+        if (!is_opened)
         {
             components->erase(component.first);
             break;
@@ -119,7 +122,7 @@ void Entity::set_gui()
         ImGui::BeginChild("##SelectComponent", ImVec2(-FLT_MIN, 7 * ImGui::GetTextLineHeightWithSpacing()), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeY);
         for (int i = 1; i < 6; ++i)
         {
-            if (components->count((components_ids)i) || ((components_ids)i == MESH && mesh != nullptr)) continue;
+            if (components->count((components_ids)i)) continue;
             if (strcmp(component_search_, "") != 0 &&
                 !check_search_string(to_string((components_ids)i), component_search_, std::size(component_search_)))
                 continue;
@@ -136,7 +139,7 @@ void Entity::set_gui()
     switch ((components_ids)add_selected_)
     {
         case TRANSFORM: add_component(TRANSFORM, new TransformComponent(glm::vec3(0.0), glm::vec3(0.0), glm::vec3(1.0)));break;
-        case MESH: mesh = new MeshComponent({}, {}, 0, 0); break;
+        case MESH: add_component(MESH, new MeshComponent(0)); break;
         case CAMERA: add_component(CAMERA, new CameraComponent(transform)); break;
         case MATERIAL: add_component(MATERIAL, new MaterialComponent(glm::vec4(1.0))); break;
         case TEXTURE: add_component(TEXTURE, new TextureComponent(1, 1)); break;
