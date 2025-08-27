@@ -2,7 +2,7 @@
 
 #include "glad/glad.h"
 
-VertexArray::VertexArray(VertexBuffer* vbo, const VertexAttribute* attributes, int length)
+VertexArray::VertexArray(VertexBuffer* vbo, const std::vector<VertexAttribute>& attributes)
 {
     glGenVertexArrays(1, &handle_);
 
@@ -10,11 +10,11 @@ VertexArray::VertexArray(VertexBuffer* vbo, const VertexAttribute* attributes, i
     vbo->bind();
 
     int stride = 0;
-    for (int i = 0; i < length; ++i) stride += attributes[i].lenght;
+    for (int i = 0; i < attributes.size(); ++i) stride += attributes[i].lenght;
     stride *= sizeof(float);
 
     int offset = 0;
-    for (int i = 0; i < length; ++i)
+    for (int i = 0; i < attributes.size(); ++i)
     {
         glVertexAttribPointer(i, attributes[i].lenght, GL_FLOAT, GL_FALSE, stride, (void*)(offset * sizeof(float)));
         glEnableVertexAttribArray(i);

@@ -16,7 +16,7 @@ public:
     void unbind() override;
 
     void draw(const Scene*, const Entity*, int, int);
-    void draw_screen(Mesh*, int, unsigned int);
+    void draw_screen(Mesh*, int, float, float, unsigned int);
     
     void set_uniform(const char*, int);
     void set_uniform(const char*, float);

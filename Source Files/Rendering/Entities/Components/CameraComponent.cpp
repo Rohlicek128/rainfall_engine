@@ -25,6 +25,9 @@ CameraComponent::CameraComponent(TransformComponent* transform, const ImVec4 cle
     clear_color[1] = clear.y;
     clear_color[2] = clear.z;
     clear_color[3] = clear.w;
+
+    gamma = 2.2f;
+    exposure = 1.0f;
 }
 
 void CameraComponent::move(GLFWwindow* window, const float delta_time)
@@ -85,9 +88,11 @@ glm::mat4 CameraComponent::get_projection_matrix(const float ratio)
 
 void CameraComponent::set_gui()
 {
+    ImGui::SeparatorText("Rendering");
     ImGui::Checkbox("Wireframe", &is_wireframe);
-    ImGui::SeparatorText("Clear Color");
-    ImGui::ColorEdit4("##ClearColor", clear_color);
+    ImGui::SliderFloat("Gamma", &gamma, 0.0f, 10.0f, "%.1f");
+    ImGui::SliderFloat("Exposure", &exposure, 0.0f, 10.0f, "%.3f");
+    ImGui::ColorEdit4("Background", clear_color);
     
     ImGui::SeparatorText("Rotation");
     ImGui::PushItemWidth(150);

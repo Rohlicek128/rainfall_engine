@@ -59,14 +59,19 @@ void Framebuffer::unbind()
 
 void Framebuffer::set_gui()
 {
+    if (attached_textures.at(0) == nullptr) return;
+    
     ImVec2 window_size = ImGui::GetWindowContentRegionMax();
     window_size.x -= ImGui::GetWindowContentRegionMin().x;
     window_size.y -= ImGui::GetWindowContentRegionMin().y;
     if (attached_textures.at(0)->get_width() != (int)window_size.x || attached_textures.at(0)->get_height() != (int)window_size.y)
     {
         resize((int)window_size.x, (int)window_size.y);
-        attached_renderbuffer->resize((int)window_size.x, (int)window_size.y);
-        attach_renderbuffer(attached_renderbuffer, GL_DEPTH_STENCIL_ATTACHMENT);
+        if (attached_renderbuffer != nullptr)
+        {
+            attached_renderbuffer->resize((int)window_size.x, (int)window_size.y);
+            attach_renderbuffer(attached_renderbuffer, GL_DEPTH_STENCIL_ATTACHMENT);
+        }
     }
         
     ImGui::Image((ImTextureID)(intptr_t)attached_textures.at(0)->get_handle(),

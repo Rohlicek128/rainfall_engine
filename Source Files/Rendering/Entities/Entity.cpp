@@ -16,6 +16,8 @@ Entity::Entity(const std::string& name, TransformComponent* transform)
     is_visible = true;
     is_root = false;
 
+    mesh_ = nullptr;
+
     this->transform = transform;
 
     components = new std::map<components_ids, Component*>();
@@ -34,6 +36,7 @@ Entity& Entity::operator=(const Entity& other)
 
 bool Entity::add_component(components_ids id, Component* component)
 {
+    if (id == LIGHT && components->count(MESH) != 0) dynamic_cast<MeshComponent*>(components->at(MESH))->is_shaded = false;
     const auto result = components->insert(std::pair<components_ids, Component*>(id, component));
     return result.second;
 }
@@ -41,6 +44,14 @@ bool Entity::add_component(components_ids id, Component* component)
 bool Entity::component_exists(const components_ids id)
 {
     return components->count(id) && components->at(id)->is_enabled;
+}
+
+void Entity::set_mesh_to_component(Mesh* mesh)
+{
+    mesh_ = mesh;
+    if (components->count(MESH) == 0) return;
+
+    dynamic_cast<MeshComponent*>(components->at(MESH))->set_mesh_manager(mesh_);
 }
 
 bool Entity::add_child(Entity* child)
@@ -81,9 +92,16 @@ void Entity::set_gui()
     if (ImGui::BeginPopupContextItem())
     {
         ImGui::InputText("##InputName", name_edit_, std::size(name_edit_));
-        if (ImGui::Button("Rename")) name = name_edit_;
+        ImGui::SetNextItemShortcut(ImGuiKey_Enter);
+        if (ImGui::Button("Rename"))
+        {
+            name = name_edit_;
+            ImGui::CloseCurrentPopup();
+        }
         ImGui::EndPopup();
     }
+    ImGui::SetItemTooltip("Right-click to Rename");
+    
     ImGui::TextDisabled("ID: %i", id);
 
     ImGui::Separator();
@@ -139,11 +157,11 @@ void Entity::set_gui()
     switch ((components_ids)add_selected_)
     {
         case TRANSFORM: add_component(TRANSFORM, new TransformComponent(glm::vec3(0.0), glm::vec3(0.0), glm::vec3(1.0)));break;
-        case MESH: add_component(MESH, new MeshComponent(0)); break;
+        case MESH: add_component(MESH, new MeshComponent(0, GL_TRIANGLES, mesh_)); break;
         case CAMERA: add_component(CAMERA, new CameraComponent(transform)); break;
         case MATERIAL: add_component(MATERIAL, new MaterialComponent(glm::vec4(1.0))); break;
         case TEXTURE: add_component(TEXTURE, new TextureComponent(1, 1)); break;
-        case LIGHT: add_component(LIGHT, new LightComponent(DIRECTIONAL, glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(0.8f))); break;
+        case LIGHT: add_component(LIGHT, new LightComponent(POINT, glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(0.7f))); break;
     }
     add_selected_ = -1;
 }

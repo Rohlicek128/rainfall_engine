@@ -13,7 +13,7 @@ class Texture : public IBindable
     
     unsigned char* load_image(const std::string&);
 public:
-    Texture(const std::string&, GLenum = GL_RGB, GLenum = GL_UNSIGNED_BYTE);
+    Texture(const std::string&, GLenum = GL_RGB8, GLenum = GL_RGB, GLenum = GL_UNSIGNED_BYTE);
     Texture(int, int, GLenum = GL_RGB8, GLenum = GL_RGB, GLenum = GL_UNSIGNED_BYTE);
     ~Texture() override;
     std::string& get_path();

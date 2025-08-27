@@ -38,46 +38,46 @@ uniform DirLight dir_lights[NR_DIRECTIONAL_LIGHTS];
 #define NR_POINT_LIGHTS 1
 uniform PointLight point_lights[NR_POINT_LIGHTS];
 
-uniform int is_light;
+uniform int is_shaded;
 uniform vec3 view_pos;
 uniform Material material;
 
-vec3 CalcDirLight(DirLight light, vec3 view_dir, vec3 albedo_mat, vec3 specular_mat, vec3 normal_mat){
+vec3 CalcDirLight(DirLight light, vec3 view_dir, vec3 albedo_material, vec3 specular_material, vec3 normal_material){
 	vec3 dir_light_norm = normalize(-light.direction);
 
 	//Diffuse
-	float diff = max(dot(normal_mat, dir_light_norm), 0.0);
+	float diff = max(dot(normal_material, dir_light_norm), 0.0);
 
 	//Specular
-	float spec = pow(max(dot(view_dir, reflect(-dir_light_norm, normal_mat)), 0.0), material.shininess);
+	float spec = pow(max(dot(normal_material, normalize(dir_light_norm + view_dir)), 0.0), material.shininess);
 
 	//Result
-	vec3 ambient = light.ambient * albedo_mat;
-	vec3 diffuse = light.diffuse * diff * albedo_mat;
-	vec3 specular = light.specular * spec * specular_mat;
+	vec3 ambient = light.ambient * albedo_material;
+	vec3 diffuse = light.diffuse * diff * albedo_material;
+	vec3 specular = light.specular * spec * specular_material;
 	
-	return (ambient + diffuse + specular) * (1 - is_light) + albedo_mat * is_light;
+	return (ambient + diffuse + specular) * is_shaded + albedo_material * (1 - is_shaded);
 }
 
-vec3 CalcPointLight(PointLight light, vec3 view_dir, vec3 albedo_mat, vec3 specular_mat, vec3 normal_mat){
+vec3 CalcPointLight(PointLight light, vec3 view_dir, vec3 albedo_material, vec3 specular_material, vec3 normal_material){
 	vec3 dir_light_norm = normalize(light.position - vFragPos);
 
 	//Diffuse
-	float diff = max(dot(normal_mat, dir_light_norm), 0.0);
+	float diff = max(dot(normal_material, dir_light_norm), 0.0);
 
 	//Specular
-	float spec = pow(max(dot(view_dir, reflect(-dir_light_norm, normal_mat)), 0.0), material.shininess);
+	float spec = pow(max(dot(normal_material, normalize(dir_light_norm + view_dir)), 0.0), material.shininess);
 
 	//Attenuation
 	float distance = length(light.position - vFragPos);
 	float attenuation = 1.0 / (light.attenuation_params.x + light.attenuation_params.y * distance + light.attenuation_params.z * (distance * distance));
 	
 	//Result
-	vec3 ambient = light.ambient * albedo_mat  * attenuation;
-	vec3 diffuse = light.diffuse * diff * albedo_mat  * attenuation;
-	vec3 specular = light.specular * spec * specular_mat  * attenuation;
+	vec3 ambient = light.ambient * albedo_material  * attenuation;
+	vec3 diffuse = light.diffuse * diff * albedo_material  * attenuation;
+	vec3 specular = light.specular * spec * specular_material  * attenuation;
 
-	return (ambient + diffuse + specular) * (1 - is_light) + albedo_mat * is_light;
+	return (ambient + diffuse + specular) * is_shaded + albedo_material * (1 - is_shaded);
 }
 
 void main(){
@@ -94,6 +94,5 @@ void main(){
 	for (int i = 0; i < NR_POINT_LIGHTS; ++i){
 		if (point_lights[i].is_lighting) result += CalcPointLight(point_lights[i], view_dir, albedo, specular, normal);
 	}
-	
     pixel_color = vec4(result, 1.0);
 }

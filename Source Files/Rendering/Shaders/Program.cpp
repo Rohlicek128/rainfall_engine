@@ -112,7 +112,6 @@ void Program::draw(const Scene* scene, const Entity* camera, const int width, co
                 dynamic_cast<LightComponent*>(entity->components->at(LIGHT))->diffuse *
                     dynamic_cast<LightComponent*>(entity->components->at(LIGHT))->intensity);
             set_uniform("material.shininess", 32.0f);
-            set_uniform("is_light", 1);
         }
         else
         {
@@ -123,20 +122,28 @@ void Program::draw(const Scene* scene, const Entity* camera, const int width, co
             }
             set_uniform("material.color", 1.0, 1.0, 1.0);
             set_uniform("material.shininess", 32.0f);
-            set_uniform("is_light", 0);
         }
 
         const MeshComponent* mesh = dynamic_cast<MeshComponent*>(entity->components->at(MESH));
-        if (mesh->model_index < 0 || mesh->model_index >= scene->mesh->models.size()) continue;
-        glDrawElements(mesh->primitive_type, scene->mesh->models.at(mesh->model_index)->indices_length,
+        set_uniform("is_shaded", mesh->is_shaded);
+        if (const ModelData* model_data = scene->mesh->get_model(mesh->model_index))
+        {
+            if (!mesh->is_culled) glDisable(GL_CULL_FACE);
+            else if (mesh->is_inverted) glCullFace(GL_FRONT);
+            
+            glDrawElements(mesh->primitive_type, model_data->indices_length,
             GL_UNSIGNED_INT, (void*)(scene->mesh->get_model_indices_offset(mesh->model_index) * sizeof(GLuint)));
+
+            if (!mesh->is_culled) glEnable(GL_CULL_FACE);
+            else if (mesh->is_inverted) glCullFace(GL_BACK);
+        }
     }
 
     scene->mesh->unbind();
     unbind();
 }
 
-void Program::draw_screen(Mesh* mesh, const int quad_index, const unsigned int texture_handle)
+void Program::draw_screen(Mesh* mesh, const int quad_index, const float gamma, const float exposure, const unsigned int texture_handle)
 {
     bind();
     mesh->bind();
@@ -145,8 +152,14 @@ void Program::draw_screen(Mesh* mesh, const int quad_index, const unsigned int t
     glBindTexture(GL_TEXTURE_2D, texture_handle);
     set_uniform("screen_texture", 0);
 
-    glDrawElements(GL_TRIANGLES, mesh->models.at(quad_index)->indices_length,
+    set_uniform("gamma", gamma);
+    set_uniform("exposure", exposure);
+
+    if (const ModelData* model_data = mesh->get_model(quad_index))
+    {
+        glDrawElements(GL_TRIANGLES, model_data->indices_length,
             GL_UNSIGNED_INT, (void*)(mesh->get_model_indices_offset(quad_index) * sizeof(GLuint)));
+    }
 
     mesh->unbind();
     unbind();

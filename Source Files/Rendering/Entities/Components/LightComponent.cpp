@@ -107,9 +107,9 @@ void LightComponent::set_gui()
     {
         ImGui::SeparatorText("Attenuation");
         ImGui::PushItemWidth(200);
-        ImGui::DragFloat("Constant", &attenuation_params.x, 0.01f, 0, 0, "%.6f");
-        ImGui::DragFloat("Linear", &attenuation_params.y, 0.001f, 0, 0, "%.6f");
-        ImGui::DragFloat("Quadratic", &attenuation_params.z, 0.0001f, 0, 0, "%.6f");
+        ImGui::DragFloat("Constant", &attenuation_params.x, 0.01f, 0, 0, "%.4f");
+        ImGui::DragFloat("Linear", &attenuation_params.y, 0.001f, 0, 0, "%.4f");
+        ImGui::DragFloat("Quadratic", &attenuation_params.z, 0.0001f, 0, 0, "%.4f");
         ImGui::PopItemWidth();
     }
 }

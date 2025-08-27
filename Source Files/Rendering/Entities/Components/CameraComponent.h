@@ -19,6 +19,9 @@ public:
     float speed;
     float clear_color[4];
 
+    float gamma;
+    float exposure;
+
     bool is_wireframe;
     
     CameraComponent(TransformComponent*, ImVec4 = {0.1f, 0.1f, 0.1f, 1.0f});

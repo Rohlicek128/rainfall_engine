@@ -24,13 +24,12 @@ class Engine
     std::unique_ptr<Scene> scene_;
     Program* program_;
 
-    Program* screen_program;
+    Program* screen_program_;
     Mesh* screen_mesh_;
     std::shared_ptr<Texture> screen_texture_;
     std::unique_ptr<Framebuffer> screen_fbo_;
     std::shared_ptr<Renderbuffer> screen_rbo_;
-
-    Entity* player_camera_;
+    
     Entity* current_camera_;
     bool camera_toggle_;
     Mouse* mouse_;
@@ -46,7 +45,7 @@ class Engine
     int display_frame_count_;
     int last_uptime_;
     int max_fps_plot_;
-    float fps_plot_[20];
+    float fps_plot_[60];
     std::deque<int> fps_history_;
     
     bool is_fullscreen_;

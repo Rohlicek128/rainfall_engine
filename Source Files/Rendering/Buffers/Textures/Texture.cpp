@@ -3,10 +3,10 @@
 #include <iostream>
 #include <stb/stb_image.h>
 
-Texture::Texture(const std::string& path, const GLenum format, const GLenum type)
+Texture::Texture(const std::string& path, const GLenum internal_format, const GLenum format, const GLenum type)
 {
     path_ = path;
-    internal_format_ = format;
+    internal_format_ = internal_format;
     format_ = format;
     type_ = type;
     
@@ -21,7 +21,7 @@ Texture::Texture(const std::string& path, const GLenum format, const GLenum type
     void* data = load_image(path);
     if (data)
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width_, height_, 0, format, type, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, internal_format_, width_, height_, 0, format_, type_, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else

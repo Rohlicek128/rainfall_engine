@@ -40,8 +40,6 @@ GLFWwindow* init_window(const int width, const int height, const char* window_na
     {
         throw "Initialize GLAD: FAILED";
     }
-    
-    glfwSetInputMode(window, GLFW_CURSOR,  GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouse_callback);
     
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);

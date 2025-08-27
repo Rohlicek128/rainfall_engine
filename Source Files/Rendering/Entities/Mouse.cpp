@@ -2,7 +2,7 @@
 
 #include <string>
 
-Mouse::Mouse(const int width, const int height, float sens)
+Mouse::Mouse(const int width, const int height, const float sens, const bool visible)
 {
     last_x = width / 2;
     last_y = height / 2;
@@ -11,7 +11,7 @@ Mouse::Mouse(const int width, const int height, float sens)
     sensitivity = sens;
 
     first_move = true;
-    is_visible = false;
+    is_visible = visible;
 }
 
 void Mouse::set_gui()
