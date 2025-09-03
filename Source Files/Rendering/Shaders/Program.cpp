@@ -2,41 +2,37 @@
 
 #include <iostream>
 
-#include "../Buffers/Textures/Texture.h"
-#include "../Entities/Components/CameraComponent.h"
-#include "../Entities/Components/LightComponent.h"
-#include "../Entities/Components/MaterialComponent.h"
-#include "../Entities/Components/MeshComponent.h"
-#include "../Entities/Components/TextureComponent.h"
+#include <glad/glad.h>
 
 class MaterialComponent;
 
-Program::Program(const Shader* shaders)
+Program::Program(const std::vector<Shader>& shaders)
 {
     handle_ = glCreateProgram();
 
-    for (int i = 0; i < sizeof(shaders) / sizeof(*shaders); ++i)
-    {
+    for (int i = 0; i < shaders.size(); ++i)
         glAttachShader(handle_, shaders[i].get_handle());
-    }
     glLinkProgram(handle_);
+
+    is_successful();
     
-    int success;
-    char info_log[512];
-    glGetProgramiv(handle_, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(handle_, 512, nullptr, info_log);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << info_log << std::endl;
-    }
-    
-    for (int i = 0; i < sizeof(shaders) / sizeof(*shaders); ++i)
-    {
+    for (int i = 0; i < shaders.size(); ++i)
         glDetachShader(handle_, shaders[i].get_handle());
-    }
 }
 Program::~Program()
 {
     glDeleteProgram(handle_);
+}
+
+void Program::is_successful()
+{
+    int success;
+    char info_log[512];
+    glGetProgramiv(handle_, GL_LINK_STATUS, &success);
+    if (!success) {
+        glGetProgramInfoLog(handle_, std::size(info_log), nullptr, info_log);
+        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << info_log << std::endl;
+    }
 }
 
 void Program::bind()
@@ -49,121 +45,6 @@ void Program::unbind()
     glUseProgram(0);
 }
 
-
-void Program::draw(const Scene* scene, const Entity* camera, const int width, const int height)
-{
-    bind();
-    scene->mesh->bind();
-
-    //Lights
-    int dir_index = 0;
-    int point_index = 0;
-    for (const Entity* light : scene->lights)
-    {
-        LightComponent* component = dynamic_cast<LightComponent*>(light->components->at(LIGHT));
-        switch (component->type)
-        {
-            case DIRECTIONAL:
-                component->set_uniforms(this, dir_index, light->transform);
-                dir_index++;
-                break;
-            case POINT:
-                component->set_uniforms(this, point_index, light->transform);
-                point_index++;
-                break;
-        }
-    }
-    
-    //Camera
-    CameraComponent* camera_component = dynamic_cast<CameraComponent*>(camera->components->at(CAMERA));
-    set_uniform("view_pos", camera->transform->position);
-    set_uniform("view", camera_component->get_view_matrix());
-    set_uniform("projection", camera_component->get_projection_matrix((float)width / (float)height));
-    
-    set_uniform("material.diffuse_map", 0);
-    set_uniform("material.specular_map", 1);
-
-    //Entities
-    for (const std::unique_ptr<Entity>& entity : scene->entities)
-    {
-        if (!entity->is_visible || !entity->component_exists(MESH)) continue;
-
-        const glm::mat4 model = entity->get_model_matrix();
-        set_uniform("model", model);
-        set_uniform("inverse_model", glm::mat3(transpose(inverse(model))));
-        
-        if (entity->component_exists(TEXTURE))
-            dynamic_cast<TextureComponent*>(entity->components->at(TEXTURE))->active_bind(0);
-        else
-        {
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, 1);
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, 1);
-        }
-        
-        if (entity->component_exists(MATERIAL))
-        {
-            dynamic_cast<MaterialComponent*>(entity->components->at(MATERIAL))->set_uniforms(this);
-        }
-        else if (entity->component_exists(LIGHT))
-        {
-            set_uniform("material.color",
-                dynamic_cast<LightComponent*>(entity->components->at(LIGHT))->diffuse *
-                    dynamic_cast<LightComponent*>(entity->components->at(LIGHT))->intensity);
-            set_uniform("material.shininess", 32.0f);
-        }
-        else
-        {
-            if (!entity->component_exists(TEXTURE))
-            {
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, 3);
-            }
-            set_uniform("material.color", 1.0, 1.0, 1.0);
-            set_uniform("material.shininess", 32.0f);
-        }
-
-        const MeshComponent* mesh = dynamic_cast<MeshComponent*>(entity->components->at(MESH));
-        set_uniform("is_shaded", mesh->is_shaded);
-        if (const ModelData* model_data = scene->mesh->get_model(mesh->model_index))
-        {
-            if (!mesh->is_culled) glDisable(GL_CULL_FACE);
-            else if (mesh->is_inverted) glCullFace(GL_FRONT);
-            
-            glDrawElements(mesh->primitive_type, model_data->indices_length,
-            GL_UNSIGNED_INT, (void*)(scene->mesh->get_model_indices_offset(mesh->model_index) * sizeof(GLuint)));
-
-            if (!mesh->is_culled) glEnable(GL_CULL_FACE);
-            else if (mesh->is_inverted) glCullFace(GL_BACK);
-        }
-    }
-
-    scene->mesh->unbind();
-    unbind();
-}
-
-void Program::draw_screen(Mesh* mesh, const int quad_index, const float gamma, const float exposure, const unsigned int texture_handle)
-{
-    bind();
-    mesh->bind();
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture_handle);
-    set_uniform("screen_texture", 0);
-
-    set_uniform("gamma", gamma);
-    set_uniform("exposure", exposure);
-
-    if (const ModelData* model_data = mesh->get_model(quad_index))
-    {
-        glDrawElements(GL_TRIANGLES, model_data->indices_length,
-            GL_UNSIGNED_INT, (void*)(mesh->get_model_indices_offset(quad_index) * sizeof(GLuint)));
-    }
-
-    mesh->unbind();
-    unbind();
-}
 
 void Program::set_uniform(const char* name, const int value)
 {

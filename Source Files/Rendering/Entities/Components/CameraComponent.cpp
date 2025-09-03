@@ -17,7 +17,7 @@ CameraComponent::CameraComponent(TransformComponent* transform, const ImVec4 cle
     near_plane = 0.1f;
     far_plane = 1000.0f;
 
-    speed = 5.0f;
+    speed = 10.0f;
 
     is_wireframe = false;
 
@@ -91,7 +91,7 @@ void CameraComponent::set_gui()
     ImGui::SeparatorText("Rendering");
     ImGui::Checkbox("Wireframe", &is_wireframe);
     ImGui::SliderFloat("Gamma", &gamma, 0.0f, 10.0f, "%.1f");
-    ImGui::SliderFloat("Exposure", &exposure, 0.0f, 10.0f, "%.3f");
+    ImGui::SliderFloat("Exposure", &exposure, 0.0f, 100.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
     ImGui::ColorEdit4("Background", clear_color);
     
     ImGui::SeparatorText("Rotation");

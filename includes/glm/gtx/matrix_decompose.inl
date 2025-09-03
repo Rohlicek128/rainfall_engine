@@ -1,5 +1,7 @@
 /// @ref gtx_matrix_decompose
 
+#include <glm/gtc/quaternion.hpp>
+
 #include "../gtc/constants.hpp"
 #include "../gtc/epsilon.hpp"
 #include "../gtx/transform.hpp"

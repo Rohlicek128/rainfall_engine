@@ -2,6 +2,9 @@
 #include <memory>
 #include <vector>
 
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+
 #include "ModelData.h"
 #include "../Buffers/IndexBuffer.h"
 #include "../Buffers/VertexArray.h"
@@ -16,6 +19,9 @@ class Mesh : public IGui
     std::vector<std::unique_ptr<ModelData>> models_;
     int selected_mesh_;
 
+    bool add_tangent_;
+    int stride_;
+    glm::vec3 calculate_tangent(const glm::vec3&, const glm::vec3&, const glm::vec3&, const glm::vec2&, const glm::vec2&, const glm::vec2&);
     float* concat_vertices();
     unsigned int* concat_indices();
     unsigned int get_vertices_length();
@@ -23,7 +29,7 @@ class Mesh : public IGui
 public:
     std::vector<VertexAttribute> attributes;
     
-    Mesh(const std::vector<VertexAttribute>&);
+    Mesh(const std::vector<VertexAttribute>&, bool = false);
     void bind();
     void unbind();
     void compile();

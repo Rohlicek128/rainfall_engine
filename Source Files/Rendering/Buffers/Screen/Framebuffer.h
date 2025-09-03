@@ -10,14 +10,16 @@
 class Framebuffer : public IBindable, public IGui
 {
 public:
-    std::vector<std::shared_ptr<Texture>> attached_textures;
-    std::shared_ptr<Renderbuffer> attached_renderbuffer;
+    std::vector<std::unique_ptr<Texture>> attached_textures;
+    std::unique_ptr<Renderbuffer> attached_renderbuffer;
     
     Framebuffer();
     ~Framebuffer() override;
-    void attach_texture_2d(const std::shared_ptr<Texture>&, GLenum);
-    void attach_renderbuffer(const std::shared_ptr<Renderbuffer>&, GLenum);
+    void attach_texture_2d(std::unique_ptr<Texture>, GLenum);
+    void attach_renderbuffer(std::unique_ptr<Renderbuffer>, GLenum);
     bool check_completeness();
+    
+    void set_draw_buffers();
     void resize(int, int);
     void bind() override;
     void unbind() override;

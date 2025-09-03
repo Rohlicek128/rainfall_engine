@@ -24,12 +24,12 @@ void main(){
 	
 	//Exposure Reinhart
 	vec3 mapped = vec3(1.0) - exp(-color * exposure);
-	
 	//vec3 mapped = Tonemap_ACES(color);
 	
 	//Gamma
 	mapped = pow(mapped, vec3(1.0 / gamma));
 	
+	//vec4 val = textureLod(screen_texture, vTexCoord, 0.0);
 	pixel_color = vec4(mapped, 1.0);
 	//pixel_color = vec4(1.0, 0.0, 0.0, 1.0);
 }

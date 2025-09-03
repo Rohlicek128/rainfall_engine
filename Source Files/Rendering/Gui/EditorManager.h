@@ -5,9 +5,7 @@
 #include "../../Imgui/imgui_impl_opengl3.h"
 #include "../Buffers/Screen/Framebuffer.h"
 
-#include "../Entities/Entity.h"
-#include "../World/Mesh.h"
-#include "../World/Scene.h"
+class Mesh;
 
 class EditorManager
 {
@@ -16,6 +14,8 @@ public:
     bool toggle_visibility;
     bool show_imgui_demo;
     bool show_statistics;
+
+    int gizmo_operation;
     
     ImGuiIO* imgui_io;
 

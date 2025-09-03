@@ -1,22 +1,21 @@
 #pragma once
-#include "Shader.h"
-#include "../World//Mesh.h"
-#include "../Buffers/Textures/Texture.h"
-#include "../World/Scene.h"
+
+#include "../Buffers/IBindable.h"
 #include "glm/vec3.hpp"
 #include "glm/mat4x4.hpp"
 #include "glm/mat3x3.hpp"
 
+#include "../World/Scene.h"
+#include "Shader.h"
+
 class Program : public IBindable
 {
 public:
-    Program(const Shader*);
+    Program(const std::vector<Shader>&);
     ~Program() override;
+    void is_successful();
     void bind() override;
     void unbind() override;
-
-    void draw(const Scene*, const Entity*, int, int);
-    void draw_screen(Mesh*, int, float, float, unsigned int);
     
     void set_uniform(const char*, int);
     void set_uniform(const char*, float);

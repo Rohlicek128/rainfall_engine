@@ -2,12 +2,18 @@
 
 #include <iostream>
 
-Mesh::Mesh(const std::vector<VertexAttribute>& attribs)
+Mesh::Mesh(const std::vector<VertexAttribute>& attribs, const bool tangent)
 {
     vbo_ = nullptr;
     ebo_ = nullptr;
     vao_ = nullptr;
     attributes = attribs;
+    
+    add_tangent_ = tangent;
+    if (add_tangent_) attributes.emplace_back("Tangent", 3);
+    
+    stride_ = 0;
+    stride_ = get_stride();
 
     selected_mesh_ = 0;
 }
@@ -50,6 +56,7 @@ int Mesh::get_model_indices_offset(const int index)
 
 int Mesh::get_stride()
 {
+    if (stride_ != 0 || attributes.empty()) return stride_;
     int stride = 0;
     for (int i = 0; i < attributes.size(); ++i) stride += attributes.at(i).lenght;
     return stride;
@@ -60,7 +67,8 @@ void Mesh::add_model(const std::string& name, float verts[], const int v_length,
     std::unique_ptr<ModelData> model = std::make_unique<ModelData>();
     model->name = name;
 
-    model->vertices_length = v_length;
+    if (!add_tangent_) model->vertices_length = v_length;
+    else model->vertices_length = v_length + v_length / (get_stride() - 3) * 3;
     model->vertices = new float[v_length];
     std::copy_n(verts, v_length, model->vertices);
 
@@ -77,6 +85,22 @@ ModelData* Mesh::get_model(const int index)
     return models_.at(index).get();
 }
 
+glm::vec3 Mesh::calculate_tangent(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3, const glm::vec2& uv1, const glm::vec2& uv2, const glm::vec2& uv3)
+{
+    const glm::vec3 e1 = v2 - v1;
+    const glm::vec3 e2 = v3 - v1;
+    const glm::vec2 d1 = uv2 - uv1;
+    const glm::vec2 d2 = uv3 - uv1;
+
+    const float f = 1.0f / (d1.x * d2.y - d2.x * d1.y);
+
+    return {
+        f * (d2.y * e1.x - d1.y * e2.x),
+        f * (d2.y * e1.y - d1.y * e2.y),
+        f * (d2.y * e1.z - d1.y * e2.z)
+    };
+}
+
 float* Mesh::concat_vertices()
 {
     int size = 0;
@@ -88,13 +112,53 @@ float* Mesh::concat_vertices()
     
     float* verts = new float[size];
     int offset = 0;
+    const int tangent_stride = add_tangent_ ? attributes.back().lenght : 0;
     for (const std::unique_ptr<ModelData>& model : models_)
     {
         if (model == nullptr) continue;
-        
-        for (int j = 0; j < model->vertices_length; ++j)
+
+        glm::vec3 t_pos[3] {glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(0.0f)};
+        glm::vec2 t_uv[3] {glm::vec2(0.0f), glm::vec2(0.0f), glm::vec2(0.0f)};
+        for (int i = 0; i < model->indices_length / 3; ++i) // Each triangle
         {
-            verts[offset + j] = model->vertices[j];
+            for (int j = 0; j < 3; ++j) // Each vertex
+            {
+                t_pos[j].x = model->vertices[model->indices[i * 3 + j] * (stride_ - tangent_stride) + 0];
+                t_pos[j].y = model->vertices[model->indices[i * 3 + j] * (stride_ - tangent_stride) + 1];
+                t_pos[j].z = model->vertices[model->indices[i * 3 + j] * (stride_ - tangent_stride) + 2];
+                verts[offset + model->indices[i * 3 + j] * stride_ + 0] = t_pos[j].x;
+                verts[offset + model->indices[i * 3 + j] * stride_ + 1] = t_pos[j].y;
+                verts[offset + model->indices[i * 3 + j] * stride_ + 2] = t_pos[j].z;
+                
+                t_uv[j].x = model->vertices[model->indices[i * 3 + j] * (stride_ - tangent_stride) + 3];
+                t_uv[j].y = model->vertices[model->indices[i * 3 + j] * (stride_ - tangent_stride) + 4];
+                verts[offset + model->indices[i * 3 + j] * stride_ + 3] = t_uv[j].x;
+                verts[offset + model->indices[i * 3 + j] * stride_ + 4] = t_uv[j].y;
+            }
+
+            glm::vec3 tangent;
+            if (add_tangent_) tangent = calculate_tangent(t_pos[0], t_pos[1], t_pos[2], t_uv[0], t_uv[1], t_uv[2]);
+
+            for (int j = 0; j < 3; ++j)
+            {
+                for (int k = 5; k < stride_ - tangent_stride; ++k)
+                    verts[offset + model->indices[i * 3 + j] * stride_ + k] = model->vertices[model->indices[i * 3 + j] * (stride_ - tangent_stride) + k];
+                if (add_tangent_)
+                {
+                    verts[offset + model->indices[i * 3 + j] * stride_ + (stride_ - 3)] = tangent.x;
+                    verts[offset + model->indices[i * 3 + j] * stride_ + (stride_ - 2)] = tangent.y;
+                    verts[offset + model->indices[i * 3 + j] * stride_ + (stride_ - 1)] = tangent.z;
+                }
+            }
+            /*if (add_tangent_)
+            {
+                for (int j = 0; j < 3; ++j)
+                {
+                    for (int k = 0; k < stride_; ++k)
+                        std::cout << verts[offset + model->indices[i * 3 + j] * stride_ + k] << ' ';
+                    std::cout << '\n';
+                }
+            }*/
         }
         offset += model->vertices_length;
     }

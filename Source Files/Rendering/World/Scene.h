@@ -1,8 +1,12 @@
 #pragma once
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "Mesh.h"
+#include "../Gui/IGui.h"
+
+class Entity;
 
 class Scene : public IGui
 {
@@ -13,9 +17,12 @@ public:
     std::vector<std::unique_ptr<Entity>> entities;
     std::vector<Entity*> lights;
     std::unique_ptr<Mesh> mesh;
-
+    
     std::unique_ptr<Entity> editor_camera;
     Entity* player_camera;
+    Entity* current_camera;
+    
+    std::unique_ptr<Entity> skybox;
 
     
     bool opened_gui;

@@ -3,6 +3,8 @@
 #include <fstream>
 #include <iostream>
 
+#include "glad/glad.h"
+
 std::string Shader::read_file(const char* path) const
 {
     std::ifstream file(path);
@@ -10,7 +12,7 @@ std::string Shader::read_file(const char* path) const
     return file_contents;
 }
 
-Shader::Shader(const std::string& path, const GLenum type)
+Shader::Shader(const std::string& path, const int type)
 {
     handle_ = glCreateShader(type);
 

@@ -2,7 +2,9 @@
 #include <glm/vec3.hpp>
 
 #include "Component.h"
-#include "../../Shaders/Program.h"
+
+class Program;
+class TransformComponent;
 
 enum light_type
 {

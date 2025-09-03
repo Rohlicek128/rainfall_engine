@@ -4,9 +4,9 @@
 #include <vector>
 
 #include "../Gui/IGui.h"
-#include "../World/Mesh.h"
 #include "Components/TransformComponent.h"
-#include "Components/MeshComponent.h"
+
+class Mesh;
 
 class Entity : public IGui
 {

@@ -19,6 +19,12 @@ void mouse_callback(GLFWwindow*, double x, double y)
     render_args.mouse_y = static_cast<float>(y);
 }
 
+void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    render_args.scroll_x = static_cast<float>(xoffset);
+    render_args.scroll_y = static_cast<float>(yoffset);
+}
+
 GLFWwindow* init_window(const int width, const int height, const char* window_name)
 {
     glfwInit();
@@ -41,6 +47,7 @@ GLFWwindow* init_window(const int width, const int height, const char* window_na
         throw "Initialize GLAD: FAILED";
     }
     glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, mouse_scroll_callback);
     
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glViewport(0, 0, width, height);

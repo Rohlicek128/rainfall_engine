@@ -4,12 +4,11 @@
 
 #include "../../World/Mesh.h"
 
-MeshComponent::MeshComponent(const int index, const GLenum type, Mesh* mesh)
+MeshComponent::MeshComponent(const int index, const int type, Mesh* mesh)
 {
     model_index = index;
     
     primitive_type = type;
-    type_edit_ = type;
     is_inverted = false;
     is_culled = true;
     is_shaded = true;
@@ -56,6 +55,5 @@ void MeshComponent::set_gui()
     ImGui::Checkbox("Is Inverted", &is_inverted);
     
     const char* type_names[] = { "Points", "Lines", "Line Loop", "Line Strip", "Triangles", "Triangle Strip", "Triangle Fan", "Quads", "Quads Strip", "Polygon" };
-    ImGui::Combo("Primitive", &type_edit_, type_names, std::size(type_names));
-    primitive_type = type_edit_;
+    ImGui::Combo("Primitive", &primitive_type, type_names, std::size(type_names));
 }

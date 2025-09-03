@@ -3,26 +3,35 @@
 #include <algorithm>
 #include <iostream>
 
+#include "../Imgui/ImGuizmo.h"
 #include "Entities/Components/CameraComponent.h"
 #include "Entities/Components/LightComponent.h"
 #include "Entities/Components/MaterialComponent.h"
 #include "Entities/Components/MeshComponent.h"
 #include "Entities/Components/TextureComponent.h"
 
+#include "Shaders/Shader.h"
+
 Engine::Engine(const EngineArgs& args) : fps_plot_{}
 {
     set_icon(args.window, "Icon/green_tick.png");
 
     textures_ = TextureManager::get_instance();
-    textures_->add_texture(new Texture("white1x1.png", GL_RGBA8, GL_RGBA));
-    textures_->add_texture(new Texture("black1x1.png", GL_RGBA8, GL_RGBA));
-    textures_->add_texture(new Texture("missing_texture.png", GL_SRGB8_ALPHA8, GL_RGBA));
-    textures_->add_texture(new Texture("chill_guy.jpg", GL_SRGB8, GL_RGB));
-    textures_->add_texture(new Texture("container_diffuse.png", GL_SRGB8_ALPHA8, GL_RGBA));
-    textures_->add_texture(new Texture("container_specular.png", GL_RGBA8, GL_RGBA));
-    textures_->add_texture(new Texture("shrek.png", GL_SRGB8_ALPHA8, GL_RGBA));
-    textures_->add_texture(new Texture("test_fail.png", GL_SRGB8_ALPHA8, GL_RGBA));
-    textures_->add_texture(new Texture("black_hole.jpg", GL_SRGB8, GL_RGB));
+    textures_->add_texture(std::make_unique<Texture>("white1x1.png", GL_RGBA8, GL_RGBA));
+    textures_->add_texture(std::make_unique<Texture>("black1x1.png", GL_RGBA8, GL_RGBA));
+    textures_->add_texture(std::make_unique<Texture>("missing_texture.png", GL_SRGB8_ALPHA8, GL_RGBA));
+    textures_->add_texture(std::make_unique<Texture>("chill_guy.jpg", GL_SRGB8, GL_RGB));
+    textures_->add_texture(std::make_unique<Texture>("container_diffuse.png", GL_SRGB8_ALPHA8, GL_RGBA));
+    textures_->add_texture(std::make_unique<Texture>("container_specular.png", GL_RGBA8, GL_RGBA));
+    textures_->add_texture(std::make_unique<Texture>("circuits_normal.jpg", GL_RGB8, GL_RGB));
+    textures_->add_texture(std::make_unique<Texture>("shrek.png", GL_SRGB8_ALPHA8, GL_RGBA));
+    textures_->add_texture(std::make_unique<Texture>("test_fail.png", GL_SRGB8_ALPHA8, GL_RGBA));
+    textures_->add_texture(std::make_unique<Texture>("black_hole.jpg", GL_SRGB8, GL_RGB));
+
+    std::vector<std::string> faces = {"Skybox/0right.jpg", "Skybox/1left.jpg", "Skybox/2top.jpg",
+        "Skybox/3bottom.jpg", "Skybox/4front.jpg", "Skybox/5back.jpg"};
+    textures_->add_cubemap(std::make_unique<Cubemap>(faces, GL_SRGB8, GL_RGB, GL_UNSIGNED_BYTE));
+    
 
     editor_ = new EditorManager(true, args.width, args.height);
     editor_->init_imgui(args.window);
@@ -32,17 +41,17 @@ Engine::Engine(const EngineArgs& args) : fps_plot_{}
     if (mouse_->is_visible)
     {
         glfwSetInputMode(args.window, GLFW_CURSOR,  GLFW_CURSOR_NORMAL);
-        editor_->imgui_io->ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
+        //editor_->imgui_io->ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
     }
     else
     {
         glfwSetInputMode(args.window, GLFW_CURSOR,  GLFW_CURSOR_DISABLED);
-        editor_->imgui_io->ConfigFlags |= ImGuiConfigFlags_NoMouse;
+        //editor_->imgui_io->ConfigFlags |= ImGuiConfigFlags_NoMouse;
     }
 
     
     //Scene
-    scene_ = std::make_unique<Scene>("Test Scene", Mesh({{"Position", 3}, {"TexCoord", 2}, {"Normal", 3}}));
+    scene_ = std::make_unique<Scene>("Test Scene", Mesh({{"Position", 3}, {"TexCoord", 2}, {"Normal", 3}}, true));
 
     set_models_to_mesh(scene_->mesh.get());
     scene_->mesh->compile();
@@ -60,13 +69,13 @@ Engine::Engine(const EngineArgs& args) : fps_plot_{}
     );
     obj1->add_component(MESH, new MeshComponent(0));
     obj1->add_component(MATERIAL, new MaterialComponent(glm::vec4(1.0, 1.0, 1.0, 1.0)));
-    obj1->add_component(TEXTURE, new TextureComponent(textures_->get_texture(4)->get_handle(),textures_->get_texture(5)->get_handle()));
+    obj1->add_component(TEXTURE, new TextureComponent(GL_TEXTURE_2D, textures_->get_texture(4)->get_handle(),textures_->get_texture(5)->get_handle()));
 
     std::unique_ptr<Entity> obj2 = std::make_unique<Entity>("Cube #2",
-        new TransformComponent(glm::vec3(3.0f, 1.0f, 3.0f), glm::vec3(0.0f), glm::vec3(3.0f))
+        new TransformComponent(glm::vec3(5.0f, 2.0f, 3.0f), glm::vec3(0.0f), glm::vec3(3.0f))
     );
     obj2->add_component(MESH, new MeshComponent(0));
-    obj2->add_component(TEXTURE, new TextureComponent(textures_->get_texture(3)->get_handle(), 1));
+    obj2->add_component(TEXTURE, new TextureComponent(GL_TEXTURE_2D, textures_->get_texture(3)->get_handle(), 1));
     obj1->add_child(obj2.get());
 
     std::unique_ptr<Entity> obj3 = std::make_unique<Entity>("Paper plane #2",
@@ -76,7 +85,7 @@ Engine::Engine(const EngineArgs& args) : fps_plot_{}
     obj2->add_child(obj3.get());
 
     std::unique_ptr<Entity> floor = std::make_unique<Entity>("Floor",
-        new TransformComponent(glm::vec3(0.0f, -0.501f, 0.0f), glm::vec3(0.0f), glm::vec3(50.0f))
+        new TransformComponent(glm::vec3(0.0f, -1.001f, 0.0f), glm::vec3(0.0f), glm::vec3(50.0f))
     );
     floor->add_component(MESH, new MeshComponent(1));
     floor->add_component(MATERIAL, new MaterialComponent(glm::vec4(0.012, 0.012, 0.012, 1.0)));
@@ -85,7 +94,7 @@ Engine::Engine(const EngineArgs& args) : fps_plot_{}
         new TransformComponent(glm::vec3(0.0f, 20.0f, 0.0f), glm::vec3(-6.0f, -10, 6.0f), glm::vec3(0.5f))
     );
     dir_light->add_component(MESH, new MeshComponent(0));
-    dir_light->add_component(LIGHT, new LightComponent(DIRECTIONAL, glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(0.7f), 100.0f));
+    dir_light->add_component(LIGHT, new LightComponent(DIRECTIONAL, glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(0.7f), 5.0f));
 
     std::unique_ptr<Entity> point_light = std::make_unique<Entity>("Bulb",
         new TransformComponent(glm::vec3(3.0f, 5.0f, 1.0f), glm::vec3(0.0f), glm::vec3(0.35f))
@@ -102,12 +111,9 @@ Engine::Engine(const EngineArgs& args) : fps_plot_{}
     scene_->add_entity(std::move(dir_light), true);
     scene_->add_entity(std::move(point_light), true);
 
-
-    const Shader vert("shader.vert", GL_VERTEX_SHADER);
-    const Shader frag("shader.frag", GL_FRAGMENT_SHADER);
-    const Shader shaders[]{vert, frag};
-    program_ = new Program(shaders);
-    
+    g_buffer_ = std::make_unique<GBuffer>(args.width, args.height);
+    geometry_program_ = new GeometryProgram({{"Geometry/geometry.vert", GL_VERTEX_SHADER}, {"Geometry/geometry.frag", GL_FRAGMENT_SHADER}});
+    lighting_program_ = new LightingProgram({{"Screen/screen.vert", GL_VERTEX_SHADER}, {"Lighting/lighting.frag", GL_FRAGMENT_SHADER}});
 
     //Screen Mesh
     float vertices_quad[] = {
@@ -123,23 +129,13 @@ Engine::Engine(const EngineArgs& args) : fps_plot_{}
     screen_mesh_ = new Mesh({{"PosTex", 4}});
     screen_mesh_->add_model("Quad", vertices_quad, std::size(vertices_quad), indices_quad, std::size(indices_quad));
     screen_mesh_->compile();
-
-    const Shader vert_screen("Screen/screen.vert", GL_VERTEX_SHADER);
-    const Shader frag_screen("Screen/screen.frag", GL_FRAGMENT_SHADER);
-    Shader shaders_screen[]{vert_screen, frag_screen};
-    screen_program_ = new Program(shaders_screen);
+    
+    post_process_program_ = new PostProcessProgram({{"Screen/screen.vert", GL_VERTEX_SHADER}, {"Screen/screen.frag", GL_FRAGMENT_SHADER}}, args.width, args.height);
+    
+    skybox_program_ = new SkyboxProgram({{"Skybox/skybox.vert", GL_VERTEX_SHADER}, {"Skybox/skybox.frag", GL_FRAGMENT_SHADER}});
     
 
-    screen_texture_ = std::make_shared<Texture>(args.width, args.height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
-    screen_rbo_ = std::make_shared<Renderbuffer>(args.width, args.height, GL_DEPTH24_STENCIL8);
-
-    screen_fbo_ = std::make_unique<Framebuffer>();
-    screen_fbo_->attach_texture_2d(screen_texture_, GL_COLOR_ATTACHMENT0);
-    screen_fbo_->attach_renderbuffer(screen_rbo_, GL_DEPTH_STENCIL_ATTACHMENT);
-    screen_fbo_->check_completeness();
-    
-
-    current_camera_ = editor_->is_visible ? scene_->editor_camera.get() : scene_->player_camera;
+    scene_->current_camera = editor_->is_visible ? scene_->editor_camera.get() : scene_->player_camera;
     entity_selected_ = nullptr;
     
     is_fullscreen_ = false;
@@ -210,18 +206,20 @@ void Engine::set_icon(GLFWwindow* window, const std::string& path)
     stbi_image_free(images[0].pixels);
 }
 
+void Engine::resize(const int width, const int height)
+{
+    g_buffer_->resize(width, height);
+    post_process_program_->resize(width, height);
+    editor_->viewport_fbo->resize(width, height);
+}
+
 void Engine::update(const EngineArgs& args)
 {
     update_delta_time();
     mouse_->pos_x = args.mouse_x;
     mouse_->pos_y = args.mouse_y;
     if (!editor_->is_visible && (viewport_[0] != args.width || viewport_[1] != args.height))
-    {
-        screen_fbo_->resize(args.width, args.height);
-        screen_rbo_->resize(args.width, args.height);
-        screen_fbo_->attach_renderbuffer(screen_rbo_, GL_DEPTH_STENCIL_ATTACHMENT);
-        editor_->viewport_fbo->resize(args.width, args.height);
-    }
+        resize(args.width, args.height);
     viewport_[0] = args.width;
     viewport_[1] = args.height;
 
@@ -253,12 +251,7 @@ void Engine::update(const EngineArgs& args)
         editor_->toggle_visibility = false;
         editor_->is_visible = !editor_->is_visible;
         if (!editor_->is_visible)
-        {
-            screen_fbo_->resize(args.width, args.height);
-            screen_rbo_->resize(args.width, args.height);
-            screen_fbo_->attach_renderbuffer(screen_rbo_, GL_DEPTH_STENCIL_ATTACHMENT);
-            editor_->viewport_fbo->resize(args.width, args.height);
-        }
+            resize(args.width, args.height);
     }
     else if (!editor_->toggle_visibility && glfwGetKey(args.window, GLFW_KEY_HOME) == GLFW_RELEASE) editor_->toggle_visibility = true;
 
@@ -266,8 +259,8 @@ void Engine::update(const EngineArgs& args)
     if (glfwGetKey(args.window, GLFW_KEY_INSERT) == GLFW_PRESS && camera_toggle_)
     {
         camera_toggle_ = false;
-        if (current_camera_ != scene_->editor_camera.get()) current_camera_ = scene_->editor_camera.get();
-        else if (current_camera_ != scene_->player_camera && scene_->player_camera != nullptr) current_camera_ = scene_->player_camera;
+        if (scene_->current_camera != scene_->editor_camera.get()) scene_->current_camera = scene_->editor_camera.get();
+        else if (scene_->current_camera != scene_->player_camera && scene_->player_camera != nullptr) scene_->current_camera = scene_->player_camera;
     }
     else if (!camera_toggle_ && glfwGetKey(args.window, GLFW_KEY_INSERT) == GLFW_RELEASE) camera_toggle_ = true;
     
@@ -281,45 +274,64 @@ void Engine::update(const EngineArgs& args)
     }
     else if (!fullscreen_toggle_ && glfwGetKey(args.window, GLFW_KEY_F11) == GLFW_RELEASE) fullscreen_toggle_ = true;
 
+    //Gizmo
+    if (glfwGetKey(args.window, GLFW_KEY_F5)) editor_->gizmo_operation = -1;
+    else if (glfwGetKey(args.window, GLFW_KEY_F6)) editor_->gizmo_operation = ImGuizmo::OPERATION::TRANSLATE;
+    else if (glfwGetKey(args.window, GLFW_KEY_F7)) editor_->gizmo_operation = ImGuizmo::OPERATION::ROTATE;
+    else if (glfwGetKey(args.window, GLFW_KEY_F8)) editor_->gizmo_operation = ImGuizmo::OPERATION::SCALE;
+
 
     //Camera update
-    dynamic_cast<CameraComponent*>(current_camera_->components->at(CAMERA))->move(args.window, delta_time_);
-    if (!mouse_->is_visible) dynamic_cast<CameraComponent*>(current_camera_->components->at(CAMERA))->mouse_move(*mouse_, delta_time_);
+    CameraComponent* camera_component = dynamic_cast<CameraComponent*>(scene_->current_camera->components->at(CAMERA));
+    camera_component->move(args.window, static_cast<float>(delta_time_));
+    if (!mouse_->is_visible) camera_component->mouse_move(*mouse_, static_cast<float>(delta_time_));
+
+    camera_component->exposure += camera_component->exposure * args.scroll_y * static_cast<float>(delta_time_) * 175.0f;
+    camera_component->exposure = std::max(0.001f, camera_component->exposure);
     
-    //if (args.io->WantCaptureMouse) return;
+    //if (editor_->imgui_io->WantCaptureMouse) std::cout << "wants\n";
 }
 
-void Engine::render(const EngineArgs& args)
+void Engine::render(EngineArgs& args)
 {
     editor_->new_frame();
 
-    CameraComponent* cur_camera_comp = dynamic_cast<CameraComponent*>(current_camera_->components->at(CAMERA));
-    const int cur_width = editor_->viewport_fbo->attached_textures.at(0)->get_width();
-    const int cur_height = editor_->viewport_fbo->attached_textures.at(0)->get_height();
-    
-    screen_fbo_->bind();
-    glViewport(0, 0, screen_fbo_->attached_textures.at(0)->get_width(), screen_fbo_->attached_textures.at(0)->get_height());
+    const CameraComponent* cur_camera_comp = dynamic_cast<CameraComponent*>(scene_->current_camera->components->at(CAMERA));
+    const int cur_width = editor_->is_visible ? editor_->viewport_fbo->attached_textures.at(0)->get_width() : args.width;
+    const int cur_height = editor_->is_visible ? editor_->viewport_fbo->attached_textures.at(0)->get_height() : args.height;
+
+    //Geometry Pass
+    g_buffer_->bind();
+    glViewport(0, 0, cur_width, cur_height);
     glClearColor(cur_camera_comp->clear_color[0], cur_camera_comp->clear_color[1], cur_camera_comp->clear_color[2], cur_camera_comp->clear_color[3]);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    //Draw
+    
     if (cur_camera_comp->is_wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     
-    program_->draw(scene_.get(), current_camera_, cur_width, cur_height);
+    geometry_program_->draw(*scene_, (float)cur_width / (float)cur_height);
+    //skybox_program_->draw(*scene_, (float)cur_width / (float)cur_height);
     
     if (cur_camera_comp->is_wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    screen_fbo_->unbind();
+    g_buffer_->unbind();
+    //glViewport(0, 0, cur_width, cur_height);
+
+    //Lighting Pass
+    glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    post_process_program_->bind_framebuffer();
     glViewport(0, 0, cur_width, cur_height);
+    lighting_program_->draw(*scene_, *screen_mesh_, 0, *g_buffer_);
+    post_process_program_->unbind_framebuffer();
     
-    //Screen
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    //Post Process Pass
+    glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     if (editor_->is_visible) editor_->viewport_fbo->bind();
-    glDisable(GL_DEPTH_TEST);
-    screen_program_->draw_screen(screen_mesh_, 0, cur_camera_comp->gamma, cur_camera_comp->exposure, screen_fbo_->attached_textures.at(0)->get_handle()); //static_cast<unsigned int>(cur_camera_comp->clear_color[0] * 255)
-    glEnable(GL_DEPTH_TEST);
-    if (editor_->is_visible) editor_->viewport_fbo->unbind();
+    glViewport(0, 0, cur_width, cur_height);
 
+    post_process_program_->draw(*screen_mesh_, 0, *cur_camera_comp);
+    
+    if (editor_->is_visible) editor_->viewport_fbo->unbind();
     glViewport(0, 0, args.width, args.height);
     
     //Editor
@@ -329,18 +341,26 @@ void Engine::render(const EngineArgs& args)
 
         //Viewport
         const ImVec4 old_bg = ImGui::GetStyle().Colors[2];
-        if (current_camera_ == scene_->player_camera) ImGui::GetStyle().Colors[2] = {0.5f, 0.2f, 0.2f, 0.7f};
-        else current_camera_ = scene_->editor_camera.get();
-        ImGui::Begin("Viewport");
+        if (scene_->current_camera == scene_->player_camera) ImGui::GetStyle().Colors[2] = {0.5f, 0.2f, 0.2f, 0.7f};
+        else scene_->current_camera = scene_->editor_camera.get();
+        ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoInputs);
+        const ImVec2 pos_vp  = ImGui::GetCursorScreenPos();
+        const ImVec2 size_vp = ImGui::GetContentRegionAvail();
         editor_->viewport_fbo->set_gui();
+        ImGuizmo::SetRect(pos_vp.x, pos_vp.y, size_vp.x, size_vp.y);
+        if (scene_->selected_entity != nullptr) scene_->selected_entity->transform->set_guizmo(scene_->current_camera, editor_->gizmo_operation);
         ImVec2 pos = ImGui::GetWindowPos();
         pos.x += ImGui::GetWindowContentRegionMin().x + 10;
         pos.y += ImGui::GetWindowContentRegionMin().y + 10;
         ImGui::End();
-        if (current_camera_ == scene_->player_camera) ImGui::GetStyle().Colors[2] = old_bg;
+        if (scene_->current_camera == scene_->player_camera) ImGui::GetStyle().Colors[2] = old_bg;
+
+        //g_buffer_->resize(editor_->viewport_fbo->attached_textures.front()->get_width(), editor_->viewport_fbo->attached_textures.front()->get_height());
+        //post_process_program_->resize(editor_->viewport_fbo->attached_textures.front()->get_width(), editor_->viewport_fbo->attached_textures.front()->get_height());
         
         mouse_->set_gui();
-
+        
+            
         //Scene
         if (ImGui::Begin("Scene Graph ##ENTITIES_GRAPH"))
             scene_->set_scene_graph();
@@ -384,6 +404,9 @@ void Engine::render(const EngineArgs& args)
         if (editor_->show_imgui_demo) ImGui::ShowDemoWindow();
     }
     editor_->render();
+
+    args.scroll_x = 0.0f;
+    args.scroll_y = 0.0f;
     
     glfwSwapBuffers(args.window);
     glfwPollEvents();
@@ -393,35 +416,35 @@ void Engine::render(const EngineArgs& args)
 void Engine::set_models_to_mesh(Mesh* mesh)
 {
     float vertices_cube[] = {
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, // A 0
-        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f, // B 1
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f, // C 2
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f, // D 3
-
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, // E 4
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, // F 5
-        0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, // G 6
-        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // H 7
-
-        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, // D 8
-        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f, // A 9
-        -0.5f, -0.5f, 0.5f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f, // E 10
-        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, // H 11
-
-        0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // B 12
-        0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, // C 13
-        0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, // G 14
-        0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, // F 15
-
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, // A 16
-        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f, // B 17
-        0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f, // F 18
-        -0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f, // E 19
-
-        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, // C 20
-        -0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, // D 21
-        -0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, // H 22
-        0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f // G 23
+        -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, // A 0
+        1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f, // B 1
+        1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f, // C 2
+        -1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f, // D 3
+        
+        -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, // E 4
+        1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, // F 5
+        1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, // G 6
+        -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // H 7
+        
+        -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, // D 8
+        -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f, // A 9
+        -1.0f, -1.0f, 1.0f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f, // E 10
+        -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, // H 11
+        
+        1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // B 12
+        1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, // C 13
+        1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, // G 14
+        1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, // F 15
+        
+        -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, // A 16
+        1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f, // B 17
+        1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f, // F 18
+        -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f, // E 19
+        
+        1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, // C 20
+        -1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, // D 21
+        -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, // H 22
+        1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f // G 23
     };
     unsigned int indices_cube[] = {
         // front and back

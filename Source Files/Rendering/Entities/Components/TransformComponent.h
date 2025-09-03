@@ -4,6 +4,9 @@
 
 #include "Component.h"
 
+class Entity;
+class CameraComponent;
+
 class TransformComponent : public Component
 {
     float* pos_edit_;
@@ -21,5 +24,6 @@ public:
     void update_pos_edit(float = 1.0f);
     void update_rot_edit(float = 1.0f);
     void update_sca_edit(float = 1.0f);
+    void set_guizmo(const Entity*, int);
     void set_gui() override;
 };

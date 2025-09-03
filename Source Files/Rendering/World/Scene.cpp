@@ -1,6 +1,11 @@
 #include "Scene.h"
 
+#include "../Entities/Entity.h"
+#include "../World/Mesh.h"
+
 #include "../Entities/Components/CameraComponent.h"
+#include "../Entities/Components/TextureComponent.h"
+#include "../Entities/Components/MeshComponent.h"
 
 Scene::Scene(const std::string& name, Mesh&& mesh)
 {
@@ -12,6 +17,12 @@ Scene::Scene(const std::string& name, Mesh&& mesh)
         );
     editor_camera->add_component(CAMERA, new CameraComponent(editor_camera->transform, {0.25f, 0.25f, 0.25f, 1.0f}));
     player_camera = nullptr;
+
+    skybox = std::make_unique<Entity>("__skybox",
+        new TransformComponent(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f))
+        );
+    skybox->add_component(MESH, new MeshComponent(0, GL_TRIANGLES, &mesh));
+    skybox->add_component(TEXTURE, new TextureComponent(0x8513, 1, 1));
     
     this->name = name;
     this->mesh = std::make_unique<Mesh>(std::move(mesh));
@@ -133,7 +144,7 @@ void Scene::set_graph_children(const std::vector<Entity*>& children, Entity*& se
         
         ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_DrawLinesFull | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
         if (selected == children.at(i)) node_flags |= ImGuiTreeNodeFlags_Selected;
-        if (children.at(i)->children.empty()) node_flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet;
+        if (children.at(i)->children.empty()) node_flags |= ImGuiTreeNodeFlags_Leaf;
         
         const bool opened = ImGui::TreeNodeEx((children.at(i)->name + "##ENTITY" + std::to_string(i)).c_str(), node_flags);
         if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
@@ -216,7 +227,13 @@ void Scene::set_gui()
             }
             ImGui::EndDragDropTarget();
         }
-        
+
+        ImGui::TableNextRow();
+        ImGui::TableNextColumn();
+        ImGui::Text("Skybox");
+        ImGui::TableNextColumn();
+        if (ImGui::Selectable(skybox->name.c_str()))
+            selected_entity = skybox.get();
 
         ImGui::EndTable();
     }

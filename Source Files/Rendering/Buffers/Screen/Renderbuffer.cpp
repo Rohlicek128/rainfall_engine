@@ -12,16 +12,6 @@ Renderbuffer::Renderbuffer(const int width, const int height, const GLenum forma
     Renderbuffer::unbind();
 }
 
-Renderbuffer::~Renderbuffer()
-{
-    //glDeleteRenderbuffers(1, &handle_);
-}
-
-unsigned int Renderbuffer::get_handle()
-{
-    return handle_;
-}
-
 void Renderbuffer::resize(const int width, const int height)
 {
     width_ = width;
@@ -32,6 +22,16 @@ void Renderbuffer::resize(const int width, const int height)
     bind();
     glRenderbufferStorage(GL_RENDERBUFFER, format_, width_, height_);
     unbind();
+}
+
+int Renderbuffer::get_width()
+{
+    return width_;
+}
+
+int Renderbuffer::get_height()
+{
+    return height_;
 }
 
 void Renderbuffer::bind()

@@ -1,10 +1,15 @@
 #include "TransformComponent.h"
+#include "CameraComponent.h"
+#include  "../../../Imgui/ImGuizmo.h"
+#include "../../../Utils/MathHelper.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-TransformComponent::TransformComponent(glm::vec3 pos, glm::vec3 rot, glm::vec3 sca)
+#include "../Entity.h"
+
+TransformComponent::TransformComponent(const glm::vec3 pos, const glm::vec3 rot, const glm::vec3 sca)
 {
     position = pos;
     rotation = rot;
@@ -43,6 +48,34 @@ void TransformComponent::update_sca_edit(const float scaler)
     sca_edit_[0] = scale.x * scaler;
     sca_edit_[1] = scale.y * scaler;
     sca_edit_[2] = scale.z * scaler;
+}
+
+void TransformComponent::set_guizmo(const Entity* camera, const int operation)
+{
+    if (operation == -1) return;
+    
+    ImGuizmo::SetDrawlist();
+    
+    const ImVec2 size = ImGui::GetWindowSize();
+    
+    const glm::mat4& projection = dynamic_cast<CameraComponent*>(camera->components->at(CAMERA))->get_projection_matrix(size.x / size.y);
+    const glm::mat4& view = dynamic_cast<CameraComponent*>(camera->components->at(CAMERA))->get_view_matrix(); // glm::inverse(camera->transform->get_model_matrix())
+    glm::mat4 transform = get_model_matrix();
+
+    ImGuizmo::Enable(true);
+    ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection),
+        (ImGuizmo::OPERATION)operation, ImGuizmo::LOCAL, glm::value_ptr(transform));
+
+    if (ImGuizmo::IsUsing())
+    {
+        glm::vec3 tra, rot, sca;
+        MathHelper::decompose(transform, tra, rot, sca);
+        
+        this->position = tra;
+        this->rotation += rot - this->rotation;
+        this->scale = sca;
+    }
+    
 }
 
 void TransformComponent::set_gui()

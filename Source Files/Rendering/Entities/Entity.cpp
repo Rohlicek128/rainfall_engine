@@ -6,6 +6,7 @@
 #include "Components/LightComponent.h"
 #include "Components/MaterialComponent.h"
 #include "Components/TextureComponent.h"
+#include "Components/MeshComponent.h"
 
 unsigned int Entity::global_id_ = 0;
 
@@ -160,7 +161,7 @@ void Entity::set_gui()
         case MESH: add_component(MESH, new MeshComponent(0, GL_TRIANGLES, mesh_)); break;
         case CAMERA: add_component(CAMERA, new CameraComponent(transform)); break;
         case MATERIAL: add_component(MATERIAL, new MaterialComponent(glm::vec4(1.0))); break;
-        case TEXTURE: add_component(TEXTURE, new TextureComponent(1, 1)); break;
+        case TEXTURE: add_component(TEXTURE, new TextureComponent(GL_TEXTURE_2D, 1, 1)); break;
         case LIGHT: add_component(LIGHT, new LightComponent(POINT, glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(0.7f))); break;
     }
     add_selected_ = -1;

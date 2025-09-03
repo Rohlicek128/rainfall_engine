@@ -1,26 +1,53 @@
 #include "TextureComponent.h"
 
-#include <glad/glad.h>
+#include "../../Buffers/Textures/TextureManager.h"
 
-TextureComponent::TextureComponent(unsigned int diffuse, unsigned int specular)
+TextureComponent::TextureComponent(const int type, const unsigned int diffuse, const unsigned int specular, const unsigned int normal, const int cubemap)
 {
-    diffuse_handle_ = diffuse;
-    specular_handle_ = specular;
+    this->type = type;
+    if (type == GL_TEXTURE_2D) type_edit_ = 0;
+    else type_edit_ = 1;
 
     texture_manager_ = TextureManager::get_instance();
+    
+    diffuse_handle_ = diffuse;
+    specular_handle_ = specular;
+    normal_handle_ = normal;
+    if (cubemap == -1) cubemap_handle_ = texture_manager_->get_cubemap(0)->get_handle();
 }
 
-void TextureComponent::active_bind(const unsigned int index)
+void TextureComponent::active_bind(const unsigned int offset)
 {
-    glActiveTexture(GL_TEXTURE0 + index);
-    glBindTexture(GL_TEXTURE_2D, diffuse_handle_);
+    if (type == GL_TEXTURE_2D)
+    {
+        glActiveTexture(GL_TEXTURE0 + offset);
+        glBindTexture(type, diffuse_handle_);
 
-    glActiveTexture(GL_TEXTURE1 + index);
-    glBindTexture(GL_TEXTURE_2D, specular_handle_);
+        glActiveTexture(GL_TEXTURE1 + offset);
+        glBindTexture(type, specular_handle_);
+
+        glActiveTexture(GL_TEXTURE2 + offset);
+        glBindTexture(type, normal_handle_);
+    }
+    else if (type == GL_TEXTURE_CUBE_MAP)
+    {
+        glActiveTexture(GL_TEXTURE0 + offset);
+        glBindTexture(type, cubemap_handle_);
+    }
+}
+
+int TextureComponent::has_normal()
+{
+    return normal_handle_ == 1 ? 0 : 1;
 }
 
 void TextureComponent::set_gui()
 {
+    const char* type_names[] = { "Texture 2D", "Cubemap" };
+    ImGui::Combo("Type", &type_edit_, type_names, std::size(type_names));
+    if (type_edit_ == 0) type = GL_TEXTURE_2D;
+    else if (type_edit_ == 1) type = GL_TEXTURE_CUBE_MAP;
+    
     //Diffuse
     ImGui::SeparatorText("Diffuse Map");
     texture_gui(&diffuse_handle_, "Diffuse");
@@ -28,6 +55,10 @@ void TextureComponent::set_gui()
     //Specular
     ImGui::SeparatorText("Specular Map");
     texture_gui(&specular_handle_, "Specular");
+
+    //Normal
+    ImGui::SeparatorText("Normal Map");
+    texture_gui(&normal_handle_, "Normal");
 }
 
 void TextureComponent::texture_gui(unsigned int* handle, const std::string& id_name)
@@ -49,7 +80,7 @@ void TextureComponent::texture_gui(unsigned int* handle, const std::string& id_n
     
     if (ImGui::BeginPopup(("Select " + id_name).c_str()))
     {
-        const unsigned int selected = texture_manager_->select_texture_gui();
+        const unsigned int selected = texture_manager_->select_texture_2d_gui();
         if (selected != 0) *handle = selected;
         ImGui::EndPopup();
     }

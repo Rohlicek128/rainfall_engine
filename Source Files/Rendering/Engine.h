@@ -12,25 +12,31 @@
 
 #include "EngineArgs.h"
 #include "Buffers/Screen/Framebuffer.h"
+#include "Buffers/Screen/GBuffer.h"
 #include "Buffers/Textures/TextureManager.h"
 #include "Shaders/Program.h"
 
 #include "Entities/Mouse.h"
 #include "Gui/EditorManager.h"
+#include "Shaders/Programs/GeometryProgram.h"
+#include "Shaders/Programs/LightingProgram.h"
+#include "Shaders/Programs/PostProcessProgram.h"
+#include "Shaders/Programs/SkyboxProgram.h"
 #include "World/Scene.h"
 
 class Engine
 {
     std::unique_ptr<Scene> scene_;
-    Program* program_;
 
-    Program* screen_program_;
-    Mesh* screen_mesh_;
-    std::shared_ptr<Texture> screen_texture_;
-    std::unique_ptr<Framebuffer> screen_fbo_;
-    std::shared_ptr<Renderbuffer> screen_rbo_;
+    std::unique_ptr<GBuffer> g_buffer_;
     
-    Entity* current_camera_;
+    GeometryProgram* geometry_program_;
+    LightingProgram* lighting_program_;
+    SkyboxProgram* skybox_program_;
+    PostProcessProgram* post_process_program_;
+    
+    Mesh* screen_mesh_;
+    
     bool camera_toggle_;
     Mouse* mouse_;
     GLint* viewport_;
@@ -55,6 +61,7 @@ class Engine
     Entity* entity_selected_;
 
     void update_delta_time();
+    void resize(int, int);
     void set_icon(GLFWwindow*, const std::string&);
     void set_models_to_mesh(Mesh*);
 public:
@@ -62,5 +69,5 @@ public:
     ~Engine();
     
     void update(const EngineArgs&);
-    void render(const EngineArgs&);
+    void render(EngineArgs&);
 };

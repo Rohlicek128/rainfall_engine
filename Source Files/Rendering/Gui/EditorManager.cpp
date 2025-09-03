@@ -1,5 +1,6 @@
 #include "EditorManager.h"
 
+#include "../../Imgui/ImGuizmo.h"
 #include "../Entities/Components/CameraComponent.h"
 
 EditorManager::EditorManager(const bool visible, int width, int height)
@@ -10,8 +11,11 @@ EditorManager::EditorManager(const bool visible, int width, int height)
     show_imgui_demo = false;
     show_statistics = true;
 
+    gizmo_operation = ImGuizmo::OPERATION::TRANSLATE;
+
     viewport_fbo = std::make_unique<Framebuffer>();
-    viewport_fbo->attach_texture_2d(std::make_shared<Texture>(width, height, GL_RGBA8, GL_RGBA), GL_COLOR_ATTACHMENT0);
+    viewport_fbo->attach_texture_2d(std::make_unique<Texture>(width, height, GL_RGBA8, GL_RGBA), GL_COLOR_ATTACHMENT0);
+    viewport_fbo->set_draw_buffers();
     viewport_fbo->check_completeness();
 }
 
@@ -27,6 +31,8 @@ void EditorManager::init_imgui(GLFWwindow* window)
     ImGui_ImplOpenGL3_Init("#version 460");
 
     ImGui::GetStyle().Colors[ImGuiCol_WindowBg] = {0.08f, 0.1f, 0.13f, 0.9f};
+
+    ImGuizmo::SetOrthographic(false);
 }
 
 void EditorManager::set_main_dockspace()
@@ -63,6 +69,7 @@ void EditorManager::new_frame()
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
+    ImGuizmo::BeginFrame();
 }
 
 void EditorManager::render()

@@ -63,6 +63,8 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <UndefinePreprocessorDefinitions>YAML_CPP_DLL</UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -82,6 +84,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -257,7 +260,9 @@
     <ClCompile Include="Source Files\Rendering\Buffers\IBindable.cpp" />
     <ClCompile Include="Source Files\Rendering\Buffers\IndexBuffer.cpp" />
     <ClCompile Include="Source Files\Rendering\Buffers\Screen\Framebuffer.cpp" />
+    <ClCompile Include="Source Files\Rendering\Buffers\Screen\GBuffer.cpp" />
     <ClCompile Include="Source Files\Rendering\Buffers\Screen\Renderbuffer.cpp" />
+    <ClCompile Include="Source Files\Rendering\Buffers\Textures\Cubemap.cpp" />
     <ClCompile Include="Source Files\Rendering\Buffers\Textures\Texture.cpp" />
     <ClCompile Include="Source Files\Rendering\Buffers\Textures\TextureManager.cpp" />
     <ClCompile Include="Source Files\Rendering\Buffers\VertexArray.cpp" />
@@ -348,6 +353,10 @@
     <ClCompile Include="Source Files\Rendering\Entities\Mouse.cpp" />
     <ClCompile Include="Source Files\Rendering\Gui\EditorManager.cpp" />
     <ClCompile Include="Source Files\Rendering\Shaders\Program.cpp" />
+    <ClCompile Include="Source Files\Rendering\Shaders\Programs\GeometryProgram.cpp" />
+    <ClCompile Include="Source Files\Rendering\Shaders\Programs\LightingProgram.cpp" />
+    <ClCompile Include="Source Files\Rendering\Shaders\Programs\PostProcessProgram.cpp" />
+    <ClCompile Include="Source Files\Rendering\Shaders\Programs\SkyboxProgram.cpp" />
     <ClCompile Include="Source Files\Rendering\Shaders\Shader.cpp" />
     <ClCompile Include="Source Files\Rendering\World\Mesh.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -426,6 +435,7 @@
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
     <ClCompile Include="Source Files\Rendering\World\Scene.cpp" />
+    <ClCompile Include="Source Files\Utils\MathHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\glad\glad.h" />
@@ -447,7 +457,9 @@
     <ClInclude Include="Source Files\Rendering\Buffers\IBindable.h" />
     <ClInclude Include="Source Files\Rendering\Buffers\IndexBuffer.h" />
     <ClInclude Include="Source Files\Rendering\Buffers\Screen\Framebuffer.h" />
+    <ClInclude Include="Source Files\Rendering\Buffers\Screen\GBuffer.h" />
     <ClInclude Include="Source Files\Rendering\Buffers\Screen\Renderbuffer.h" />
+    <ClInclude Include="Source Files\Rendering\Buffers\Textures\Cubemap.h" />
     <ClInclude Include="Source Files\Rendering\Buffers\Textures\Texture.h" />
     <ClInclude Include="Source Files\Rendering\Buffers\Textures\TextureManager.h" />
     <ClInclude Include="Source Files\Rendering\Buffers\VertexArray.h" />
@@ -466,20 +478,29 @@
     <ClInclude Include="Source Files\Rendering\Gui\EditorManager.h" />
     <ClInclude Include="Source Files\Rendering\Gui\IGui.h" />
     <ClInclude Include="Source Files\Rendering\Shaders\Program.h" />
+    <ClInclude Include="Source Files\Rendering\Shaders\Programs\GeometryProgram.h" />
+    <ClInclude Include="Source Files\Rendering\Shaders\Programs\LightingProgram.h" />
+    <ClInclude Include="Source Files\Rendering\Shaders\Programs\PostProcessProgram.h" />
+    <ClInclude Include="Source Files\Rendering\Shaders\Programs\SkyboxProgram.h" />
     <ClInclude Include="Source Files\Rendering\Shaders\Shader.h" />
     <ClInclude Include="Source Files\Rendering\World\Mesh.h" />
     <ClInclude Include="Source Files\Rendering\World\ModelData.h" />
     <ClInclude Include="Source Files\Rendering\World\Scene.h" />
+    <ClInclude Include="Source Files\Utils\MathHelper.h" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="lib\glfw3.dll" />
     <Content Include="lib\glfw3.lib" />
     <Content Include="lib\glfw3dll.lib" />
     <Content Include="lib\glfw3_mt.lib" />
+    <Content Include="Source Files\Rendering\Shaders\GLSL\Geometry\geometry.frag" />
+    <Content Include="Source Files\Rendering\Shaders\GLSL\Geometry\geometry.vert" />
+    <Content Include="Source Files\Rendering\Shaders\GLSL\Lighting\lighting.frag" />
+    <Content Include="Source Files\Rendering\Shaders\GLSL\Lighting\lighting.vert" />
     <Content Include="Source Files\Rendering\Shaders\GLSL\Screen\screen.frag" />
     <Content Include="Source Files\Rendering\Shaders\GLSL\Screen\screen.vert" />
-    <Content Include="Source Files\Rendering\Shaders\GLSL\shader.frag" />
-    <Content Include="Source Files\Rendering\Shaders\GLSL\shader.vert" />
+    <Content Include="Source Files\Rendering\Shaders\GLSL\Skybox\skybox.frag" />
+    <Content Include="Source Files\Rendering\Shaders\GLSL\Skybox\skybox.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

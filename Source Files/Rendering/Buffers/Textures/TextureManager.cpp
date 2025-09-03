@@ -4,8 +4,7 @@ TextureManager* TextureManager::instance_ptr_ = nullptr;
 
 TextureManager::TextureManager()
 {
-    textures_ = {};
-    select_scale_ = 100.0;
+    select_scale_ = 100.0f;
 }
 
 TextureManager* TextureManager::get_instance()
@@ -17,31 +16,42 @@ TextureManager* TextureManager::get_instance()
     return instance_ptr_;
 }
 
-void TextureManager::add_texture(Texture* texture)
+void TextureManager::add_texture(std::unique_ptr<Texture> texture)
 {
-    textures_.push_back(texture);
+    textures_.push_back(std::move(texture));
 }
 
 Texture* TextureManager::get_texture(const int index)
 {
-    return textures_.at(index);
+    return textures_.at(index).get();
 }
 
-Texture* TextureManager::get_texture_by_handle(unsigned int handle)
+Texture* TextureManager::get_texture_by_handle(const unsigned int handle)
 {
     for (int i = 0; i < textures_.size(); ++i)
     {
-        if (textures_.at(i)->get_handle() == handle) return textures_.at(i);
+        if (textures_.at(i)->get_handle() == handle) return textures_.at(i).get();
     }
     return nullptr;
 }
 
-void TextureManager::set_gui()
+void TextureManager::add_cubemap(std::unique_ptr<Cubemap> cubemap)
 {
-    select_texture_gui();
+    cubemaps_.push_back(std::move(cubemap));
 }
 
-unsigned int TextureManager::select_texture_gui()
+Cubemap* TextureManager::get_cubemap(const int index)
+{
+    return cubemaps_.at(index).get();
+}
+
+
+void TextureManager::set_gui()
+{
+    select_texture_2d_gui();
+}
+
+unsigned int TextureManager::select_texture_2d_gui()
 {
     ImGui::SeparatorText("Select a texture:");
     
