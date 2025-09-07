@@ -102,7 +102,7 @@ void Texture::active_bind(const unsigned int index)
 
 void Texture::resize(const int width, const int height)
 {
-    if (width_ == width || height_ == height) return;
+    if (width_ == width && height_ == height) return;
     width_ = width;
     height_ = height;
     bind();

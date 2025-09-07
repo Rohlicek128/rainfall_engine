@@ -25,7 +25,7 @@ Engine::Engine(const EngineArgs& args) : fps_plot_{}
     textures_->add_texture(std::make_unique<Texture>("container_specular.png", GL_RGBA8, GL_RGBA));
     textures_->add_texture(std::make_unique<Texture>("circuits_normal.jpg", GL_RGB8, GL_RGB));
     textures_->add_texture(std::make_unique<Texture>("shrek.png", GL_SRGB8_ALPHA8, GL_RGBA));
-    textures_->add_texture(std::make_unique<Texture>("test_fail.png", GL_SRGB8_ALPHA8, GL_RGBA));
+    //textures_->add_texture(std::make_unique<Texture>("test_fail.png", GL_SRGB8_ALPHA8, GL_RGBA));
     textures_->add_texture(std::make_unique<Texture>("black_hole.jpg", GL_SRGB8, GL_RGB));
 
     std::vector<std::string> faces = {"Skybox/0right.jpg", "Skybox/1left.jpg", "Skybox/2top.jpg",
@@ -76,7 +76,7 @@ Engine::Engine(const EngineArgs& args) : fps_plot_{}
     );
     obj2->add_component(MESH, new MeshComponent(0));
     obj2->add_component(TEXTURE, new TextureComponent(GL_TEXTURE_2D, textures_->get_texture(3)->get_handle(), 1));
-    obj1->add_child(obj2.get());
+    //obj1->add_child(obj2.get());
 
     std::unique_ptr<Entity> obj3 = std::make_unique<Entity>("Paper plane #2",
         new TransformComponent(glm::vec3(-2.0f, 1.0f, -2.0f), glm::vec3(0.0f), glm::vec3(0.5f))
@@ -206,13 +206,6 @@ void Engine::set_icon(GLFWwindow* window, const std::string& path)
     stbi_image_free(images[0].pixels);
 }
 
-void Engine::resize(const int width, const int height)
-{
-    g_buffer_->resize(width, height);
-    post_process_program_->resize(width, height);
-    editor_->viewport_fbo->resize(width, height);
-}
-
 void Engine::update(const EngineArgs& args)
 {
     update_delta_time();
@@ -222,6 +215,9 @@ void Engine::update(const EngineArgs& args)
         resize(args.width, args.height);
     viewport_[0] = args.width;
     viewport_[1] = args.height;
+
+    scene_->entities.at(1)->transform->rotation.y += (float)delta_time_ * 20.0f;
+    scene_->entities.at(1)->transform->update_rot_edit();
 
     //Input
     if (glfwGetKey(args.window, GLFW_KEY_END) == GLFW_PRESS) glfwSetWindowShouldClose(args.window, true);
@@ -309,29 +305,23 @@ void Engine::render(EngineArgs& args)
     if (cur_camera_comp->is_wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     
     geometry_program_->draw(*scene_, (float)cur_width / (float)cur_height);
-    //skybox_program_->draw(*scene_, (float)cur_width / (float)cur_height);
     
     if (cur_camera_comp->is_wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     g_buffer_->unbind();
-    //glViewport(0, 0, cur_width, cur_height);
 
     //Lighting Pass
-    glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     post_process_program_->bind_framebuffer();
-    glViewport(0, 0, cur_width, cur_height);
     lighting_program_->draw(*scene_, *screen_mesh_, 0, *g_buffer_);
     post_process_program_->unbind_framebuffer();
+
+    //g_buffer_->blit_framebuffer();
+    skybox_program_->draw(*scene_, (float)cur_width / (float)cur_height);
     
     //Post Process Pass
-    glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     if (editor_->is_visible) editor_->viewport_fbo->bind();
-    glViewport(0, 0, cur_width, cur_height);
-
     post_process_program_->draw(*screen_mesh_, 0, *cur_camera_comp);
-    
     if (editor_->is_visible) editor_->viewport_fbo->unbind();
+    
     glViewport(0, 0, args.width, args.height);
     
     //Editor
@@ -344,9 +334,12 @@ void Engine::render(EngineArgs& args)
         if (scene_->current_camera == scene_->player_camera) ImGui::GetStyle().Colors[2] = {0.5f, 0.2f, 0.2f, 0.7f};
         else scene_->current_camera = scene_->editor_camera.get();
         ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoInputs);
+        
         const ImVec2 pos_vp  = ImGui::GetCursorScreenPos();
         const ImVec2 size_vp = ImGui::GetContentRegionAvail();
+        resize((int)size_vp.x, (int)size_vp.y);
         editor_->viewport_fbo->set_gui();
+        
         ImGuizmo::SetRect(pos_vp.x, pos_vp.y, size_vp.x, size_vp.y);
         if (scene_->selected_entity != nullptr) scene_->selected_entity->transform->set_guizmo(scene_->current_camera, editor_->gizmo_operation);
         ImVec2 pos = ImGui::GetWindowPos();
@@ -355,11 +348,8 @@ void Engine::render(EngineArgs& args)
         ImGui::End();
         if (scene_->current_camera == scene_->player_camera) ImGui::GetStyle().Colors[2] = old_bg;
 
-        //g_buffer_->resize(editor_->viewport_fbo->attached_textures.front()->get_width(), editor_->viewport_fbo->attached_textures.front()->get_height());
-        //post_process_program_->resize(editor_->viewport_fbo->attached_textures.front()->get_width(), editor_->viewport_fbo->attached_textures.front()->get_height());
         
         mouse_->set_gui();
-        
             
         //Scene
         if (ImGui::Begin("Scene Graph ##ENTITIES_GRAPH"))
@@ -395,6 +385,9 @@ void Engine::render(EngineArgs& args)
                     ImGui::Text("Uptime: %.3f s", glfwGetTime());
                     ImGui::Text("Window W: %i, H: %i", args.width, args.height);
                     ImGui::Text("Viewport W: %i, H: %i", cur_width, cur_height);
+                    ImGui::Text("GBuffer W: %i, H: %i", g_buffer_->albedo_spec_texture->get_width(), g_buffer_->albedo_spec_texture->get_height());
+                    ImGui::Text("Post Process W: %i, H: %i", post_process_program_->framebuffer_->attached_textures.front()->get_width(), post_process_program_->framebuffer_->attached_textures.front()->get_height());
+                    ImGui::Text("Editor W: %i, H: %i", editor_->viewport_fbo->attached_textures.front()->get_width(), editor_->viewport_fbo->attached_textures.front()->get_height());
                     ImGui::TreePop();
                 }
             }
@@ -410,6 +403,13 @@ void Engine::render(EngineArgs& args)
     
     glfwSwapBuffers(args.window);
     glfwPollEvents();
+}
+
+void Engine::resize(const int width, const int height)
+{
+    g_buffer_->resize(width, height);
+    post_process_program_->resize(width, height);
+    editor_->viewport_fbo->resize(width, height);
 }
 
 

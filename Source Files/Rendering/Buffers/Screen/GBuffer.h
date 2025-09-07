@@ -14,6 +14,7 @@ public:
     GBuffer(int width, int height);
     ~GBuffer() override = default;
     void resize(int, int);
+    void blit_framebuffer();
     void active_bind();
     void bind() override;
     void unbind() override;

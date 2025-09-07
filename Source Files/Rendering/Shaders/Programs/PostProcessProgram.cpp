@@ -5,11 +5,11 @@
 #include "../../Buffers/Screen/Framebuffer.h"
 #include "../../Entities/Components/CameraComponent.h"
 
-PostProcessProgram::PostProcessProgram(const std::vector<Shader>& shaders, int height, int width) : Program(shaders)
+PostProcessProgram::PostProcessProgram(const std::vector<Shader>& shaders, int width, int height) : Program(shaders)
 {
     framebuffer_ = std::make_unique<Framebuffer>();
     framebuffer_->attach_texture_2d(std::make_unique<Texture>(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT), GL_COLOR_ATTACHMENT0);
-    framebuffer_->attach_renderbuffer(std::make_unique<Renderbuffer>(width, height, GL_DEPTH24_STENCIL8), GL_DEPTH_STENCIL_ATTACHMENT);
+    framebuffer_->attach_renderbuffer(std::make_unique<Renderbuffer>(width, height, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT));
     framebuffer_->set_draw_buffers();
     framebuffer_->check_completeness();
 }

@@ -19,13 +19,18 @@ GBuffer::GBuffer(int width, int height)
     framebuffer_->set_draw_buffers();
 
     //Renderbuffer
-    framebuffer_->attach_renderbuffer(std::make_unique<Renderbuffer>(width, height, GL_DEPTH_COMPONENT), GL_DEPTH_ATTACHMENT);
+    framebuffer_->attach_renderbuffer(std::make_unique<Renderbuffer>(width, height, GL_DEPTH_COMPONENT, GL_DEPTH_ATTACHMENT));
     framebuffer_->check_completeness();
 }
 
 void GBuffer::resize(const int width, const int height)
 {
     framebuffer_->resize(width, height);
+}
+
+void GBuffer::blit_framebuffer()
+{
+    framebuffer_->blit_framebuffer();
 }
 
 void GBuffer::active_bind()

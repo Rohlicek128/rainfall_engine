@@ -24,10 +24,10 @@ void Framebuffer::attach_texture_2d(std::unique_ptr<Texture> texture, const GLen
     unbind();
 }
 
-void Framebuffer::attach_renderbuffer(std::unique_ptr<Renderbuffer> renderbuffer, const GLenum attachment)
+void Framebuffer::attach_renderbuffer(std::unique_ptr<Renderbuffer> renderbuffer)
 {
     bind();
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, renderbuffer->get_handle());
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, renderbuffer->get_attachment(), GL_RENDERBUFFER, renderbuffer->get_handle());
     attached_renderbuffer = std::move(renderbuffer);
     unbind();
 }
@@ -36,10 +36,21 @@ bool Framebuffer::check_completeness()
 {
     bind();
     const bool result = glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
-    if(!result) std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!\n";
+    if(!result)
+        std::cout << "ERROR::FRAMEBUFFER::H" << handle_ << " Framebuffer is not complete!\n";
     unbind();
     
     return result;
+}
+
+void Framebuffer::blit_framebuffer()
+{
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, handle_);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBlitFramebuffer(0, 0, attached_textures.front()->get_width(), attached_textures.front()->get_height(),
+        0, 0, attached_textures.front()->get_width(), attached_textures.front()->get_height(),
+        GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Framebuffer::set_draw_buffers()
@@ -57,11 +68,21 @@ void Framebuffer::set_draw_buffers()
 
 void Framebuffer::resize(const int w, const int h)
 {
-    for (const auto& texture : attached_textures) texture->resize(w, h);
+    for (const auto& texture : attached_textures)
+    {
+        texture->resize(w, h);
+        bind();
+        glFramebufferTexture2D(GL_FRAMEBUFFER, texture->attachment, GL_TEXTURE_2D, texture->get_handle(), 0);
+        unbind();
+    }
+    check_completeness();
     
-    if (attached_renderbuffer == nullptr || attached_renderbuffer->get_width() == w || attached_renderbuffer->get_height() == h) return;
+    if (attached_renderbuffer == nullptr || (attached_renderbuffer->get_width() == w && attached_renderbuffer->get_height() == h)) return;
     attached_renderbuffer->resize(w, h);
-    attach_renderbuffer(std::make_unique<Renderbuffer>(*attached_renderbuffer), GL_DEPTH_STENCIL_ATTACHMENT);
+    bind();
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, attached_renderbuffer->get_attachment(), GL_RENDERBUFFER, attached_renderbuffer->get_handle());
+    unbind();
+    check_completeness();
 }
 
 void Framebuffer::bind()
@@ -78,11 +99,6 @@ void Framebuffer::set_gui()
 {
     if (attached_textures.at(0) == nullptr) return;
     
-    ImVec2 window_size = ImGui::GetWindowContentRegionMax();
-    window_size.x -= ImGui::GetWindowContentRegionMin().x;
-    window_size.y -= ImGui::GetWindowContentRegionMin().y;
-    resize((int)window_size.x, (int)window_size.y);
-        
     ImGui::Image((ImTextureID)(intptr_t)attached_textures.at(0)->get_handle(),
-        {window_size.x, window_size.y},{0, 1}, {1, 0});
+        {(float)attached_textures.at(0)->get_width(), (float)attached_textures.at(0)->get_height()},{0, 1}, {1, 0});
 }

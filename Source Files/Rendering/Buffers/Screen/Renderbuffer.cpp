@@ -1,10 +1,11 @@
 #include "Renderbuffer.h"
 
-Renderbuffer::Renderbuffer(const int width, const int height, const GLenum format)
+Renderbuffer::Renderbuffer(const int width, const int height, const GLenum format, const GLenum attachment)
 {
     width_ = width;
     height_ = height;
     format_ = format;
+    attachment_ = attachment;
     
     glGenRenderbuffers(1, &handle_);
     Renderbuffer::bind();
@@ -32,6 +33,16 @@ int Renderbuffer::get_width()
 int Renderbuffer::get_height()
 {
     return height_;
+}
+
+GLenum Renderbuffer::get_format()
+{
+    return format_;
+}
+
+GLenum Renderbuffer::get_attachment()
+{
+    return attachment_;
 }
 
 void Renderbuffer::bind()

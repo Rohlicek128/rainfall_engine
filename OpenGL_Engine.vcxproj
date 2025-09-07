@@ -496,7 +496,6 @@
     <Content Include="Source Files\Rendering\Shaders\GLSL\Geometry\geometry.frag" />
     <Content Include="Source Files\Rendering\Shaders\GLSL\Geometry\geometry.vert" />
     <Content Include="Source Files\Rendering\Shaders\GLSL\Lighting\lighting.frag" />
-    <Content Include="Source Files\Rendering\Shaders\GLSL\Lighting\lighting.vert" />
     <Content Include="Source Files\Rendering\Shaders\GLSL\Screen\screen.frag" />
     <Content Include="Source Files\Rendering\Shaders\GLSL\Screen\screen.vert" />
     <Content Include="Source Files\Rendering\Shaders\GLSL\Skybox\skybox.frag" />

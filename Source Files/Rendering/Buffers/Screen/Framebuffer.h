@@ -16,8 +16,10 @@ public:
     Framebuffer();
     ~Framebuffer() override;
     void attach_texture_2d(std::unique_ptr<Texture>, GLenum);
-    void attach_renderbuffer(std::unique_ptr<Renderbuffer>, GLenum);
+    void attach_renderbuffer(std::unique_ptr<Renderbuffer>);
     bool check_completeness();
+    
+    void blit_framebuffer();
     
     void set_draw_buffers();
     void resize(int, int);
