@@ -40,8 +40,8 @@ void LightingProgram::draw(const Scene& scene, Mesh& screen_mesh, const int quad
     //GBuffer
     g_buffer.active_bind();
     set_uniform("g_position", 0);
-    set_uniform("g_albedo_spec", 1);
-    set_uniform("g_normal_shin", 2);
+    set_uniform("g_albedo_rough", 1);
+    set_uniform("g_normal_metal", 2);
     
     set_uniform("is_shaded", 1);
 

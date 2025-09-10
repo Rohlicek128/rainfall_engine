@@ -1,9 +1,10 @@
 #include "MaterialComponent.h"
 
-MaterialComponent::MaterialComponent(const glm::vec4 color, const float shininess)
+MaterialComponent::MaterialComponent(const glm::vec4 color, const float roughness, const float metallic)
 {
     this->color = color;
-    this->shininess = shininess;
+    this->metallic = metallic;
+    this->roughness = roughness;
 
     color_edit_ = new float[] {color.r, color.g, color.b, color.a};
 }
@@ -16,7 +17,8 @@ MaterialComponent::~MaterialComponent()
 void MaterialComponent::set_uniforms(Program* program)
 {
     program->set_uniform("material.color", glm::vec3(color));
-    program->set_uniform("material.shininess", shininess);
+    program->set_uniform("material.roughness", roughness);
+    program->set_uniform("material.metallic", metallic);
     program->set_uniform("is_light", 0);
 }
 
@@ -28,5 +30,7 @@ void MaterialComponent::set_gui()
     color.b = color_edit_[2];
     color.a = color_edit_[3];
 
-    ImGui::SliderFloat("Shininess", &shininess, 1.0f, 1024.0f, "%.1f", ImGuiSliderFlags_Logarithmic);
+    //ImGui::SliderFloat("Shininess", &metallic, 1.0f, 1024.0f, "%.1f", ImGuiSliderFlags_Logarithmic);
+    ImGui::SliderFloat("Roughness", &roughness, 0.0f, 1.0f, "%.2f");
+    ImGui::SliderFloat("Metallic", &metallic, 0.0f, 1.0f, "%.2f");
 }

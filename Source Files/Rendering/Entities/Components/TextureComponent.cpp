@@ -9,9 +9,12 @@ TextureComponent::TextureComponent(const int type, const unsigned int diffuse, c
     else type_edit_ = 1;
 
     texture_manager_ = TextureManager::get_instance();
+
+    scale = 1.0f;
     
     diffuse_handle_ = diffuse;
-    specular_handle_ = specular;
+    roughness_handle_ = specular;
+    metallic_handle_ = 2;
     normal_handle_ = normal;
     if (cubemap == -1) cubemap_handle_ = texture_manager_->get_cubemap(0)->get_handle();
 }
@@ -24,9 +27,12 @@ void TextureComponent::active_bind(const unsigned int offset)
         glBindTexture(type, diffuse_handle_);
 
         glActiveTexture(GL_TEXTURE1 + offset);
-        glBindTexture(type, specular_handle_);
+        glBindTexture(type, roughness_handle_);
 
         glActiveTexture(GL_TEXTURE2 + offset);
+        glBindTexture(type, metallic_handle_);
+
+        glActiveTexture(GL_TEXTURE3 + offset);
         glBindTexture(type, normal_handle_);
     }
     else if (type == GL_TEXTURE_CUBE_MAP)
@@ -41,20 +47,39 @@ int TextureComponent::has_normal()
     return normal_handle_ == 1 ? 0 : 1;
 }
 
+int TextureComponent::has_roughness()
+{
+    return roughness_handle_ == 2 ? 0 : 1;
+}
+
+int TextureComponent::has_metallic()
+{
+    return metallic_handle_ == 2 ? 0 : 1;
+}
+
 void TextureComponent::set_gui()
 {
     const char* type_names[] = { "Texture 2D", "Cubemap" };
     ImGui::Combo("Type", &type_edit_, type_names, std::size(type_names));
     if (type_edit_ == 0) type = GL_TEXTURE_2D;
     else if (type_edit_ == 1) type = GL_TEXTURE_CUBE_MAP;
+
+    //Scale
+    ImGui::DragFloat("Scale", &scale, 0.01f, 0, 0, "%.2f");
     
     //Diffuse
     ImGui::SeparatorText("Diffuse Map");
     texture_gui(&diffuse_handle_, "Diffuse");
     
-    //Specular
-    ImGui::SeparatorText("Specular Map");
-    texture_gui(&specular_handle_, "Specular");
+    //Roughness
+    ImGui::SeparatorText("Roughness Map");
+    texture_gui(&roughness_handle_, "Roughness");
+    if (roughness_handle_ == 1) roughness_handle_ = 2;
+
+    //Metallic
+    ImGui::SeparatorText("Metallic Map");
+    texture_gui(&metallic_handle_, "Metallic");
+    if (metallic_handle_ == 1) metallic_handle_ = 2;
 
     //Normal
     ImGui::SeparatorText("Normal Map");
@@ -65,7 +90,7 @@ void TextureComponent::texture_gui(unsigned int* handle, const std::string& id_n
 {
     //Image Select
     Texture* texture = texture_manager_->get_texture_by_handle(*handle);
-    if (texture->get_handle() == 1)
+    if (texture->get_handle() == 1 || texture->get_handle() == 2)
     {
         if (ImGui::Button(("  Select..  ##" + id_name).c_str()))
             ImGui::OpenPopup(("Select " + id_name).c_str());
@@ -86,7 +111,7 @@ void TextureComponent::texture_gui(unsigned int* handle, const std::string& id_n
     }
 
     //Info
-    if (texture->get_handle() == 1) return;
+    if (texture->get_handle() == 1 || texture->get_handle() == 2) return;
     ImGui::SameLine();
     ImGui::BeginGroup();
     {

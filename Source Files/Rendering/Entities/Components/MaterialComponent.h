@@ -9,9 +9,10 @@ class MaterialComponent : public Component
     float* color_edit_;
 public:
     glm::vec4 color;
-    float shininess;
+    float roughness;
+    float metallic;
     
-    MaterialComponent(glm::vec4, float = 32.0f);
+    MaterialComponent(glm::vec4, float = 1.0f, float = 0.0f);
     ~MaterialComponent() override;
     void set_uniforms(Program*);
     void set_gui() override;

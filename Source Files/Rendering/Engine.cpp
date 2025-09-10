@@ -25,8 +25,11 @@ Engine::Engine(const EngineArgs& args) : fps_plot_{}
     textures_->add_texture(std::make_unique<Texture>("container_specular.png", GL_RGBA8, GL_RGBA));
     textures_->add_texture(std::make_unique<Texture>("circuits_normal.jpg", GL_RGB8, GL_RGB));
     textures_->add_texture(std::make_unique<Texture>("shrek.png", GL_SRGB8_ALPHA8, GL_RGBA));
-    //textures_->add_texture(std::make_unique<Texture>("test_fail.png", GL_SRGB8_ALPHA8, GL_RGBA));
     textures_->add_texture(std::make_unique<Texture>("black_hole.jpg", GL_SRGB8, GL_RGB));
+
+    textures_->add_texture(std::make_unique<Texture>("rocky_dirt/rocky_trail_02_diff_1k.jpg", GL_SRGB8, GL_RGB));
+    textures_->add_texture(std::make_unique<Texture>("rocky_dirt/rocky_trail_02_arm_1k.jpg", GL_RGB8, GL_RGB));
+    textures_->add_texture(std::make_unique<Texture>("rocky_dirt/rocky_trail_02_nor_gl_1k.jpg", GL_RGB8, GL_RGB));
 
     std::vector<std::string> faces = {"Skybox/0right.jpg", "Skybox/1left.jpg", "Skybox/2top.jpg",
         "Skybox/3bottom.jpg", "Skybox/4front.jpg", "Skybox/5back.jpg"};
@@ -101,6 +104,12 @@ Engine::Engine(const EngineArgs& args) : fps_plot_{}
     );
     point_light->add_component(MESH, new MeshComponent(0));
     point_light->add_component(LIGHT, new LightComponent(POINT, glm::vec3(0.2f), glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0.8f), 0.5f));
+
+    std::unique_ptr<Entity> point_light_2 = std::make_unique<Entity>("Bulb #2",
+        new TransformComponent(glm::vec3(3.0f, 5.0f, 4.0f), glm::vec3(0.0f), glm::vec3(0.35f))
+    );
+    point_light_2->add_component(MESH, new MeshComponent(0));
+    point_light_2->add_component(LIGHT, new LightComponent(POINT, glm::vec3(0.2f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.8f), 1.0f));
     
     scene_->add_entity(std::move(player_camera));
     scene_->add_entity(std::move(obj1));
@@ -110,10 +119,11 @@ Engine::Engine(const EngineArgs& args) : fps_plot_{}
     
     scene_->add_entity(std::move(dir_light), true);
     scene_->add_entity(std::move(point_light), true);
+    scene_->add_entity(std::move(point_light_2), true);
 
     g_buffer_ = std::make_unique<GBuffer>(args.width, args.height);
     geometry_program_ = new GeometryProgram({{"Geometry/geometry.vert", GL_VERTEX_SHADER}, {"Geometry/geometry.frag", GL_FRAGMENT_SHADER}});
-    lighting_program_ = new LightingProgram({{"Screen/screen.vert", GL_VERTEX_SHADER}, {"Lighting/lighting.frag", GL_FRAGMENT_SHADER}});
+    lighting_program_ = new LightingProgram({{"Screen/screen.vert", GL_VERTEX_SHADER}, {"Lighting/pbr_lighting.frag", GL_FRAGMENT_SHADER}});
 
     //Screen Mesh
     float vertices_quad[] = {
@@ -315,7 +325,7 @@ void Engine::render(EngineArgs& args)
     post_process_program_->unbind_framebuffer();
 
     //g_buffer_->blit_framebuffer();
-    skybox_program_->draw(*scene_, (float)cur_width / (float)cur_height);
+    //skybox_program_->draw(*scene_, (float)cur_width / (float)cur_height);
     
     //Post Process Pass
     if (editor_->is_visible) editor_->viewport_fbo->bind();
@@ -385,7 +395,7 @@ void Engine::render(EngineArgs& args)
                     ImGui::Text("Uptime: %.3f s", glfwGetTime());
                     ImGui::Text("Window W: %i, H: %i", args.width, args.height);
                     ImGui::Text("Viewport W: %i, H: %i", cur_width, cur_height);
-                    ImGui::Text("GBuffer W: %i, H: %i", g_buffer_->albedo_spec_texture->get_width(), g_buffer_->albedo_spec_texture->get_height());
+                    ImGui::Text("GBuffer W: %i, H: %i", g_buffer_->albedo_rough_texture->get_width(), g_buffer_->albedo_rough_texture->get_height());
                     ImGui::Text("Post Process W: %i, H: %i", post_process_program_->framebuffer_->attached_textures.front()->get_width(), post_process_program_->framebuffer_->attached_textures.front()->get_height());
                     ImGui::Text("Editor W: %i, H: %i", editor_->viewport_fbo->attached_textures.front()->get_width(), editor_->viewport_fbo->attached_textures.front()->get_height());
                     ImGui::TreePop();

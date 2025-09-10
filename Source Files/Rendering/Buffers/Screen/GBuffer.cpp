@@ -8,9 +8,9 @@ GBuffer::GBuffer(int width, int height)
     framebuffer_->attach_texture_2d(std::make_unique<Texture>(width, height, GL_RGB16F, GL_RGB, GL_FLOAT), GL_COLOR_ATTACHMENT0);
     position_texture = framebuffer_->attached_textures.back().get();
 
-    //Albedo + Specular
+    //Albedo + Roughness
     framebuffer_->attach_texture_2d(std::make_unique<Texture>(width, height, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE), GL_COLOR_ATTACHMENT1);
-    albedo_spec_texture = framebuffer_->attached_textures.back().get();
+    albedo_rough_texture = framebuffer_->attached_textures.back().get();
 
     //Normal + Shininess
     framebuffer_->attach_texture_2d(std::make_unique<Texture>(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT), GL_COLOR_ATTACHMENT2);
@@ -36,7 +36,7 @@ void GBuffer::blit_framebuffer()
 void GBuffer::active_bind()
 {
     position_texture->active_bind(0);
-    albedo_spec_texture->active_bind(1);
+    albedo_rough_texture->active_bind(1);
     normal_shin_texture->active_bind(2);
 }
 

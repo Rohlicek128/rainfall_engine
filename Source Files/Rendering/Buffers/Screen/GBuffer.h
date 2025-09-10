@@ -8,7 +8,7 @@ class GBuffer : public IBindable
     
 public:
     Texture* position_texture;
-    Texture* albedo_spec_texture;
+    Texture* albedo_rough_texture;
     Texture* normal_shin_texture;
     
     GBuffer(int width, int height);

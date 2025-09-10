@@ -15,8 +15,10 @@ uniform mat3 inverse_model;
 uniform mat4 view;
 uniform mat4 projection;
 
+uniform float texture_scaling;
+
 void main(){
-	vTexCoord = texCoord;
+	vTexCoord = texCoord * texture_scaling;
 	vFragPos = vec3(model * vec4(position, 1.0));
 	vNormal = inverse_model * normal;
 
