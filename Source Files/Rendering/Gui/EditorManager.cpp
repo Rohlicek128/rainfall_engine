@@ -10,6 +10,7 @@ EditorManager::EditorManager(const bool visible, int width, int height)
     toggle_visibility = true;
     show_imgui_demo = false;
     show_statistics = true;
+    show_g_buffer_inspector = false;
 
     gizmo_operation = ImGuizmo::OPERATION::TRANSLATE;
 
@@ -53,6 +54,7 @@ void EditorManager::set_main_dockspace()
         {
             ImGui::SeparatorText("Available Windows");
             ImGui::MenuItem("Show Statistics", "CTRL+P", &show_statistics);
+            ImGui::MenuItem("Show GBuffer Inspector", "CTRL+G", &show_g_buffer_inspector);
 
             ImGui::Separator();
             ImGui::MenuItem("Show ImGui Demo", "CTRL+D", &show_imgui_demo);

@@ -14,6 +14,7 @@ public:
     bool toggle_visibility;
     bool show_imgui_demo;
     bool show_statistics;
+    bool show_g_buffer_inspector;
 
     int gizmo_operation;
     

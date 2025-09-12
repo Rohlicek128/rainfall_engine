@@ -97,19 +97,19 @@ Engine::Engine(const EngineArgs& args) : fps_plot_{}
         new TransformComponent(glm::vec3(0.0f, 20.0f, 0.0f), glm::vec3(-6.0f, -10, 6.0f), glm::vec3(0.5f))
     );
     dir_light->add_component(MESH, new MeshComponent(0));
-    dir_light->add_component(LIGHT, new LightComponent(DIRECTIONAL, glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(0.7f), 5.0f));
+    dir_light->add_component(LIGHT, new LightComponent(DIRECTIONAL, glm::vec3(1.0f), 5.0f));
 
     std::unique_ptr<Entity> point_light = std::make_unique<Entity>("Bulb",
         new TransformComponent(glm::vec3(3.0f, 5.0f, 1.0f), glm::vec3(0.0f), glm::vec3(0.35f))
     );
     point_light->add_component(MESH, new MeshComponent(0));
-    point_light->add_component(LIGHT, new LightComponent(POINT, glm::vec3(0.2f), glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0.8f), 0.5f));
+    point_light->add_component(LIGHT, new LightComponent(POINT, glm::vec3(1.0f, 1.0f, 0.0f), 0.5f));
 
     std::unique_ptr<Entity> point_light_2 = std::make_unique<Entity>("Bulb #2",
         new TransformComponent(glm::vec3(3.0f, 5.0f, 4.0f), glm::vec3(0.0f), glm::vec3(0.35f))
     );
     point_light_2->add_component(MESH, new MeshComponent(0));
-    point_light_2->add_component(LIGHT, new LightComponent(POINT, glm::vec3(0.2f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.8f), 1.0f));
+    point_light_2->add_component(LIGHT, new LightComponent(POINT, glm::vec3(1.0f, 1.0f, 1.0f), 1.0f));
     
     scene_->add_entity(std::move(player_camera));
     scene_->add_entity(std::move(obj1));
@@ -324,8 +324,8 @@ void Engine::render(EngineArgs& args)
     lighting_program_->draw(*scene_, *screen_mesh_, 0, *g_buffer_);
     post_process_program_->unbind_framebuffer();
 
-    //g_buffer_->blit_framebuffer();
-    //skybox_program_->draw(*scene_, (float)cur_width / (float)cur_height);
+    g_buffer_->blit_framebuffer();
+    skybox_program_->draw(*scene_, (float)cur_width / (float)cur_height);
     
     //Post Process Pass
     if (editor_->is_visible) editor_->viewport_fbo->bind();
@@ -376,6 +376,14 @@ void Engine::render(EngineArgs& args)
         if (ImGui::Begin("Inspector ##ENTITIES_EDITOR"))
             scene_->set_entity_inspector();
         ImGui::End();
+
+        //GBuffer
+        if (editor_->show_g_buffer_inspector)
+        {
+            if (ImGui::Begin("GBuffer Inspector", &editor_->show_g_buffer_inspector))
+                g_buffer_->set_gui();
+            ImGui::End();
+        }
 
         //Statistics
         if (editor_->show_statistics)

@@ -36,6 +36,7 @@ void LightingProgram::draw(const Scene& scene, Mesh& screen_mesh, const int quad
     
     //Camera
     set_uniform("view_pos", scene.current_camera->transform->position);
+    set_uniform("ambient", 0.01f, 0.01f, 0.01f);
 
     //GBuffer
     g_buffer.active_bind();

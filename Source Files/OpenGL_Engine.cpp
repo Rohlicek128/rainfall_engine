@@ -1,85 +1,12 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <iostream>
-
 #include "Rendering/Engine.h"
-
-EngineArgs render_args;
-
-void framebuffer_size_callback(GLFWwindow*, int width, int height)
-{
-    glViewport(0, 0, width, height);
-    render_args.width = width;
-    render_args.height = height;
-}
-
-void mouse_callback(GLFWwindow*, double x, double y)
-{
-    render_args.mouse_x = static_cast<float>(x);
-    render_args.mouse_y = static_cast<float>(y);
-}
-
-void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
-    render_args.scroll_x = static_cast<float>(xoffset);
-    render_args.scroll_y = static_cast<float>(yoffset);
-}
-
-GLFWwindow* init_window(const int width, const int height, const char* window_name)
-{
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-
-    GLFWwindow* window = glfwCreateWindow(width, height, window_name, nullptr, nullptr);
-    if (window == nullptr)
-    {
-        throw "Create GLFW Window: FAILED";
-    }
-    glfwMakeContextCurrent(window);
-    glfwSwapInterval(0);
-
-
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        throw "Initialize GLAD: FAILED";
-    }
-    glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetScrollCallback(window, mouse_scroll_callback);
-    
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glViewport(0, 0, width, height);
-    render_args.width = width;
-    render_args.height = height;
-
-    glfwSetWindowPos(window, 50, 50);
-
-    return window;
-}
+#include "Rendering/Window.h"
 
 int main()
 {
-    GLFWwindow* window;
-    try
-    {
-        window = init_window(1920, 1080, "RAINFALL ENGINE");
-    }
-    catch (std::string e)
-    {
-        std::cout << e << '\n';
-        glfwTerminate();
-        return -1;
-    }
-    render_args.window = window;
-    
-    Engine engine(render_args);
-    while (!glfwWindowShouldClose(window))
-    {
-        engine.update(render_args);
-        engine.render(render_args);
-    }
+    Window window("Rainfall Engine", 1920, 1080);
+    Engine engine(Window::engine_args);
+
+    window.run(engine);
     
     return 0;
 }

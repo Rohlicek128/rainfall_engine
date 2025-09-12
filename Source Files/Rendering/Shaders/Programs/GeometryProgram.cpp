@@ -68,7 +68,7 @@ void GeometryProgram::draw(const Scene& scene, const float aspect_ratio)
         else if (entity->component_exists(LIGHT))
         {
             set_uniform("material.color",
-                dynamic_cast<LightComponent*>(entity->components->at(LIGHT))->diffuse *
+                dynamic_cast<LightComponent*>(entity->components->at(LIGHT))->color *
                     dynamic_cast<LightComponent*>(entity->components->at(LIGHT))->intensity);
             set_uniform("material.roughness", 1.0f);
             set_uniform("material.metallic", 0.0f);

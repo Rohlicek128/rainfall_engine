@@ -3,19 +3,14 @@
 struct DirLight {
 	bool is_lighting;
 	vec3 direction;
-
-	vec3 ambient;
-	vec3 diffuse;
-	vec3 specular;
+    
+	vec3 color;
 };
 
 struct PointLight {
 	bool is_lighting;
 	vec3 position;
-
-	vec3 ambient;
-	vec3 diffuse;
-	vec3 specular;
+	vec3 color;
 
 	vec3 attenuation_params;
 };
@@ -34,6 +29,7 @@ uniform sampler2D g_albedo_rough;
 uniform sampler2D g_normal_metal;
 
 uniform vec3 view_pos;
+uniform vec3 ambient;
 
 const float PI = 3.14159265359;
 
@@ -83,7 +79,7 @@ void main(){
 
 		vec3 L = normalize(-dir_lights[i].direction);
 		vec3 H = normalize(V + L);
-		vec3 radiance = dir_lights[i].diffuse * max(dot(N, L), 0.0);
+		vec3 radiance = dir_lights[i].color * max(dot(N, L), 0.0);
 
 		vec3 F = fresnel_schlick(max(dot(H, V), 0.0), F0);
 		float NDF = distribution_ggx(N, H, roughness);
@@ -103,7 +99,7 @@ void main(){
 		
 		float distance = length(point_lights[i].position - frag_pos);
 		float attenuation = 1.0 / (point_lights[i].attenuation_params.x + point_lights[i].attenuation_params.y * distance + point_lights[i].attenuation_params.z * (distance * distance));
-		vec3 radiance = point_lights[i].diffuse * attenuation;
+		vec3 radiance = point_lights[i].color * attenuation;
 		
 		vec3 F = fresnel_schlick(max(dot(H, V), 0.0), F0);
 		float NDF = distribution_ggx(N, H, roughness);
@@ -114,7 +110,6 @@ void main(){
 		
 		Lo += (kD * albedo / PI + specular) * radiance * max(dot(N, L), 0.0);
 	}
-	vec3 ambient = vec3(0.001) * albedo;
-	
-	pixel_color = vec4(ambient + Lo, 1.0);
+    
+	pixel_color = vec4((ambient * albedo) + Lo, 1.0);
 }

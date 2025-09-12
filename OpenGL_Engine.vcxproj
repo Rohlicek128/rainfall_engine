@@ -358,6 +358,7 @@
     <ClCompile Include="Source Files\Rendering\Shaders\Programs\PostProcessProgram.cpp" />
     <ClCompile Include="Source Files\Rendering\Shaders\Programs\SkyboxProgram.cpp" />
     <ClCompile Include="Source Files\Rendering\Shaders\Shader.cpp" />
+    <ClCompile Include="Source Files\Rendering\Window.cpp" />
     <ClCompile Include="Source Files\Rendering\World\Mesh.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -483,6 +484,7 @@
     <ClInclude Include="Source Files\Rendering\Shaders\Programs\PostProcessProgram.h" />
     <ClInclude Include="Source Files\Rendering\Shaders\Programs\SkyboxProgram.h" />
     <ClInclude Include="Source Files\Rendering\Shaders\Shader.h" />
+    <ClInclude Include="Source Files\Rendering\Window.h" />
     <ClInclude Include="Source Files\Rendering\World\Mesh.h" />
     <ClInclude Include="Source Files\Rendering\World\ModelData.h" />
     <ClInclude Include="Source Files\Rendering\World\Scene.h" />

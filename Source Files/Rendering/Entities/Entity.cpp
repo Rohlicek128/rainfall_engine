@@ -162,7 +162,7 @@ void Entity::set_gui()
         case CAMERA: add_component(CAMERA, new CameraComponent(transform)); break;
         case MATERIAL: add_component(MATERIAL, new MaterialComponent(glm::vec4(1.0))); break;
         case TEXTURE: add_component(TEXTURE, new TextureComponent(GL_TEXTURE_2D, 1, 1)); break;
-        case LIGHT: add_component(LIGHT, new LightComponent(POINT, glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(0.7f))); break;
+        case LIGHT: add_component(LIGHT, new LightComponent(POINT, glm::vec3(1.0f))); break;
     }
     add_selected_ = -1;
 }
