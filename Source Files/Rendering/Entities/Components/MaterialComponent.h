@@ -15,5 +15,9 @@ public:
     MaterialComponent(glm::vec4, float = 1.0f, float = 0.0f);
     ~MaterialComponent() override;
     void set_uniforms(Program*);
+
+    std::string get_name() override;
     void set_gui() override;
+    void serialize(YAML::Emitter& out) override;
+    bool deserialize(YAML::Node& node) override;
 };

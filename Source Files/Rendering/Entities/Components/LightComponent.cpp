@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <string>
 
-LightComponent::LightComponent(const light_type& t, const glm::vec3& c, const float i, const glm::vec3& attenuation)
+LightComponent::LightComponent(const LIGHT_TYPE& t, const glm::vec3& c, const float i, const glm::vec3& attenuation)
 {
     type = t;
     color = c;
@@ -18,7 +18,7 @@ LightComponent::LightComponent(const light_type& t, const glm::vec3& c, const fl
 
 LightComponent::~LightComponent()
 {
-    delete[] color_edit_;
+    //delete[] color_edit_;
 }
 
 void LightComponent::set_uniforms(Program* program, const int index, const TransformComponent* transform)
@@ -38,14 +38,21 @@ void LightComponent::set_uniforms(Program* program, const int index, const Trans
             program->set_uniform((point_lights + "].color").c_str(), color * intensity);
             program->set_uniform((point_lights + "].attenuation_params").c_str(), attenuation_params);
             break;
+        case SPOTLIGHT:
+            break;
     }
+}
+
+std::string LightComponent::get_name()
+{
+    return "Light";
 }
 
 void LightComponent::set_gui()
 {
     const char* type_names[] = { "Directional", "Point", "Spotlight" };
     ImGui::Combo("Type", &type_edit_, type_names, std::size(type_names));
-    type = (light_type)type_edit_;
+    type = (LIGHT_TYPE)type_edit_;
 
     ImGui::SeparatorText("Color");
 
@@ -69,4 +76,48 @@ void LightComponent::set_gui()
         ImGui::DragFloat("Quadratic", &attenuation_params.z, 0.0001f, 0, 0, "%.4f");
         ImGui::PopItemWidth();
     }
+}
+
+void LightComponent::serialize(YAML::Emitter& out)
+{
+    out << YAML::BeginMap;
+    out << YAML::Key << get_name() << YAML::Value << YAML::BeginMap;
+    out << YAML::Key << "Enabled" << YAML::Value << is_enabled;
+
+    out << YAML::Key << "Type" << YAML::Value << type;
+    out << YAML::Key << "Color" << YAML::Value;
+    emit_out(out, color);
+    out << YAML::Key << "Intensity" << YAML::Value << intensity;
+    if (type == POINT)
+    {
+        out << YAML::Key << "Attenuation" << YAML::Value;
+        emit_out(out, attenuation_params);
+    }
+    
+    out << YAML::EndMap;
+    out << YAML::EndMap;
+}
+
+bool LightComponent::deserialize(YAML::Node& node)
+{
+    is_enabled = node["Enabled"].as<bool>();
+    
+    type = (LIGHT_TYPE)node["Type"].as<int>();
+    type_edit_ = type;
+    if (YAML::Node cur = node["Color"])
+    {
+        color = des_vec3(cur);
+        color_edit_[0] = color.x;
+        color_edit_[1] = color.y;
+        color_edit_[2] = color.z;
+    }
+        
+    intensity = node["Intensity"].as<float>();
+    if (type == POINT)
+    {
+        if (YAML::Node cur = node["Attenuation"])
+            attenuation_params = des_vec3(cur);
+    }
+    
+    return true;
 }

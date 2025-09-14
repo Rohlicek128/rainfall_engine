@@ -11,10 +11,8 @@
 #include <stb/stb_image.h>
 
 #include "EngineArgs.h"
-#include "Buffers/Screen/Framebuffer.h"
 #include "Buffers/Screen/GBuffer.h"
 #include "Buffers/Textures/TextureManager.h"
-#include "Shaders/Program.h"
 
 #include "Entities/Mouse.h"
 #include "Gui/EditorManager.h"
@@ -23,6 +21,7 @@
 #include "Shaders/Programs/PostProcessProgram.h"
 #include "Shaders/Programs/SkyboxProgram.h"
 #include "World/Scene.h"
+#include "Entities/Entity.h"
 
 class Engine
 {
@@ -51,19 +50,19 @@ class Engine
     int display_frame_count_;
     int last_uptime_;
     int max_fps_plot_;
-    float fps_plot_[60];
+    float fps_plot_[30];
     std::deque<int> fps_history_;
     
     bool is_fullscreen_;
     bool fullscreen_toggle_;
     bool can_escape_;
-    
-    Entity* entity_selected_;
 
     void update_delta_time();
     void resize(int, int);
     void set_icon(GLFWwindow*, const std::string&);
+    
     void set_models_to_mesh(Mesh*);
+    void set_hardcoded_entities(Scene&);
 public:
     Engine(const EngineArgs&);
     ~Engine();

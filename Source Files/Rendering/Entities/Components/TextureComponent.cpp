@@ -57,6 +57,11 @@ int TextureComponent::has_metallic()
     return metallic_handle_ == 2 ? 0 : 1;
 }
 
+std::string TextureComponent::get_name()
+{
+    return "Texture";
+}
+
 void TextureComponent::set_gui()
 {
     const char* type_names[] = { "Texture 2D", "Cubemap" };
@@ -125,4 +130,49 @@ void TextureComponent::texture_gui(unsigned int* handle, const std::string& id_n
         else ImGui::Text("FAILED TO LOAD");
         ImGui::EndGroup();
     }
+}
+
+void TextureComponent::serialize(YAML::Emitter& out)
+{
+    out << YAML::BeginMap;
+    out << YAML::Key << "Texture" << YAML::Value << YAML::BeginMap;
+    out << YAML::Key << "Enabled" << YAML::Value << is_enabled;
+
+    out << YAML::Key << "Type" << YAML::Value << type;
+    out << YAML::Key << "Scale" << YAML::Value << scale;
+    if (type == GL_TEXTURE_2D)
+    {
+        out << YAML::Key << "Diffuse" << YAML::Value << diffuse_handle_;
+        out << YAML::Key << "Roughness" << YAML::Value << roughness_handle_;
+        out << YAML::Key << "Metallic" << YAML::Value << metallic_handle_;
+        out << YAML::Key << "Normal" << YAML::Value << normal_handle_;
+    }
+    else if (type == GL_TEXTURE_CUBE_MAP)
+    {
+        out << YAML::Key << "Cubemap" << YAML::Value << cubemap_handle_;
+    }
+    
+    out << YAML::EndMap;
+    out << YAML::EndMap;
+}
+
+bool TextureComponent::deserialize(YAML::Node& node)
+{
+    is_enabled = node["Enabled"].as<bool>();
+    
+    type = node["Type"].as<int>();
+    scale = node["Scale"].as<float>();
+    if (type == GL_TEXTURE_2D)
+    {
+        diffuse_handle_ = node["Diffuse"].as<unsigned int>();
+        roughness_handle_ = node["Roughness"].as<unsigned int>();
+        metallic_handle_ = node["Metallic"].as<unsigned int>();
+        normal_handle_ = node["Normal"].as<unsigned int>();
+    }
+    else if (type == GL_TEXTURE_CUBE_MAP)
+    {
+        cubemap_handle_ = node["Cubemap"].as<unsigned int>();
+    }
+    
+    return true;
 }

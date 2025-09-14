@@ -86,6 +86,11 @@ glm::mat4 CameraComponent::get_projection_matrix(const float ratio)
     return glm::perspective(glm::radians(fov), ratio, near_plane, far_plane);
 }
 
+std::string CameraComponent::get_name()
+{
+    return "Camera";
+}
+
 void CameraComponent::set_gui()
 {
     ImGui::SeparatorText("Rendering");
@@ -103,7 +108,7 @@ void CameraComponent::set_gui()
     set_yaw_pitch(yaw, pitch);
     
     ImGui::SeparatorText("Field of View");
-    ImGui::SliderFloat("##Fov", &fov, 10.0f, 125.0f);
+    ImGui::SliderFloat("##Fov", &fov, 10.0f, 125.0f, "%.1f");
 
     ImGui::SeparatorText("Clipping Planes");
     ImGui::DragFloat("Near Plane", &near_plane, 0.01f, 0.01f, 100.0f);
@@ -111,4 +116,61 @@ void CameraComponent::set_gui()
 
     ImGui::SeparatorText("Movement");
     ImGui::DragFloat("Speed", &speed, 0.1f, 0.1f, 500.0f);
+}
+
+void CameraComponent::serialize(YAML::Emitter& out)
+{
+    out << YAML::BeginMap;
+    out << YAML::Key << get_name() << YAML::Value << YAML::BeginMap;
+    out << YAML::Key << "Enabled" << YAML::Value << is_enabled;
+    
+    out << YAML::Key << "Wireframe" << YAML::Value << is_wireframe;
+
+    out << YAML::Key << "Yaw" << YAML::Value << yaw;
+    out << YAML::Key << "Pitch" << YAML::Value << pitch;
+    out << YAML::Key << "Fov" << YAML::Value << fov;
+    out << YAML::Key << "Near Plane" << YAML::Value << near_plane;
+    out << YAML::Key << "Far Plane" << YAML::Value << far_plane;
+    out << YAML::Key << "Speed" << YAML::Value << speed;
+    
+    out << YAML::Key << "Gamma" << YAML::Value << gamma;
+    out << YAML::Key << "Exposure" << YAML::Value << exposure;
+    
+    out << YAML::Key << "Clear Color" << YAML::Value << YAML::Flow << YAML::BeginSeq;
+    out << clear_color[0] << clear_color[1] << clear_color[2] << clear_color[3] << YAML::EndSeq;
+
+    out << YAML::Key << "Up Vector" << YAML::Value;
+    emit_out(out, up);
+    
+    out << YAML::EndMap;
+    out << YAML::EndMap;
+}
+
+bool CameraComponent::deserialize(YAML::Node& node)
+{
+    is_enabled = node["Enabled"].as<bool>();
+    is_wireframe = node["Wireframe"].as<bool>();
+
+    yaw = node["Yaw"].as<float>();
+    pitch = node["Pitch"].as<float>();
+    fov = node["Fov"].as<float>();
+    near_plane = node["Near Plane"].as<float>();
+    far_plane = node["Far Plane"].as<float>();
+    speed = node["Speed"].as<float>();
+    
+    gamma = node["Gamma"].as<float>();
+    exposure = node["Exposure"].as<float>();
+    
+    if (YAML::Node cur = node["Clear Color"])
+    {
+        const glm::vec4 clear = des_vec4(cur);
+        clear_color[0] = clear.x;
+        clear_color[1] = clear.y;
+        clear_color[2] = clear.z;
+        clear_color[3] = clear.w;
+    }
+    if (YAML::Node cur = node["Up Vector"])
+        up = des_vec3(cur);
+    
+    return true;
 }

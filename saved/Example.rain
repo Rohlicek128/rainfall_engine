@@ -1,0 +1,281 @@
+Scene: Example
+Selected Entity Id: 5
+Current Camera Id: 2
+Player Camera Id: 4
+Editor Camera:
+  Entity: __editor_camera
+  Id: 2
+  Is Visible: true
+  Children Ids: []
+  Components:
+    - Transform:
+        Position: [3.09666, 5.8417263, -17.472584]
+        Rotation: [0.40818438, -0.2957229, 0.8636744]
+        Scale: [1, 1, 1]
+    - Camera:
+        Enabled: true
+        Wireframe: false
+        Yaw: 64.70394
+        Pitch: -17.200891
+        Fov: 85
+        Near Plane: 0.1
+        Far Plane: 1000
+        Speed: 12.5
+        Gamma: 2.2
+        Exposure: 9.528781
+        Clear Color: [0.25, 0.25, 0.25, 1]
+        Up Vector: [0, 1, 0]
+Entities:
+  - Entity: Player camera
+    Id: 4
+    Is Visible: true
+    Parent Id: 1
+    Children Ids: []
+    Components:
+      - Transform:
+          Position: [-2.8600726, 1.2074224, 6.2764225]
+          Rotation: [0.7626495, 0.0017448842, -0.6468098]
+          Scale: [0.3, 0.3, 0.3]
+      - Mesh:
+          Enabled: true
+          Model Id: 0
+          Primitive: 4
+          Is Culled: true
+          Is Inverted: false
+      - Camera:
+          Enabled: true
+          Wireframe: false
+          Yaw: -40.301575
+          Pitch: 0.09997454
+          Fov: 100.016
+          Near Plane: 0.1
+          Far Plane: 1000
+          Speed: 10
+          Gamma: 2.2
+          Exposure: 6.6413894
+          Clear Color: [0.39769453, 0.39769453, 0.39769453, 1]
+          Up Vector: [0, 1, 0]
+  - Entity: Cube
+    Id: 5
+    Is Visible: true
+    Parent Id: 1
+    Children Ids: []
+    Components:
+      - Transform:
+          Position: [0, 1.32, 0]
+          Rotation: [25.6, 92.21798, 0]
+          Scale: [1, 1, 1]
+      - Mesh:
+          Enabled: true
+          Model Id: 0
+          Primitive: 4
+          Is Culled: true
+          Is Inverted: false
+      - Material:
+          Enabled: true
+          Color: [1, 1, 1, 1]
+          Roughness: 1
+          Metallic: 0
+      - Texture:
+          Enabled: true
+          Type: 3553
+          Scale: 1
+          Diffuse: 5
+          Roughness: 6
+          Metallic: 6
+          Normal: 1
+  - Entity: "Cube #2"
+    Id: 6
+    Is Visible: true
+    Parent Id: 1
+    Children Ids: [7]
+    Components:
+      - Transform:
+          Position: [12.32, 2, 3]
+          Rotation: [0, 69, 0]
+          Scale: [3, 3, 3]
+      - Mesh:
+          Enabled: true
+          Model Id: 0
+          Primitive: 4
+          Is Culled: true
+          Is Inverted: false
+      - Texture:
+          Enabled: true
+          Type: 3553
+          Scale: 1
+          Diffuse: 4
+          Roughness: 2
+          Metallic: 2
+          Normal: 7
+      - Material:
+          Enabled: true
+          Color: [1, 1, 1, 1]
+          Roughness: 0.55
+          Metallic: 1
+  - Entity: "Paper plane #2"
+    Id: 7
+    Is Visible: true
+    Parent Id: 6
+    Children Ids: []
+    Components:
+      - Transform:
+          Position: [-2.11, -0.22, 2.97]
+          Rotation: [0, 73.1, 0]
+          Scale: [0.5, 0.5, 0.5]
+      - Material:
+          Enabled: true
+          Color: [0, 0, 1, 1]
+          Roughness: 1
+          Metallic: 0
+      - Mesh:
+          Enabled: true
+          Model Id: 2
+          Primitive: 4
+          Is Culled: false
+          Is Inverted: false
+  - Entity: Floor
+    Id: 8
+    Is Visible: true
+    Parent Id: 1
+    Children Ids: []
+    Components:
+      - Transform:
+          Position: [0, -1.001, 0]
+          Rotation: [0, 0, 0]
+          Scale: [250, 250, 250]
+      - Mesh:
+          Enabled: true
+          Model Id: 1
+          Primitive: 4
+          Is Culled: true
+          Is Inverted: false
+      - Material:
+          Enabled: false
+          Color: [0.012, 0.012, 0.012, 1]
+          Roughness: 1
+          Metallic: 0
+      - Texture:
+          Enabled: true
+          Type: 3553
+          Scale: 19.8
+          Diffuse: 11
+          Roughness: 12
+          Metallic: 12
+          Normal: 13
+  - Entity: Sun
+    Id: 9
+    Is Visible: true
+    Parent Id: 1
+    Children Ids: []
+    Components:
+      - Transform:
+          Position: [0, 20, 0]
+          Rotation: [-6, -10, 6]
+          Scale: [0.5, 0.5, 0.5]
+      - Mesh:
+          Enabled: true
+          Model Id: 0
+          Primitive: 4
+          Is Culled: true
+          Is Inverted: false
+      - Light:
+          Enabled: false
+          Type: 0
+          Color: [1, 1, 1]
+          Intensity: 15.3
+  - Entity: Bulb
+    Id: 10
+    Is Visible: true
+    Parent Id: 1
+    Children Ids: []
+    Components:
+      - Transform:
+          Position: [8.16, 1.87, 0.02]
+          Rotation: [0, 0, 0]
+          Scale: [0.35, 0.35, 0.35]
+      - Mesh:
+          Enabled: true
+          Model Id: 0
+          Primitive: 4
+          Is Culled: true
+          Is Inverted: false
+      - Light:
+          Enabled: true
+          Type: 1
+          Color: [1, 0, 0]
+          Intensity: 2.1
+          Attenuation: [1, 0.377, 0.2802]
+  - Entity: "Bulb #2"
+    Id: 11
+    Is Visible: true
+    Parent Id: 1
+    Children Ids: []
+    Components:
+      - Transform:
+          Position: [13.39, 2.33, -3.2]
+          Rotation: [0, 0, 0]
+          Scale: [0.35, 0.35, 0.35]
+      - Mesh:
+          Enabled: true
+          Model Id: 0
+          Primitive: 4
+          Is Culled: true
+          Is Inverted: false
+      - Light:
+          Enabled: true
+          Type: 1
+          Color: [1, 1, 1]
+          Intensity: 12.5
+          Attenuation: [1, 0.5, 0.3]
+  - Entity: Blue Light
+    Id: 22
+    Is Visible: true
+    Parent Id: 1
+    Children Ids: []
+    Components:
+      - Transform:
+          Position: [-10.05, 1.28, -9.48]
+          Rotation: [0, 0, 0]
+          Scale: [0.2, 0.2, 0.2]
+      - Light:
+          Enabled: true
+          Type: 1
+          Color: [0, 0.9221902, 1]
+          Intensity: 1
+          Attenuation: [1, 0.045, 0.0107]
+      - Mesh:
+          Enabled: true
+          Model Id: 0
+          Primitive: 4
+          Is Culled: true
+          Is Inverted: false
+  - Entity: Gold
+    Id: 33
+    Is Visible: true
+    Parent Id: 1
+    Children Ids: []
+    Components:
+      - Transform:
+          Position: [14.18, 1, -11.76]
+          Rotation: [0, -43, 0]
+          Scale: [2, 2, 2]
+      - Mesh:
+          Enabled: true
+          Model Id: 0
+          Primitive: 4
+          Is Culled: true
+          Is Inverted: false
+      - Texture:
+          Enabled: true
+          Type: 3553
+          Scale: 0.4
+          Diffuse: 1
+          Roughness: 2
+          Metallic: 2
+          Normal: 13
+      - Material:
+          Enabled: true
+          Color: [1, 0.6541122, 0.12391931, 1]
+          Roughness: 0.43
+          Metallic: 1

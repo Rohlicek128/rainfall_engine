@@ -5,11 +5,14 @@
 
 #include "Mesh.h"
 #include "../Gui/IGui.h"
+#include "Loading/ISerializable.h"
 
 class Entity;
 
-class Scene : public IGui
+class Scene : public IGui, ISerializable
 {
+    void serialize(YAML::Emitter& out) override;
+    bool deserialize(YAML::Node& node) override;
 public:
     std::string name;
 
@@ -31,15 +34,20 @@ public:
     Scene(const std::string&, Mesh&&);
     ~Scene() override = default;
     
-    void add_entity(std::unique_ptr<Entity>, bool = false);
+    void add_entity(std::unique_ptr<Entity>);
     void remove_entity(Entity*);
     void remove_entity(int);
     void add_light(Entity*);
+    bool check_light(Entity*);
     Entity* find_entity_by_id(unsigned int);
 
     void set_scene_graph();
     void set_graph_children(const std::vector<Entity*>&, Entity*&);
     void set_entity_inspector();
+
+    void reset();
+    void save(const std::string& path);
+    void load(const std::string& path);
     
     void set_gui() override;
 };

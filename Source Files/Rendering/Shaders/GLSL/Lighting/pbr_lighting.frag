@@ -21,7 +21,7 @@ out vec4 pixel_color;
 
 #define NR_DIRECTIONAL_LIGHTS 1
 uniform DirLight dir_lights[NR_DIRECTIONAL_LIGHTS];
-#define NR_POINT_LIGHTS 2
+#define NR_POINT_LIGHTS 5
 uniform PointLight point_lights[NR_POINT_LIGHTS];
 
 uniform sampler2D g_position;
@@ -110,6 +110,8 @@ void main(){
 		
 		Lo += (kD * albedo / PI + specular) * radiance * max(dot(N, L), 0.0);
 	}
+	
+	//length(frag_pos - view_pos) depth
     
-	pixel_color = vec4((ambient * albedo) + Lo, 1.0);
+	pixel_color = vec4(((ambient * albedo) + Lo), 1.0);
 }

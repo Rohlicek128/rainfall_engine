@@ -24,6 +24,7 @@ Engine::Engine(const EngineArgs& args) : fps_plot_{}
     textures_->add_texture(std::make_unique<Texture>("container_diffuse.png", GL_SRGB8_ALPHA8, GL_RGBA));
     textures_->add_texture(std::make_unique<Texture>("container_specular.png", GL_RGBA8, GL_RGBA));
     textures_->add_texture(std::make_unique<Texture>("circuits_normal.jpg", GL_RGB8, GL_RGB));
+    textures_->add_texture(std::make_unique<Texture>("sofa_normal.jpg", GL_RGB8, GL_RGB));
     textures_->add_texture(std::make_unique<Texture>("shrek.png", GL_SRGB8_ALPHA8, GL_RGBA));
     textures_->add_texture(std::make_unique<Texture>("black_hole.jpg", GL_SRGB8, GL_RGB));
 
@@ -54,77 +55,19 @@ Engine::Engine(const EngineArgs& args) : fps_plot_{}
 
     
     //Scene
-    scene_ = std::make_unique<Scene>("Test Scene", Mesh({{"Position", 3}, {"TexCoord", 2}, {"Normal", 3}}, true));
-
+    scene_ = std::make_unique<Scene>("Testing", Mesh({{"Position", 3}, {"TexCoord", 2}, {"Normal", 3}}, true));
     set_models_to_mesh(scene_->mesh.get());
     scene_->mesh->compile();
+    //set_hardcoded_entities(*scene_);
 
-    //Entities
-    std::unique_ptr<Entity> player_camera = std::make_unique<Entity>("Player camera",
-        new TransformComponent(glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(0.3f))
-    );
-    player_camera->add_component(CAMERA, new CameraComponent(player_camera->transform));
-    player_camera->add_component(MESH, new MeshComponent(1));
-    scene_->player_camera = player_camera.get();
-
-    std::unique_ptr<Entity> obj1 = std::make_unique<Entity>("Cube",
-        new TransformComponent(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f))
-    );
-    obj1->add_component(MESH, new MeshComponent(0));
-    obj1->add_component(MATERIAL, new MaterialComponent(glm::vec4(1.0, 1.0, 1.0, 1.0)));
-    obj1->add_component(TEXTURE, new TextureComponent(GL_TEXTURE_2D, textures_->get_texture(4)->get_handle(),textures_->get_texture(5)->get_handle()));
-
-    std::unique_ptr<Entity> obj2 = std::make_unique<Entity>("Cube #2",
-        new TransformComponent(glm::vec3(5.0f, 2.0f, 3.0f), glm::vec3(0.0f), glm::vec3(3.0f))
-    );
-    obj2->add_component(MESH, new MeshComponent(0));
-    obj2->add_component(TEXTURE, new TextureComponent(GL_TEXTURE_2D, textures_->get_texture(3)->get_handle(), 1));
-    //obj1->add_child(obj2.get());
-
-    std::unique_ptr<Entity> obj3 = std::make_unique<Entity>("Paper plane #2",
-        new TransformComponent(glm::vec3(-2.0f, 1.0f, -2.0f), glm::vec3(0.0f), glm::vec3(0.5f))
-    );
-    obj3->add_component(MATERIAL, new MaterialComponent(glm::vec4(0.0, 0.0, 1.0, 1.0)));
-    obj2->add_child(obj3.get());
-
-    std::unique_ptr<Entity> floor = std::make_unique<Entity>("Floor",
-        new TransformComponent(glm::vec3(0.0f, -1.001f, 0.0f), glm::vec3(0.0f), glm::vec3(50.0f))
-    );
-    floor->add_component(MESH, new MeshComponent(1));
-    floor->add_component(MATERIAL, new MaterialComponent(glm::vec4(0.012, 0.012, 0.012, 1.0)));
-
-    std::unique_ptr<Entity> dir_light = std::make_unique<Entity>("Sun",
-        new TransformComponent(glm::vec3(0.0f, 20.0f, 0.0f), glm::vec3(-6.0f, -10, 6.0f), glm::vec3(0.5f))
-    );
-    dir_light->add_component(MESH, new MeshComponent(0));
-    dir_light->add_component(LIGHT, new LightComponent(DIRECTIONAL, glm::vec3(1.0f), 5.0f));
-
-    std::unique_ptr<Entity> point_light = std::make_unique<Entity>("Bulb",
-        new TransformComponent(glm::vec3(3.0f, 5.0f, 1.0f), glm::vec3(0.0f), glm::vec3(0.35f))
-    );
-    point_light->add_component(MESH, new MeshComponent(0));
-    point_light->add_component(LIGHT, new LightComponent(POINT, glm::vec3(1.0f, 1.0f, 0.0f), 0.5f));
-
-    std::unique_ptr<Entity> point_light_2 = std::make_unique<Entity>("Bulb #2",
-        new TransformComponent(glm::vec3(3.0f, 5.0f, 4.0f), glm::vec3(0.0f), glm::vec3(0.35f))
-    );
-    point_light_2->add_component(MESH, new MeshComponent(0));
-    point_light_2->add_component(LIGHT, new LightComponent(POINT, glm::vec3(1.0f, 1.0f, 1.0f), 1.0f));
-    
-    scene_->add_entity(std::move(player_camera));
-    scene_->add_entity(std::move(obj1));
-    scene_->add_entity(std::move(obj2));
-    scene_->add_entity(std::move(obj3));
-    scene_->add_entity(std::move(floor));
-    
-    scene_->add_entity(std::move(dir_light), true);
-    scene_->add_entity(std::move(point_light), true);
-    scene_->add_entity(std::move(point_light_2), true);
+    //scene_->save("saved/");
+    scene_->load("saved/Example.rain");
 
     g_buffer_ = std::make_unique<GBuffer>(args.width, args.height);
     geometry_program_ = new GeometryProgram({{"Geometry/geometry.vert", GL_VERTEX_SHADER}, {"Geometry/geometry.frag", GL_FRAGMENT_SHADER}});
     lighting_program_ = new LightingProgram({{"Screen/screen.vert", GL_VERTEX_SHADER}, {"Lighting/pbr_lighting.frag", GL_FRAGMENT_SHADER}});
 
+    
     //Screen Mesh
     float vertices_quad[] = {
         -1.0f, 1.0f, 0.0f, 1.0f,
@@ -144,9 +87,6 @@ Engine::Engine(const EngineArgs& args) : fps_plot_{}
     
     skybox_program_ = new SkyboxProgram({{"Skybox/skybox.vert", GL_VERTEX_SHADER}, {"Skybox/skybox.frag", GL_FRAGMENT_SHADER}});
     
-
-    scene_->current_camera = editor_->is_visible ? scene_->editor_camera.get() : scene_->player_camera;
-    entity_selected_ = nullptr;
     
     is_fullscreen_ = false;
     fullscreen_toggle_ = true;
@@ -226,9 +166,12 @@ void Engine::update(const EngineArgs& args)
     viewport_[0] = args.width;
     viewport_[1] = args.height;
 
-    scene_->entities.at(1)->transform->rotation.y += (float)delta_time_ * 20.0f;
-    scene_->entities.at(1)->transform->update_rot_edit();
-
+    if (scene_->entities.size() >= 2)
+    {
+        scene_->entities.at(1)->transform->rotation.y += (float)delta_time_ * 20.0f;
+        scene_->entities.at(1)->transform->update_rot_edit();
+    }
+    
     //Input
     if (glfwGetKey(args.window, GLFW_KEY_END) == GLFW_PRESS) glfwSetWindowShouldClose(args.window, true);
 
@@ -288,21 +231,22 @@ void Engine::update(const EngineArgs& args)
 
 
     //Camera update
-    CameraComponent* camera_component = dynamic_cast<CameraComponent*>(scene_->current_camera->components->at(CAMERA));
+    CameraComponent* camera_component = scene_->current_camera->get_component<CameraComponent>();
     camera_component->move(args.window, static_cast<float>(delta_time_));
     if (!mouse_->is_visible) camera_component->mouse_move(*mouse_, static_cast<float>(delta_time_));
+    
+    
+    if (editor_->imgui_io->WantCaptureMouse) return;
 
     camera_component->exposure += camera_component->exposure * args.scroll_y * static_cast<float>(delta_time_) * 175.0f;
     camera_component->exposure = std::max(0.001f, camera_component->exposure);
-    
-    //if (editor_->imgui_io->WantCaptureMouse) std::cout << "wants\n";
 }
 
 void Engine::render(EngineArgs& args)
 {
     editor_->new_frame();
 
-    const CameraComponent* cur_camera_comp = dynamic_cast<CameraComponent*>(scene_->current_camera->components->at(CAMERA));
+    const CameraComponent* cur_camera_comp = scene_->current_camera->get_component<CameraComponent>();
     const int cur_width = editor_->is_visible ? editor_->viewport_fbo->attached_textures.at(0)->get_width() : args.width;
     const int cur_height = editor_->is_visible ? editor_->viewport_fbo->attached_textures.at(0)->get_height() : args.height;
 
@@ -324,8 +268,8 @@ void Engine::render(EngineArgs& args)
     lighting_program_->draw(*scene_, *screen_mesh_, 0, *g_buffer_);
     post_process_program_->unbind_framebuffer();
 
-    g_buffer_->blit_framebuffer();
-    skybox_program_->draw(*scene_, (float)cur_width / (float)cur_height);
+    //g_buffer_->blit_framebuffer();
+    //skybox_program_->draw(*scene_, (float)cur_width / (float)cur_height);
     
     //Post Process Pass
     if (editor_->is_visible) editor_->viewport_fbo->bind();
@@ -337,7 +281,7 @@ void Engine::render(EngineArgs& args)
     //Editor
     if (editor_->is_visible)
     {
-        editor_->set_main_dockspace();
+        editor_->set_main_dockspace(*scene_);
 
         //Viewport
         const ImVec4 old_bg = ImGui::GetStyle().Colors[2];
@@ -351,7 +295,7 @@ void Engine::render(EngineArgs& args)
         editor_->viewport_fbo->set_gui();
         
         ImGuizmo::SetRect(pos_vp.x, pos_vp.y, size_vp.x, size_vp.y);
-        if (scene_->selected_entity != nullptr) scene_->selected_entity->transform->set_guizmo(scene_->current_camera, editor_->gizmo_operation);
+        if (scene_->selected_entity != nullptr) scene_->selected_entity->transform->set_guizmo(*scene_->current_camera, editor_->gizmo_operation);
         ImVec2 pos = ImGui::GetWindowPos();
         pos.x += ImGui::GetWindowContentRegionMin().x + 10;
         pos.y += ImGui::GetWindowContentRegionMin().y + 10;
@@ -513,4 +457,68 @@ void Engine::set_models_to_mesh(Mesh* mesh)
         2, 0, 3
     };
     mesh->add_model("Paper plane", vertices_paper, std::size(vertices_paper), indices_paper, std::size(indices_paper));
+}
+
+void Engine::set_hardcoded_entities(Scene& scene)
+{
+    std::unique_ptr<Entity> player_camera = std::make_unique<Entity>("Player camera",
+        new TransformComponent(glm::vec3(2.0f, 1.0f, 2.0f), glm::vec3(0.0f), glm::vec3(0.3f))
+    );
+    player_camera->add_component<CameraComponent>(player_camera->transform);
+    player_camera->add_component<MeshComponent>(1);
+    scene.player_camera = player_camera.get();
+
+    std::unique_ptr<Entity> obj1 = std::make_unique<Entity>("Cube",
+        new TransformComponent(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f))
+    );
+    obj1->add_component<MeshComponent>(0);
+    obj1->add_component<MaterialComponent>(glm::vec4(1.0, 1.0, 1.0, 1.0));
+    obj1->add_component<TextureComponent>(GL_TEXTURE_2D, textures_->get_texture(4)->get_handle(),textures_->get_texture(5)->get_handle());
+
+    std::unique_ptr<Entity> obj2 = std::make_unique<Entity>("Cube #2",
+        new TransformComponent(glm::vec3(5.0f, 2.0f, 3.0f), glm::vec3(0.0f), glm::vec3(3.0f))
+    );
+    obj2->add_component<MeshComponent>(0);
+    obj2->add_component<TextureComponent>(GL_TEXTURE_2D, textures_->get_texture(3)->get_handle(), 1);
+
+    std::unique_ptr<Entity> obj3 = std::make_unique<Entity>("Paper plane #2",
+        new TransformComponent(glm::vec3(-2.0f, 1.0f, -2.0f), glm::vec3(0.0f), glm::vec3(0.5f))
+    );
+    obj3->add_component<MaterialComponent>(glm::vec4(0.0, 0.0, 1.0, 1.0));
+    obj2->add_child(obj3.get());
+
+    std::unique_ptr<Entity> floor = std::make_unique<Entity>("Floor",
+        new TransformComponent(glm::vec3(0.0f, -1.001f, 0.0f), glm::vec3(0.0f), glm::vec3(250.0f))
+    );
+    floor->add_component<MeshComponent>(1);
+    floor->add_component<MaterialComponent>(glm::vec4(0.012, 0.012, 0.012, 1.0));
+    obj2->add_child(floor.get());
+
+    std::unique_ptr<Entity> dir_light = std::make_unique<Entity>("Sun",
+        new TransformComponent(glm::vec3(0.0f, 20.0f, 0.0f), glm::vec3(-6.0f, -10, 6.0f), glm::vec3(0.5f))
+    );
+    dir_light->add_component<MeshComponent>(0);
+    dir_light->add_component<LightComponent>(DIRECTIONAL, glm::vec3(1.0f), 5.0f);
+
+    std::unique_ptr<Entity> point_light = std::make_unique<Entity>("Bulb",
+        new TransformComponent(glm::vec3(3.0f, 5.0f, 1.0f), glm::vec3(0.0f), glm::vec3(0.35f))
+    );
+    point_light->add_component<MeshComponent>(0);
+    point_light->add_component<LightComponent>(POINT, glm::vec3(1.0f, 1.0f, 0.0f), 0.5f);
+
+    std::unique_ptr<Entity> point_light_2 = std::make_unique<Entity>("Bulb #2",
+        new TransformComponent(glm::vec3(3.0f, 5.0f, 4.0f), glm::vec3(0.0f), glm::vec3(0.35f))
+    );
+    point_light_2->add_component<MeshComponent>(0);
+    point_light_2->add_component<LightComponent>(POINT, glm::vec3(1.0f, 1.0f, 1.0f), 1.0f);
+    
+    scene.add_entity(std::move(player_camera));
+    scene.add_entity(std::move(obj1));
+    scene.add_entity(std::move(obj2));
+    scene.add_entity(std::move(obj3));
+    scene.add_entity(std::move(floor));
+    
+    scene.add_entity(std::move(dir_light));
+    scene.add_entity(std::move(point_light));
+    scene.add_entity(std::move(point_light_2));
 }

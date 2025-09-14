@@ -50,7 +50,7 @@ void TransformComponent::update_sca_edit(const float scaler)
     sca_edit_[2] = scale.z * scaler;
 }
 
-void TransformComponent::set_guizmo(const Entity* camera, const int operation)
+void TransformComponent::set_guizmo(Entity& camera, const int operation)
 {
     if (operation == -1) return;
     
@@ -58,8 +58,8 @@ void TransformComponent::set_guizmo(const Entity* camera, const int operation)
     
     const ImVec2 size = ImGui::GetWindowSize();
     
-    const glm::mat4& projection = dynamic_cast<CameraComponent*>(camera->components->at(CAMERA))->get_projection_matrix(size.x / size.y);
-    const glm::mat4& view = dynamic_cast<CameraComponent*>(camera->components->at(CAMERA))->get_view_matrix(); // glm::inverse(camera->transform->get_model_matrix())
+    const glm::mat4& projection = camera.get_component<CameraComponent>()->get_projection_matrix(size.x / size.y);
+    const glm::mat4& view = camera.get_component<CameraComponent>()->get_view_matrix(); // glm::inverse(camera->transform->get_model_matrix())
     glm::mat4 transform = get_model_matrix();
 
     ImGuizmo::Enable(true);
@@ -76,6 +76,11 @@ void TransformComponent::set_guizmo(const Entity* camera, const int operation)
         this->scale = sca;
     }
     
+}
+
+std::string TransformComponent::get_name()
+{
+    return "Transform";
 }
 
 void TransformComponent::set_gui()
@@ -97,4 +102,41 @@ void TransformComponent::set_gui()
         scale.y = sca_edit_[1];
         scale.z = sca_edit_[2];
     }
+}
+
+void TransformComponent::serialize(YAML::Emitter& out)
+{
+    out << YAML::BeginMap;
+    out << YAML::Key << "Transform" << YAML::Value << YAML::BeginMap;
+
+    out << YAML::Key << "Position" << YAML::Value;
+    emit_out(out, position);
+    out << YAML::Key << "Rotation" << YAML::Value;
+    emit_out(out, rotation);
+    out << YAML::Key << "Scale" << YAML::Value;
+    emit_out(out, scale);
+    
+    out << YAML::EndMap;
+    out << YAML::EndMap;
+}
+
+bool TransformComponent::deserialize(YAML::Node& node)
+{
+    if (YAML::Node cur = node["Position"])
+    {
+        position = des_vec3(cur);
+        update_pos_edit();
+    }
+    if (YAML::Node cur = node["Rotation"])
+    {
+        rotation = des_vec3(cur);
+        update_rot_edit();
+    }
+    if (YAML::Node cur = node["Scale"])
+    {
+        scale = des_vec3(cur);
+        update_sca_edit();
+    }
+    
+    return true;
 }

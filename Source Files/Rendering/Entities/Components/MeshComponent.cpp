@@ -22,6 +22,11 @@ void MeshComponent::set_mesh_manager(Mesh*& mesh)
     mesh_ = mesh;
 }
 
+std::string MeshComponent::get_name()
+{
+    return "Mesh";
+}
+
 void MeshComponent::set_gui()
 {
     ImGui::SeparatorText("Model");
@@ -50,10 +55,37 @@ void MeshComponent::set_gui()
     }
 
     ImGui::SeparatorText("Rendering");
-    ImGui::Checkbox("Is Shaded", &is_shaded);
+    //ImGui::Checkbox("Is Shaded", &is_shaded);
     ImGui::Checkbox("Is Culled", &is_culled);
     ImGui::Checkbox("Is Inverted", &is_inverted);
     
     const char* type_names[] = { "Points", "Lines", "Line Loop", "Line Strip", "Triangles", "Triangle Strip", "Triangle Fan", "Quads", "Quads Strip", "Polygon" };
     ImGui::Combo("Primitive", &primitive_type, type_names, std::size(type_names));
+}
+
+void MeshComponent::serialize(YAML::Emitter& out)
+{
+    out << YAML::BeginMap;
+    out << YAML::Key << "Mesh" << YAML::Value << YAML::BeginMap;
+    out << YAML::Key << "Enabled" << YAML::Value << is_enabled;
+
+    out << YAML::Key << "Model Id" << YAML::Value << model_index;
+    out << YAML::Key << "Primitive" << YAML::Value << primitive_type;
+    out << YAML::Key << "Is Culled" << YAML::Value << is_culled;
+    out << YAML::Key << "Is Inverted" << YAML::Value << is_inverted;
+    
+    out << YAML::EndMap;
+    out << YAML::EndMap;
+}
+
+bool MeshComponent::deserialize(YAML::Node& node)
+{
+    is_enabled = node["Enabled"].as<bool>();
+    
+    model_index = node["Model Id"].as<int>();
+    primitive_type = node["Primitive"].as<int>();
+    is_culled = node["Is Culled"].as<bool>();
+    is_inverted = node["Is Inverted"].as<bool>();
+    
+    return true;
 }

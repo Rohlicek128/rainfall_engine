@@ -17,7 +17,7 @@ void GeometryProgram::draw(const Scene& scene, const float aspect_ratio)
     scene.mesh->bind();
     
     //Camera
-    CameraComponent* camera_component = dynamic_cast<CameraComponent*>(scene.current_camera->components->at(CAMERA));
+    CameraComponent* camera_component = scene.current_camera->get_component<CameraComponent>();
     set_uniform("view", camera_component->get_view_matrix());
     set_uniform("projection", camera_component->get_projection_matrix(aspect_ratio));
     
@@ -29,15 +29,14 @@ void GeometryProgram::draw(const Scene& scene, const float aspect_ratio)
     //Entities
     for (const std::unique_ptr<Entity>& entity : scene.entities)
     {
-        if (!entity->is_visible || !entity->component_exists(MESH)) continue;
+        if (!entity->is_visible || !entity->get_enabled_component<MeshComponent>()) continue;
 
         const glm::mat4 model = entity->get_model_matrix();
         set_uniform("model", model);
         set_uniform("inverse_model", glm::mat3(transpose(inverse(model))));
         
-        if (entity->component_exists(TEXTURE))
+        if (TextureComponent* texture = entity->get_enabled_component<TextureComponent>())
         {
-            TextureComponent* texture = dynamic_cast<TextureComponent*>(entity->components->at(TEXTURE));
             if (texture->type == GL_TEXTURE_2D) texture->active_bind(0);
             set_uniform("material.has_normal_map", texture->has_normal());
             set_uniform("texture_scaling", texture->scale);
@@ -54,40 +53,38 @@ void GeometryProgram::draw(const Scene& scene, const float aspect_ratio)
             set_uniform("texture_scaling", 1.0f);
         }
         
-        if (entity->component_exists(MATERIAL))
+        if (MaterialComponent* material = entity->get_enabled_component<MaterialComponent>())
         {
-            dynamic_cast<MaterialComponent*>(entity->components->at(MATERIAL))->set_uniforms(this);
-            if (entity->component_exists(TEXTURE))
+            material->set_uniforms(this);
+            if (TextureComponent* texture = entity->get_enabled_component<TextureComponent>())
             {
-                if (dynamic_cast<TextureComponent*>(entity->components->at(TEXTURE))->has_roughness())
+                if (texture->has_roughness())
                     set_uniform("material.roughness", 0.0f);
-                if (dynamic_cast<TextureComponent*>(entity->components->at(TEXTURE))->has_metallic())
+                if (texture->has_metallic())
                     set_uniform("material.metallic", 0.0f);
             }
         }
-        else if (entity->component_exists(LIGHT))
+        else if (const LightComponent* light = entity->get_enabled_component<LightComponent>())
         {
-            set_uniform("material.color",
-                dynamic_cast<LightComponent*>(entity->components->at(LIGHT))->color *
-                    dynamic_cast<LightComponent*>(entity->components->at(LIGHT))->intensity);
+            set_uniform("material.color", light->color * light->intensity);
             set_uniform("material.roughness", 1.0f);
             set_uniform("material.metallic", 0.0f);
         }
         else
         {
-            if (!entity->component_exists(TEXTURE))
+            if (!entity->get_enabled_component<TextureComponent>())
             {
                 glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_2D, 3);
                 set_uniform("material.roughness", 1.0f);
             }
-            else if (dynamic_cast<TextureComponent*>(entity->components->at(TEXTURE))->has_roughness())
+            else if (entity->get_enabled_component<TextureComponent>()->has_roughness())
                 set_uniform("material.roughness", 0.0f);
             set_uniform("material.color", 1.0, 1.0, 1.0);
             set_uniform("material.metallic", 0.0f);
         }
 
-        const MeshComponent* mesh = dynamic_cast<MeshComponent*>(entity->components->at(MESH));
+        const MeshComponent* mesh = entity->get_component<MeshComponent>();
         if (const ModelData* model_data = scene.mesh->get_model(mesh->model_index))
         {
             if (!mesh->is_culled) glDisable(GL_CULL_FACE);

@@ -11,7 +11,7 @@ MaterialComponent::MaterialComponent(const glm::vec4 color, const float roughnes
 
 MaterialComponent::~MaterialComponent()
 {
-    delete[] color_edit_;
+    //delete[] color_edit_;
 }
 
 void MaterialComponent::set_uniforms(Program* program)
@@ -20,6 +20,11 @@ void MaterialComponent::set_uniforms(Program* program)
     program->set_uniform("material.roughness", roughness);
     program->set_uniform("material.metallic", metallic);
     program->set_uniform("is_light", 0);
+}
+
+std::string MaterialComponent::get_name()
+{
+    return "Material";
 }
 
 void MaterialComponent::set_gui()
@@ -33,4 +38,37 @@ void MaterialComponent::set_gui()
     //ImGui::SliderFloat("Shininess", &metallic, 1.0f, 1024.0f, "%.1f", ImGuiSliderFlags_Logarithmic);
     ImGui::SliderFloat("Roughness", &roughness, 0.0f, 1.0f, "%.2f");
     ImGui::SliderFloat("Metallic", &metallic, 0.0f, 1.0f, "%.2f");
+}
+
+void MaterialComponent::serialize(YAML::Emitter& out)
+{
+    out << YAML::BeginMap;
+    out << YAML::Key << "Material" << YAML::Value << YAML::BeginMap;
+    out << YAML::Key << "Enabled" << YAML::Value << is_enabled;
+
+    out << YAML::Key << "Color" << YAML::Value;
+    emit_out(out, color);
+    out << YAML::Key << "Roughness" << YAML::Value << roughness;
+    out << YAML::Key << "Metallic" << YAML::Value << metallic;
+    
+    out << YAML::EndMap;
+    out << YAML::EndMap;
+}
+
+bool MaterialComponent::deserialize(YAML::Node& node)
+{
+    is_enabled = node["Enabled"].as<bool>();
+
+    if (YAML::Node cur = node["Color"])
+    {
+        color = des_vec4(cur);
+        color_edit_[0] = color.r;
+        color_edit_[1] = color.g;
+        color_edit_[2] = color.b;
+        color_edit_[3] = color.a;
+    }
+    roughness = node["Roughness"].as<float>();
+    metallic = node["Metallic"].as<float>();
+    
+    return true;
 }

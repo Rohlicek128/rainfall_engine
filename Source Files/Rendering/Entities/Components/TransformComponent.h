@@ -3,6 +3,7 @@
 #include <glm/mat4x4.hpp>
 
 #include "Component.h"
+#include "../../World/Loading/ISerializable.h"
 
 class Entity;
 class CameraComponent;
@@ -24,6 +25,10 @@ public:
     void update_pos_edit(float = 1.0f);
     void update_rot_edit(float = 1.0f);
     void update_sca_edit(float = 1.0f);
-    void set_guizmo(const Entity*, int);
+    void set_guizmo(Entity&, int);
+
+    std::string get_name() override;
     void set_gui() override;
+    void serialize(YAML::Emitter& out) override;
+    bool deserialize(YAML::Node& node) override;
 };

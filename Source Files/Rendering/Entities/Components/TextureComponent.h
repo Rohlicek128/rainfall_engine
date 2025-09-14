@@ -28,5 +28,9 @@ public:
     int has_normal();
     int has_roughness();
     int has_metallic();
+
+    std::string get_name() override;
     void set_gui() override;
+    void serialize(YAML::Emitter& out) override;
+    bool deserialize(YAML::Node& node) override;
 };

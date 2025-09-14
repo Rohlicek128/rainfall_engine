@@ -2,6 +2,7 @@
 
 #include "../../Imgui/ImGuizmo.h"
 #include "../Entities/Components/CameraComponent.h"
+#include "../World/Scene.h"
 
 EditorManager::EditorManager(const bool visible, int width, int height)
 {
@@ -36,12 +37,28 @@ void EditorManager::init_imgui(GLFWwindow* window)
     ImGuizmo::SetOrthographic(false);
 }
 
-void EditorManager::set_main_dockspace()
+void EditorManager::set_main_dockspace(Scene& scene)
 {
     ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 
     if (ImGui::BeginMainMenuBar())
     {
+        if (ImGui::BeginMenu("File"))
+        {
+            if (ImGui::MenuItem("New Scene"))
+                scene.reset();
+            if (ImGui::MenuItem("Save Scene"))
+                scene.save("saved/");
+            if (ImGui::MenuItem("Load Scene"))
+                scene.load("saved/Example.rain");
+
+            ImGui::Separator();
+
+            if (ImGui::MenuItem("Exit"))
+                exit(0);
+            
+            ImGui::EndMenu();
+        }
         if (ImGui::BeginMenu("Options"))
         {
             ImGui::SeparatorText("Editor Options");

@@ -19,5 +19,9 @@ public:
     MeshComponent(int, int = 4, Mesh* = nullptr);
     ~MeshComponent() override = default;
     void set_mesh_manager(Mesh*&);
+
+    std::string get_name() override;
     void set_gui() override;
+    void serialize(YAML::Emitter& out) override;
+    bool deserialize(YAML::Node& node) override;
 };

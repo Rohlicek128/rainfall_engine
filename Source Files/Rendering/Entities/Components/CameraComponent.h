@@ -33,5 +33,8 @@ public:
     glm::mat4 get_view_matrix();
     glm::mat4 get_projection_matrix(float);
 
+    std::string get_name() override;
     void set_gui() override;
+    void serialize(YAML::Emitter& out) override;
+    bool deserialize(YAML::Node& node) override;
 };

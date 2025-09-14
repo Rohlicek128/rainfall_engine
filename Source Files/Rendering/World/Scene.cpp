@@ -1,46 +1,62 @@
 #include "Scene.h"
 
+#include <fstream>
+#include <iostream>
+#include <utility>
+
 #include "../Entities/Entity.h"
 #include "../World/Mesh.h"
 
 #include "../Entities/Components/CameraComponent.h"
+#include "../Entities/Components/LightComponent.h"
 #include "../Entities/Components/TextureComponent.h"
 #include "../Entities/Components/MeshComponent.h"
 
 Scene::Scene(const std::string& name, Mesh&& mesh)
 {
+    this->name = name;
+    this->mesh = std::make_unique<Mesh>(std::move(mesh));
+    
     root_entity = std::make_unique<Entity>("__root", new TransformComponent(glm::vec3(0.0f), glm::vec3(0.0f) ,glm::vec3(0.0f)));
     root_entity->is_root = true;
 
     editor_camera = std::make_unique<Entity>("__editor_camera",
         new TransformComponent(glm::vec3(2.0f, 2.0f, 0.0f), glm::vec3(0.0f), glm::vec3(1.0f))
         );
-    editor_camera->add_component(CAMERA, new CameraComponent(editor_camera->transform, {0.25f, 0.25f, 0.25f, 1.0f}));
+    editor_camera->add_component<CameraComponent>(editor_camera->transform, ImVec4(0.25f, 0.25f, 0.25f, 1.0f));
     player_camera = nullptr;
+    current_camera = editor_camera.get();
 
     skybox = std::make_unique<Entity>("__skybox",
         new TransformComponent(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f))
         );
-    skybox->add_component(MESH, new MeshComponent(0, GL_TRIANGLES, &mesh));
-    skybox->add_component(TEXTURE, new TextureComponent(0x8513, 1, 1));
-    
-    this->name = name;
-    this->mesh = std::make_unique<Mesh>(std::move(mesh));
+    skybox->add_component<MeshComponent>(0, GL_TRIANGLES, this->mesh.get());
+    skybox->add_component<TextureComponent>(0x8513, 1, 1);
 
     opened_gui = false;
     selected_entity = nullptr;
 }
 
-void Scene::add_entity(std::unique_ptr<Entity> entity, const bool is_light)
+void Scene::add_entity(std::unique_ptr<Entity> entity)
 {
     if (entity->parent == nullptr) root_entity->add_child(entity.get());
     entities.push_back(std::move(entity));
     entities.back()->set_mesh_to_component(mesh.get());
-    if (is_light) add_light(entities.back().get());
+    
+    if (entities.back()->contains_component<LightComponent>()) add_light(entities.back().get());
 }
 
 void Scene::remove_entity(Entity* entity)
 {
+    for (int i = 0; i < lights.size(); ++i)
+    {
+        if (entity == lights.at(i))
+        {
+            lights.erase(lights.begin() + i);
+            break;
+        }
+    }
+    
     for (int i = 0; i < entities.size(); ++i)
     {
         if (entity == entities.at(i).get())
@@ -49,7 +65,6 @@ void Scene::remove_entity(Entity* entity)
             for (Entity* child : entities.at(i)->children)
                 child->parent = root_entity.get();
             
-            root_entity->remove_child(entity);
             entities.erase(entities.begin() + i);
             break;
         }
@@ -69,6 +84,26 @@ void Scene::remove_entity(const int index)
 void Scene::add_light(Entity* light)
 {
     lights.push_back(light);
+}
+
+bool Scene::check_light(Entity* light)
+{
+    if (!light->contains_component<LightComponent>()) return false;
+    
+    for (int i = 0; i < lights.size(); ++i)
+    {
+        if (!lights.at(i)->contains_component<LightComponent>())
+        {
+            lights.erase(lights.begin() + i);
+            return false;
+        }
+        
+        if (lights.at(i)->id == light->id)
+            return false;
+    }
+
+    add_light(light);
+    return true;
 }
 
 Entity* Scene::find_entity_by_id(const unsigned int id)
@@ -177,6 +212,8 @@ void Scene::set_graph_children(const std::vector<Entity*>& children, Entity*& se
             if (i < children.size() && i >= 0) set_graph_children(children.at(i)->children, selected);
             ImGui::TreePop();
         }
+
+        check_light(children.at(i));
     }
 }
 
@@ -222,7 +259,7 @@ void Scene::set_gui()
             {
                 IM_ASSERT(payload->DataSize == sizeof(Entity*));
                 Entity* payload_entity = *(Entity**)payload->Data;
-                if (payload_entity != nullptr && payload_entity->component_exists(CAMERA))
+                if (payload_entity != nullptr && payload_entity->contains_component<CameraComponent>())
                     player_camera = payload_entity;
             }
             ImGui::EndDragDropTarget();
@@ -237,4 +274,126 @@ void Scene::set_gui()
 
         ImGui::EndTable();
     }
+}
+
+void Scene::reset()
+{
+    entities.clear();
+    root_entity->children.clear();
+    lights.clear();
+    
+    player_camera = nullptr;
+    current_camera = editor_camera.get();
+    selected_entity = nullptr;
+}
+
+void Scene::save(const std::string& path)
+{
+    YAML::Emitter out;
+    
+    serialize(out);
+    
+    std::ofstream file_out((path + name + ".rain").c_str());
+    file_out << out.c_str();
+
+    std::cout << "SAVED: " << name << ".rain\n";
+}
+
+void Scene::load(const std::string& path)
+{
+    const std::ifstream stream(path);
+    std::stringstream str_stream;
+    str_stream << stream.rdbuf();
+
+    YAML::Node scene = YAML::Load(str_stream.str());
+
+    reset();
+    deserialize(scene);
+
+    std::cout << "LOADED: " << path << '\n';
+}
+
+void Scene::serialize(YAML::Emitter& out)
+{
+    out << YAML::BeginMap;
+
+    out << YAML::Key << "Scene" << YAML::Value << name.c_str();
+    if (selected_entity) out << YAML::Key << "Selected Entity Id" << YAML::Value << selected_entity->id;
+
+    out << YAML::Key << "Current Camera Id" << YAML::Value << current_camera->id;
+    if (player_camera) out << YAML::Key << "Player Camera Id" << YAML::Value << player_camera->id;
+    out << YAML::Key << "Editor Camera" << YAML::Value;
+    editor_camera->serialize(out);
+    
+    out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
+    for (int i = 0; i < entities.size(); ++i)
+    {
+        entities.at(i)->serialize(out);
+    }
+    out << YAML::EndSeq;
+    
+    out << YAML::EndMap;
+}
+
+bool Scene::deserialize(YAML::Node& node)
+{
+    if (!node["Scene"]) return false;
+    
+    name = node["Scene"].as<std::string>();
+
+    int selected_entity_id = -1;
+    if (YAML::Node cur_node = node["Selected Entity Id"])
+        selected_entity_id = cur_node.as<unsigned int>();
+
+    unsigned int current_cam_id = node["Current Camera Id"].as<unsigned int>();
+    int player_cam_id = -1;
+    if (YAML::Node cam_node = node["Player Camera Id"])
+        player_cam_id = cam_node.as<unsigned int>();
+    if (YAML::Node cam_node = node["Editor Camera"])
+    {
+        std::unique_ptr<Entity> cam = std::make_unique<Entity>("__editor_camera", new TransformComponent(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(0.5f)));
+        if (cam->deserialize(cam_node))
+        {
+            editor_camera.swap(cam);
+            current_camera = editor_camera.get();
+        }
+    }
+
+    if (YAML::Node entities_des = node["Entities"])
+    {
+        for (auto entity_des : entities_des)
+        {
+            std::unique_ptr<Entity> entity = std::make_unique<Entity>("", new TransformComponent(glm::vec3(0.0f), glm::vec3(0.0f) ,glm::vec3(0.0f)));
+            if (entity->deserialize(entity_des))
+            {
+                add_entity(std::move(entity));
+            }
+        }
+    }
+
+    //Link Entities
+    for (unsigned int i = 0; i < entities.size(); ++i)
+    {
+        if (std::cmp_equal(entities.at(i)->id, selected_entity_id))
+            selected_entity = entities.at(i).get();
+        
+        if (std::cmp_equal(entities.at(i)->id, player_cam_id))
+            player_camera = entities.at(i).get();
+        if (entities.at(i)->id == current_cam_id)
+            current_camera = entities.at(i).get();
+        
+        for (unsigned int j = 0; j < entities.at(i)->get_children_ids().size(); ++j)
+        {
+            for (unsigned int k = 0; k < entities.size(); ++k)
+            {
+                if (entities.at(k)->id == entities.at(i)->get_children_ids().at(j))
+                {
+                    entities.at(i)->add_child(entities.at(k).get());
+                    break;
+                }
+            }
+        }
+    }
+
+    return true;
 }

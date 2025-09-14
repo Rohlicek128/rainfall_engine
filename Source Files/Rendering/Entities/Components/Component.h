@@ -1,7 +1,10 @@
 #pragma once
 #include "../../Gui/IGui.h"
+#include "../../World/Loading/ISerializable.h"
 
-enum components_ids
+class TransformComponent;
+
+enum COMPONENTS_IDS
 {
     TRANSFORM,
     MESH,
@@ -11,22 +14,23 @@ enum components_ids
     LIGHT
 };
 
-inline const char* to_string(const components_ids e)
+inline const char* to_string(const COMPONENTS_IDS e)
 {
     switch (e)
     {
-    case TRANSFORM: return "Transform";
-    case MESH: return "Mesh";
-    case CAMERA: return "Camera";
-    case MATERIAL: return "Material";
-    case TEXTURE: return "Texture";
-    case LIGHT: return "Light";
-    default: return "N/A";
+    case TRANSFORM: return "TRANSFORM";
+    case MESH: return "MESH";
+    case CAMERA: return "CAMERA";
+    case MATERIAL: return "MATERIAL";
+    case TEXTURE: return "TEXTURE";
+    case LIGHT: return "LIGHT";
+    default: return "Unknown";
     }
 }
 
-class Component : public IGui
+class Component : public IGui, public ISerializable
 {
 public:
     bool is_enabled = true;
+    virtual std::string get_name() = 0;
 };
