@@ -437,6 +437,7 @@
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
     <ClCompile Include="Source Files\Rendering\World\Scene.cpp" />
+    <ClCompile Include="Source Files\Utils\FileDialogs.cpp" />
     <ClCompile Include="Source Files\Utils\MathHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -528,6 +529,7 @@
     <ClInclude Include="Source Files\Rendering\World\Mesh.h" />
     <ClInclude Include="Source Files\Rendering\World\ModelData.h" />
     <ClInclude Include="Source Files\Rendering\World\Scene.h" />
+    <ClInclude Include="Source Files\Utils\FileDialogs.h" />
     <ClInclude Include="Source Files\Utils\MathHelper.h" />
   </ItemGroup>
   <ItemGroup>

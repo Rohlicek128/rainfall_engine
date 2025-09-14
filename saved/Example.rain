@@ -1,5 +1,5 @@
 Scene: Example
-Selected Entity Id: 5
+Selected Entity Id: 6
 Current Camera Id: 2
 Player Camera Id: 4
 Editor Camera:
@@ -9,14 +9,14 @@ Editor Camera:
   Children Ids: []
   Components:
     - Transform:
-        Position: [3.09666, 5.8417263, -17.472584]
-        Rotation: [0.40818438, -0.2957229, 0.8636744]
+        Position: [9.640423, 5.6712976, -18.877857]
+        Rotation: [0.08298032, -0.27481222, 0.9579106]
         Scale: [1, 1, 1]
     - Camera:
         Enabled: true
         Wireframe: false
-        Yaw: 64.70394
-        Pitch: -17.200891
+        Yaw: 445.04904
+        Pitch: -15.950822
         Fov: 85
         Near Plane: 0.1
         Far Plane: 1000
@@ -63,7 +63,7 @@ Entities:
     Components:
       - Transform:
           Position: [0, 1.32, 0]
-          Rotation: [25.6, 92.21798, 0]
+          Rotation: [25.6, 2017.6951, 0]
           Scale: [1, 1, 1]
       - Mesh:
           Enabled: true
@@ -92,7 +92,7 @@ Entities:
     Components:
       - Transform:
           Position: [12.32, 2, 3]
-          Rotation: [0, 69, 0]
+          Rotation: [0, 89.2, 0]
           Scale: [3, 3, 3]
       - Mesh:
           Enabled: true

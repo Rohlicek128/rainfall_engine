@@ -87,7 +87,7 @@ void GBuffer::set_gui()
 
             ImVec2 avail_size = ImGui::GetContentRegionAvail();
             ImGui::Image((ImTextureID)(intptr_t)renderbuffer.get_handle(),
-            {avail_size.x, (float)renderbuffer.get_width() / (float)renderbuffer.get_height() * avail_size.x},
+            {avail_size.x, (float)renderbuffer.get_height() / (float)renderbuffer.get_width() * avail_size.x},
             {0, 1}, {1, 0});
         }
         else
@@ -96,7 +96,7 @@ void GBuffer::set_gui()
 
             ImVec2 avail_size = ImGui::GetContentRegionAvail();
             ImGui::Image((ImTextureID)(intptr_t)texture->get_handle(),
-            {avail_size.x, (float)texture->get_width() / (float)texture->get_height() * avail_size.x},
+            {avail_size.x, (float)texture->get_height() / (float)texture->get_width() * avail_size.x},
             {0, 1}, {1, 0});
         }
         ImGui::EndChild();

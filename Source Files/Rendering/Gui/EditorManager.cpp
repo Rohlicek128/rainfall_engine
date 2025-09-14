@@ -4,6 +4,8 @@
 #include "../Entities/Components/CameraComponent.h"
 #include "../World/Scene.h"
 
+#include "../../Utils/FileDialogs.h"
+
 EditorManager::EditorManager(const bool visible, int width, int height)
 {
     imgui_io = nullptr;
@@ -45,12 +47,27 @@ void EditorManager::set_main_dockspace(Scene& scene)
     {
         if (ImGui::BeginMenu("File"))
         {
-            if (ImGui::MenuItem("New Scene"))
+            if (ImGui::MenuItem("New", "CTRL+N"))
                 scene.reset();
-            if (ImGui::MenuItem("Save Scene"))
-                scene.save("saved/");
-            if (ImGui::MenuItem("Load Scene"))
-                scene.load("saved/Example.rain");
+            
+            if (ImGui::MenuItem("Open..", "CTRL+O"))
+            {
+                const std::string path = FileDialogs::open_file("Rainfall Scene (*.rain)\0*.rain\0");
+                if (!path.empty())
+                    scene.load(path);
+            }
+                
+            if (ImGui::MenuItem("Save", "CTRL+S") && scene.save_path != "N/A")
+            {
+                scene.save(scene.save_path);
+            }
+            if (ImGui::MenuItem("Save As..", "CTRL+SHIFT+S"))
+            {
+                const std::string path = FileDialogs::save_file("Rainfall Scene (*.rain)\0*.rain\0");
+                if (!path.empty())
+                    scene.save(path);
+            }
+                
 
             ImGui::Separator();
 

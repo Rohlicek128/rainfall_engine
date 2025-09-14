@@ -11,10 +11,13 @@ class Entity;
 
 class Scene : public IGui, ISerializable
 {
+    char name_edit_[64] = "Untitled";
+    
     void serialize(YAML::Emitter& out) override;
     bool deserialize(YAML::Node& node) override;
 public:
     std::string name;
+    std::string save_path;
 
     std::unique_ptr<Entity> root_entity;
     std::vector<std::unique_ptr<Entity>> entities;

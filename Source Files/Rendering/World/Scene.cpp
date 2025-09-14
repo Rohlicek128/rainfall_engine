@@ -15,6 +15,7 @@
 Scene::Scene(const std::string& name, Mesh&& mesh)
 {
     this->name = name;
+    this->save_path = "N/A";
     this->mesh = std::make_unique<Mesh>(std::move(mesh));
     
     root_entity = std::make_unique<Entity>("__root", new TransformComponent(glm::vec3(0.0f), glm::vec3(0.0f) ,glm::vec3(0.0f)));
@@ -230,6 +231,8 @@ void Scene::set_gui()
     ImGui::Text("%s Settings", name.c_str());
     ImGui::PopFont();
 
+    ImGui::TextDisabled("Path: %s", save_path.c_str());
+
     ImGui::Separator();
 
     if (ImGui::BeginTable("##SceneSettings", 2, ImGuiTableFlags_Resizable | ImGuiTableFlags_ScrollY))
@@ -237,6 +240,14 @@ void Scene::set_gui()
         ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed);
         ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthStretch, 2.0f);
 
+        ImGui::TableNextRow();
+        ImGui::TableNextColumn();
+        ImGui::Text("Name");
+        ImGui::Separator();
+        ImGui::TableNextColumn();
+        ImGui::InputText("##InputSceneName", name_edit_, std::size(name_edit_));
+        name = name_edit_;
+        
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
         ImGui::Text("Editor camera");
@@ -285,6 +296,9 @@ void Scene::reset()
     player_camera = nullptr;
     current_camera = editor_camera.get();
     selected_entity = nullptr;
+
+    name = "Untitled";
+    strcpy_s(name_edit_, name.c_str());
 }
 
 void Scene::save(const std::string& path)
@@ -293,10 +307,11 @@ void Scene::save(const std::string& path)
     
     serialize(out);
     
-    std::ofstream file_out((path + name + ".rain").c_str());
+    std::ofstream file_out(path.c_str());
     file_out << out.c_str();
 
-    std::cout << "SAVED: " << name << ".rain\n";
+    save_path = path;
+    std::cout << "SAVED: " << path << '\n';
 }
 
 void Scene::load(const std::string& path)
@@ -310,6 +325,7 @@ void Scene::load(const std::string& path)
     reset();
     deserialize(scene);
 
+    save_path = path;
     std::cout << "LOADED: " << path << '\n';
 }
 
@@ -340,6 +356,7 @@ bool Scene::deserialize(YAML::Node& node)
     if (!node["Scene"]) return false;
     
     name = node["Scene"].as<std::string>();
+    strcpy_s(name_edit_, name.c_str());
 
     int selected_entity_id = -1;
     if (YAML::Node cur_node = node["Selected Entity Id"])
