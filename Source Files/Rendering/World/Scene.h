@@ -22,7 +22,7 @@ public:
     std::unique_ptr<Entity> root_entity;
     std::vector<std::unique_ptr<Entity>> entities;
     std::vector<Entity*> lights;
-    std::unique_ptr<Mesh> mesh;
+    Mesh* mesh;
     
     std::unique_ptr<Entity> editor_camera;
     Entity* player_camera;
@@ -34,7 +34,7 @@ public:
     bool opened_gui;
     Entity* selected_entity;
 
-    Scene(const std::string&, Mesh&&);
+    Scene(const std::string&, Mesh*);
     ~Scene() override = default;
     
     void add_entity(std::unique_ptr<Entity>);
@@ -50,7 +50,7 @@ public:
 
     void reset();
     void save(const std::string& path);
-    void load(const std::string& path);
+    bool load(const std::string& path);
     
     void set_gui() override;
 };

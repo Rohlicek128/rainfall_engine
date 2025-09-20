@@ -29,7 +29,7 @@ void Cubemap::set_face(const unsigned int index, const std::string& path)
 {
     faces[index] = std::make_unique<Texture>(internal_format, format, type);
     
-    unsigned char* data = stbi_load(("assets/" + path).c_str(),
+    unsigned char* data = stbi_load(path.c_str(),
         faces[index]->get_width_ptr(), faces[index]->get_height_ptr(), faces[index]->get_nr_channels_ptr(), 0);
     *faces[index]->get_path_ptr() = path;
 

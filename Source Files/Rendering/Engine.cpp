@@ -17,23 +17,23 @@ Engine::Engine(const EngineArgs& args) : fps_plot_{}
     set_icon(args.window, "Icon/green_tick.png");
 
     textures_ = TextureManager::get_instance();
-    textures_->add_texture(std::make_unique<Texture>("white1x1.png", GL_RGBA8, GL_RGBA));
-    textures_->add_texture(std::make_unique<Texture>("black1x1.png", GL_RGBA8, GL_RGBA));
-    textures_->add_texture(std::make_unique<Texture>("missing_texture.png", GL_SRGB8_ALPHA8, GL_RGBA));
-    textures_->add_texture(std::make_unique<Texture>("chill_guy.jpg", GL_SRGB8, GL_RGB));
-    textures_->add_texture(std::make_unique<Texture>("container_diffuse.png", GL_SRGB8_ALPHA8, GL_RGBA));
-    textures_->add_texture(std::make_unique<Texture>("container_specular.png", GL_RGBA8, GL_RGBA));
-    textures_->add_texture(std::make_unique<Texture>("circuits_normal.jpg", GL_RGB8, GL_RGB));
-    textures_->add_texture(std::make_unique<Texture>("sofa_normal.jpg", GL_RGB8, GL_RGB));
-    textures_->add_texture(std::make_unique<Texture>("shrek.png", GL_SRGB8_ALPHA8, GL_RGBA));
-    textures_->add_texture(std::make_unique<Texture>("black_hole.jpg", GL_SRGB8, GL_RGB));
+    textures_->add_texture(std::make_unique<Texture>("assets/white1x1.png", GL_RGBA8, GL_RGBA));
+    textures_->add_texture(std::make_unique<Texture>("assets/black1x1.png", GL_RGBA8, GL_RGBA));
+    textures_->add_texture(std::make_unique<Texture>("assets/missing_texture.png", GL_SRGB8_ALPHA8, GL_RGBA));
+    textures_->add_texture(std::make_unique<Texture>("assets/chill_guy.jpg", GL_SRGB8, GL_RGB));
+    textures_->add_texture(std::make_unique<Texture>("assets/container_diffuse.png", GL_SRGB8_ALPHA8, GL_RGBA));
+    textures_->add_texture(std::make_unique<Texture>("assets/container_specular.png", GL_RGBA8, GL_RGBA));
+    textures_->add_texture(std::make_unique<Texture>("assets/circuits_normal.jpg", GL_RGB8, GL_RGB));
+    textures_->add_texture(std::make_unique<Texture>("assets/sofa_normal.jpg", GL_RGB8, GL_RGB));
+    textures_->add_texture(std::make_unique<Texture>("assets/shrek.png", GL_SRGB8_ALPHA8, GL_RGBA));
+    textures_->add_texture(std::make_unique<Texture>("assets/black_hole.jpg", GL_SRGB8, GL_RGB));
 
-    textures_->add_texture(std::make_unique<Texture>("rocky_dirt/rocky_trail_02_diff_1k.jpg", GL_SRGB8, GL_RGB));
-    textures_->add_texture(std::make_unique<Texture>("rocky_dirt/rocky_trail_02_arm_1k.jpg", GL_RGB8, GL_RGB));
-    textures_->add_texture(std::make_unique<Texture>("rocky_dirt/rocky_trail_02_nor_gl_1k.jpg", GL_RGB8, GL_RGB));
+    textures_->add_texture(std::make_unique<Texture>("assets/rocky_dirt/rocky_trail_02_diff_1k.jpg", GL_SRGB8, GL_RGB));
+    textures_->add_texture(std::make_unique<Texture>("assets/rocky_dirt/rocky_trail_02_arm_1k.jpg", GL_RGB8, GL_RGB));
+    textures_->add_texture(std::make_unique<Texture>("assets/rocky_dirt/rocky_trail_02_nor_gl_1k.jpg", GL_RGB8, GL_RGB));
 
-    std::vector<std::string> faces = {"Skybox/0right.jpg", "Skybox/1left.jpg", "Skybox/2top.jpg",
-        "Skybox/3bottom.jpg", "Skybox/4front.jpg", "Skybox/5back.jpg"};
+    std::vector<std::string> faces = {"assets/Skybox/0right.jpg", "assets/Skybox/1left.jpg", "assets/Skybox/2top.jpg",
+        "assets/Skybox/3bottom.jpg", "assets/Skybox/4front.jpg", "assets/Skybox/5back.jpg"};
     textures_->add_cubemap(std::make_unique<Cubemap>(faces, GL_SRGB8, GL_RGB, GL_UNSIGNED_BYTE));
     
 
@@ -54,14 +54,14 @@ Engine::Engine(const EngineArgs& args) : fps_plot_{}
     }
 
     
-    //Scene
-    scene_ = std::make_unique<Scene>("Testing", Mesh({{"Position", 3}, {"TexCoord", 2}, {"Normal", 3}}, true));
-    set_models_to_mesh(scene_->mesh.get());
-    scene_->mesh->compile();
-    //set_hardcoded_entities(*scene_);
-
-    //scene_->save("saved/");
-    scene_->load("saved/Example.rain");
+    //Project
+    project_ = std::make_unique<Project>("Testing");
+    set_models_to_mesh(project_->assets_mesh.get());
+    project_->assets_mesh->compile();
+    
+    current_scene_ = nullptr;
+    project_->load_scene_from_path("saved/Example.rain");
+    
 
     g_buffer_ = std::make_unique<GBuffer>(args.width, args.height);
     geometry_program_ = new GeometryProgram({{"Geometry/geometry.vert", GL_VERTEX_SHADER}, {"Geometry/geometry.frag", GL_FRAGMENT_SHADER}});
@@ -79,7 +79,7 @@ Engine::Engine(const EngineArgs& args) : fps_plot_{}
         0, 1, 2,
         0, 2, 3
     };
-    screen_mesh_ = new Mesh({{"PosTex", 4}});
+    screen_mesh_ = std::make_unique<Mesh>(std::vector<VertexAttribute>{{"PosTex", 4}});
     screen_mesh_->add_model("Quad", vertices_quad, std::size(vertices_quad), indices_quad, std::size(indices_quad));
     screen_mesh_->compile();
     
@@ -139,7 +139,7 @@ void Engine::update_delta_time()
 
         fps_history_.push_back(display_frame_count_);
         if (fps_history_.size() > std::size(fps_plot_)) fps_history_.pop_front();
-        for (int i = 0; i < fps_history_.size(); ++i)
+        for (unsigned int i = 0; i < fps_history_.size(); ++i)
         {
             fps_plot_[i] = (float)fps_history_.at(i);
             max_fps_plot_ = std::max<int>(fps_history_.at(i), max_fps_plot_);
@@ -158,6 +158,7 @@ void Engine::set_icon(GLFWwindow* window, const std::string& path)
 
 void Engine::update(const EngineArgs& args)
 {
+    current_scene_ = project_->current_scene;
     update_delta_time();
     mouse_->pos_x = args.mouse_x;
     mouse_->pos_y = args.mouse_y;
@@ -166,10 +167,10 @@ void Engine::update(const EngineArgs& args)
     viewport_[0] = args.width;
     viewport_[1] = args.height;
 
-    if (scene_->entities.size() >= 2)
+    if (current_scene_->entities.size() >= 2)
     {
-        scene_->entities.at(1)->transform->rotation.y += (float)delta_time_ * 20.0f;
-        scene_->entities.at(1)->transform->update_rot_edit();
+        current_scene_->entities.at(1)->transform->rotation.y += (float)delta_time_ * 20.0f;
+        current_scene_->entities.at(1)->transform->update_rot_edit();
     }
     
     //Input
@@ -208,8 +209,8 @@ void Engine::update(const EngineArgs& args)
     if (glfwGetKey(args.window, GLFW_KEY_INSERT) == GLFW_PRESS && camera_toggle_)
     {
         camera_toggle_ = false;
-        if (scene_->current_camera != scene_->editor_camera.get()) scene_->current_camera = scene_->editor_camera.get();
-        else if (scene_->current_camera != scene_->player_camera && scene_->player_camera != nullptr) scene_->current_camera = scene_->player_camera;
+        if (current_scene_->current_camera != current_scene_->editor_camera.get()) current_scene_->current_camera = current_scene_->editor_camera.get();
+        else if (current_scene_->current_camera != current_scene_->player_camera && current_scene_->player_camera != nullptr) current_scene_->current_camera = current_scene_->player_camera;
     }
     else if (!camera_toggle_ && glfwGetKey(args.window, GLFW_KEY_INSERT) == GLFW_RELEASE) camera_toggle_ = true;
     
@@ -231,8 +232,8 @@ void Engine::update(const EngineArgs& args)
 
 
     //Camera update
-    CameraComponent* camera_component = scene_->current_camera->get_component<CameraComponent>();
-    camera_component->move(args.window, static_cast<float>(delta_time_));
+    CameraComponent* camera_component = current_scene_->current_camera->get_component<CameraComponent>();
+    if (!editor_->imgui_io->WantCaptureKeyboard) camera_component->move(args.window, static_cast<float>(delta_time_));
     if (!mouse_->is_visible) camera_component->mouse_move(*mouse_, static_cast<float>(delta_time_));
     
     
@@ -246,7 +247,7 @@ void Engine::render(EngineArgs& args)
 {
     editor_->new_frame();
 
-    const CameraComponent* cur_camera_comp = scene_->current_camera->get_component<CameraComponent>();
+    const CameraComponent* cur_camera_comp = current_scene_->current_camera->get_component<CameraComponent>();
     const int cur_width = editor_->is_visible ? editor_->viewport_fbo->attached_textures.at(0)->get_width() : args.width;
     const int cur_height = editor_->is_visible ? editor_->viewport_fbo->attached_textures.at(0)->get_height() : args.height;
 
@@ -258,14 +259,14 @@ void Engine::render(EngineArgs& args)
     
     if (cur_camera_comp->is_wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     
-    geometry_program_->draw(*scene_, (float)cur_width / (float)cur_height);
+    geometry_program_->draw(*current_scene_, (float)cur_width / (float)cur_height);
     
     if (cur_camera_comp->is_wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     g_buffer_->unbind();
 
     //Lighting Pass
     post_process_program_->bind_framebuffer();
-    lighting_program_->draw(*scene_, *screen_mesh_, 0, *g_buffer_);
+    lighting_program_->draw(*current_scene_, *screen_mesh_, 0, *g_buffer_);
     post_process_program_->unbind_framebuffer();
 
     //g_buffer_->blit_framebuffer();
@@ -281,12 +282,12 @@ void Engine::render(EngineArgs& args)
     //Editor
     if (editor_->is_visible)
     {
-        editor_->set_main_dockspace(*scene_);
+        editor_->set_main_dockspace(*project_);
 
         //Viewport
         const ImVec4 old_bg = ImGui::GetStyle().Colors[2];
-        if (scene_->current_camera == scene_->player_camera) ImGui::GetStyle().Colors[2] = {0.5f, 0.2f, 0.2f, 0.7f};
-        else scene_->current_camera = scene_->editor_camera.get();
+        if (current_scene_->current_camera == current_scene_->player_camera) ImGui::GetStyle().Colors[2] = {0.5f, 0.2f, 0.2f, 0.7f};
+        else current_scene_->current_camera = current_scene_->editor_camera.get();
         ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoInputs);
         
         const ImVec2 pos_vp  = ImGui::GetCursorScreenPos();
@@ -295,30 +296,29 @@ void Engine::render(EngineArgs& args)
         editor_->viewport_fbo->set_gui();
         
         ImGuizmo::SetRect(pos_vp.x, pos_vp.y, size_vp.x, size_vp.y);
-        if (scene_->selected_entity != nullptr) scene_->selected_entity->transform->set_guizmo(*scene_->current_camera, editor_->gizmo_operation);
+        if (current_scene_->selected_entity != nullptr) current_scene_->selected_entity->transform->set_guizmo(*current_scene_->current_camera, editor_->gizmo_operation);
         ImVec2 pos = ImGui::GetWindowPos();
         pos.x += ImGui::GetWindowContentRegionMin().x + 10;
         pos.y += ImGui::GetWindowContentRegionMin().y + 10;
         ImGui::End();
-        if (scene_->current_camera == scene_->player_camera) ImGui::GetStyle().Colors[2] = old_bg;
-
+        if (current_scene_->current_camera == current_scene_->player_camera) ImGui::GetStyle().Colors[2] = old_bg;
         
         mouse_->set_gui();
             
         //Scene
         if (ImGui::Begin("Scene Graph ##ENTITIES_GRAPH"))
-            scene_->set_scene_graph();
+            current_scene_->set_scene_graph();
         ImGui::End();
-        if (scene_->opened_gui)
+        if (current_scene_->opened_gui)
         {
             ImGui::SetNextWindowSize(ImVec2(500, 440), ImGuiCond_FirstUseEver);
-            if (ImGui::Begin("Scene Settings", &scene_->opened_gui))
-                scene_->set_gui();
+            if (ImGui::Begin("Scene Settings", &current_scene_->opened_gui))
+                current_scene_->set_gui();
             ImGui::End();
         }
         //Inspector
         if (ImGui::Begin("Inspector ##ENTITIES_EDITOR"))
-            scene_->set_entity_inspector();
+            current_scene_->set_entity_inspector();
         ImGui::End();
 
         //GBuffer

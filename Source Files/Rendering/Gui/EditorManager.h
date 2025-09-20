@@ -6,7 +6,7 @@
 #include "../Buffers/Screen/Framebuffer.h"
 
 class Mesh;
-class Scene;
+class Project;
 
 class EditorManager
 {
@@ -26,7 +26,7 @@ public:
     EditorManager(bool, int, int);
     ~EditorManager() = default;
     void init_imgui(GLFWwindow*);
-    void set_main_dockspace(Scene&);
+    void set_main_dockspace(Project&);
     
     void new_frame();
     void render();

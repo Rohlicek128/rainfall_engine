@@ -91,7 +91,7 @@ int* Texture::get_nr_channels_ptr() { return &nr_channels_; }
 unsigned char* Texture::load_image(const std::string& path)
 {
     stbi_set_flip_vertically_on_load(true);
-    return stbi_load(("assets/" + path).c_str(), &width_, &height_, &nr_channels_, 0);
+    return stbi_load(path.c_str(), &width_, &height_, &nr_channels_, 0);
 }
 
 void Texture::active_bind(const unsigned int index)

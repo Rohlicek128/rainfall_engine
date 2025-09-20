@@ -256,6 +256,7 @@
       <SDLCheck>true</SDLCheck>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="Source Files\Organization\Project.cpp" />
     <ClCompile Include="Source Files\Rendering\Buffers\Attributes\VertexAttribute.cpp" />
     <ClCompile Include="Source Files\Rendering\Buffers\IBindable.cpp" />
     <ClCompile Include="Source Files\Rendering\Buffers\IndexBuffer.cpp" />
@@ -494,6 +495,7 @@
     <ClInclude Include="Source Files\Imgui\imstb_rectpack.h" />
     <ClInclude Include="Source Files\Imgui\imstb_textedit.h" />
     <ClInclude Include="Source Files\Imgui\imstb_truetype.h" />
+    <ClInclude Include="Source Files\Organization\Project.h" />
     <ClInclude Include="Source Files\Rendering\Buffers\Attributes\VertexAttribute.h" />
     <ClInclude Include="Source Files\Rendering\Buffers\IBindable.h" />
     <ClInclude Include="Source Files\Rendering\Buffers\IndexBuffer.h" />

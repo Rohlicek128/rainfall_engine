@@ -1,6 +1,7 @@
 #include "EditorManager.h"
 
 #include "../../Imgui/ImGuizmo.h"
+#include "../../Organization/Project.h"
 #include "../Entities/Components/CameraComponent.h"
 #include "../World/Scene.h"
 
@@ -28,7 +29,7 @@ void EditorManager::init_imgui(GLFWwindow* window)
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     imgui_io = &ImGui::GetIO(); (void)imgui_io;
-    imgui_io->FontGlobalScale = 2.0f;
+    imgui_io->FontGlobalScale = 3.0f;
     ImGui::StyleColorsDark();
     
     ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -39,33 +40,49 @@ void EditorManager::init_imgui(GLFWwindow* window)
     ImGuizmo::SetOrthographic(false);
 }
 
-void EditorManager::set_main_dockspace(Scene& scene)
+void EditorManager::set_main_dockspace(Project& project)
 {
     ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 
     if (ImGui::BeginMainMenuBar())
     {
-        if (ImGui::BeginMenu("File"))
+        if (ImGui::BeginMenu("Project"))
+        {
+            if (ImGui::MenuItem("New Project"))
+            {
+                project.reset();
+                project.add_empty_scene();
+            }
+            if (ImGui::MenuItem("Save As..."))
+            {
+                const std::string path = FileDialogs::save_file("Rainfall Project (*.rainp)\0*.rainp\0");
+                if (!path.empty())
+                    project.save(path);
+            }
+            ImGui::EndMenu();
+        }
+        
+        if (ImGui::BeginMenu("Scene"))
         {
             if (ImGui::MenuItem("New", "CTRL+N"))
-                scene.reset();
+                project.current_scene->reset();
             
             if (ImGui::MenuItem("Open..", "CTRL+O"))
             {
                 const std::string path = FileDialogs::open_file("Rainfall Scene (*.rain)\0*.rain\0");
                 if (!path.empty())
-                    scene.load(path);
+                    project.current_scene->load(path);
             }
                 
-            if (ImGui::MenuItem("Save", "CTRL+S") && scene.save_path != "N/A")
+            if (ImGui::MenuItem("Save", "CTRL+S") && project.current_scene->save_path != "N/A")
             {
-                scene.save(scene.save_path);
+                project.current_scene->save(project.current_scene->save_path);
             }
             if (ImGui::MenuItem("Save As..", "CTRL+SHIFT+S"))
             {
                 const std::string path = FileDialogs::save_file("Rainfall Scene (*.rain)\0*.rain\0");
                 if (!path.empty())
-                    scene.save(path);
+                    project.current_scene->save(path);
             }
                 
 

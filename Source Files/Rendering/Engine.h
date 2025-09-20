@@ -20,12 +20,12 @@
 #include "Shaders/Programs/LightingProgram.h"
 #include "Shaders/Programs/PostProcessProgram.h"
 #include "Shaders/Programs/SkyboxProgram.h"
-#include "World/Scene.h"
-#include "Entities/Entity.h"
+#include "../Organization/Project.h"
 
 class Engine
 {
-    std::unique_ptr<Scene> scene_;
+    std::unique_ptr<Project> project_;
+    Scene* current_scene_;
 
     std::unique_ptr<GBuffer> g_buffer_;
     
@@ -34,7 +34,7 @@ class Engine
     SkyboxProgram* skybox_program_;
     PostProcessProgram* post_process_program_;
     
-    Mesh* screen_mesh_;
+    std::unique_ptr<Mesh> screen_mesh_;
     
     bool camera_toggle_;
     Mouse* mouse_;

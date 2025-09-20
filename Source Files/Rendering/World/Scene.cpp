@@ -12,11 +12,11 @@
 #include "../Entities/Components/TextureComponent.h"
 #include "../Entities/Components/MeshComponent.h"
 
-Scene::Scene(const std::string& name, Mesh&& mesh)
+Scene::Scene(const std::string& name, Mesh* mesh)
 {
     this->name = name;
     this->save_path = "N/A";
-    this->mesh = std::make_unique<Mesh>(std::move(mesh));
+    this->mesh = mesh;
     
     root_entity = std::make_unique<Entity>("__root", new TransformComponent(glm::vec3(0.0f), glm::vec3(0.0f) ,glm::vec3(0.0f)));
     root_entity->is_root = true;
@@ -31,7 +31,7 @@ Scene::Scene(const std::string& name, Mesh&& mesh)
     skybox = std::make_unique<Entity>("__skybox",
         new TransformComponent(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f))
         );
-    skybox->add_component<MeshComponent>(0, GL_TRIANGLES, this->mesh.get());
+    skybox->add_component<MeshComponent>(0, GL_TRIANGLES, this->mesh);
     skybox->add_component<TextureComponent>(0x8513, 1, 1);
 
     opened_gui = false;
@@ -42,7 +42,7 @@ void Scene::add_entity(std::unique_ptr<Entity> entity)
 {
     if (entity->parent == nullptr) root_entity->add_child(entity.get());
     entities.push_back(std::move(entity));
-    entities.back()->set_mesh_to_component(mesh.get());
+    entities.back()->set_mesh_to_component(mesh);
     
     if (entities.back()->contains_component<LightComponent>()) add_light(entities.back().get());
 }
@@ -311,10 +311,10 @@ void Scene::save(const std::string& path)
     file_out << out.c_str();
 
     save_path = path;
-    std::cout << "SAVED: " << path << '\n';
+    std::cout << "SAVED SCENE: " << path << '\n';
 }
 
-void Scene::load(const std::string& path)
+bool Scene::load(const std::string& path)
 {
     const std::ifstream stream(path);
     std::stringstream str_stream;
@@ -323,10 +323,12 @@ void Scene::load(const std::string& path)
     YAML::Node scene = YAML::Load(str_stream.str());
 
     reset();
-    deserialize(scene);
+    const bool result = deserialize(scene);
 
     save_path = path;
-    std::cout << "LOADED: " << path << '\n';
+    std::cout << "LOADED SCENE: " << path << '\n';
+
+    return result;
 }
 
 void Scene::serialize(YAML::Emitter& out)

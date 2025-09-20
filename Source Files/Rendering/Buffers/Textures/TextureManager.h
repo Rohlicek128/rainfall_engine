@@ -11,6 +11,7 @@ class TextureManager : IGui
     std::vector<std::unique_ptr<Texture>> textures_;
     std::vector<std::unique_ptr<Cubemap>> cubemaps_;
     float select_scale_;
+    bool load_as_srgb_;
     
     static TextureManager* instance_ptr_;
 
@@ -22,6 +23,7 @@ public:
     ~TextureManager() override = default;
     
     void add_texture(std::unique_ptr<Texture>);
+    bool add_texture_open_file(bool is_srgb);
     Texture* get_texture(int);
     Texture* get_texture_by_handle(unsigned int);
 

@@ -1,10 +1,13 @@
 #include "TextureManager.h"
 
+#include "../../../Utils/FileDialogs.h"
+
 TextureManager* TextureManager::instance_ptr_ = nullptr;
 
 TextureManager::TextureManager()
 {
     select_scale_ = 100.0f;
+    load_as_srgb_ = false;
 }
 
 TextureManager* TextureManager::get_instance()
@@ -19,6 +22,19 @@ TextureManager* TextureManager::get_instance()
 void TextureManager::add_texture(std::unique_ptr<Texture> texture)
 {
     textures_.push_back(std::move(texture));
+}
+
+bool TextureManager::add_texture_open_file(const bool is_srgb)
+{
+    const std::string path = FileDialogs::open_file("Image File (*.jpg;*.png)\0*.jpg;*.png\0");
+    if (path.empty()) return false;
+
+    const bool is_png = !path.compare(path.length() - 3, 3, "png");
+    int i_format = is_png ? (is_srgb ? GL_SRGB8_ALPHA8 : GL_RGBA8) : GL_RGB8;
+    int format = is_png ? GL_RGBA : GL_RGB;
+    add_texture(std::make_unique<Texture>(path, i_format, format));
+    
+    return true;
 }
 
 Texture* TextureManager::get_texture(const int index)
@@ -95,6 +111,13 @@ unsigned int TextureManager::select_texture_2d_gui()
     }
     ImGui::NewLine();
     if (ImGui::Button("  None  ")) return 1;
+
+    
+    if (ImGui::Button("  Add..  "))
+        add_texture_open_file(load_as_srgb_);
+
+    ImGui::SameLine();
+    ImGui::Checkbox("Load SRGB", &load_as_srgb_);
 
     return 0;
 }
