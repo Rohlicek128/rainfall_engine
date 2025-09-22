@@ -7,6 +7,7 @@
 
 class Mesh;
 class Project;
+#include "../EngineArgs.h"
 
 class EditorManager
 {
@@ -26,7 +27,9 @@ public:
     EditorManager(bool, int, int);
     ~EditorManager() = default;
     void init_imgui(GLFWwindow*);
-    void set_main_dockspace(Project&);
+    void set_main_dockspace(const EngineArgs&, Project&);
+
+    void set_red_style();
     
     void new_frame();
     void render();

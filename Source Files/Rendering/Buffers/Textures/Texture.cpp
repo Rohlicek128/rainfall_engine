@@ -43,6 +43,7 @@ Texture::Texture(const std::string& path, const GLenum internal_format, const GL
         glDeleteTextures(1, &handle_);
         handle_ = 3;
     }
+    
     Texture::unbind();
     
     stbi_image_free(data);
@@ -75,6 +76,11 @@ Texture::Texture(const int width, const int height, const GLenum internal_format
 Texture::~Texture()
 {
     //glDeleteTextures(1, &handle_);
+}
+
+void Texture::delete_texture()
+{
+    glDeleteTextures(0, &handle_);
 }
 
 std::string& Texture::get_path() { return path_; }

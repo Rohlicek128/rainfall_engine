@@ -19,6 +19,16 @@ TextureManager* TextureManager::get_instance()
     return instance_ptr_;
 }
 
+void TextureManager::add_essential_texture(std::unique_ptr<Texture> texture)
+{
+    essential_textures_.push_back(std::move(texture));
+}
+
+Texture* TextureManager::get_essential_texture(const int index)
+{
+    return essential_textures_.at(index).get();
+}
+
 void TextureManager::add_texture(std::unique_ptr<Texture> texture)
 {
     textures_.push_back(std::move(texture));
@@ -44,6 +54,11 @@ Texture* TextureManager::get_texture(const int index)
 
 Texture* TextureManager::get_texture_by_handle(const unsigned int handle)
 {
+    for (int i = 0; i < essential_textures_.size(); ++i)
+    {
+        if (essential_textures_.at(i)->get_handle() == handle) return essential_textures_.at(i).get();
+    }
+    
     for (int i = 0; i < textures_.size(); ++i)
     {
         if (textures_.at(i)->get_handle() == handle) return textures_.at(i).get();
@@ -75,7 +90,7 @@ unsigned int TextureManager::select_texture_2d_gui()
     float max_width = 0.0;
 
     float width_aspect = 0.0f;
-    for (int i = 3; i < textures_.size(); ++i)
+    for (int i = 0; i < textures_.size(); ++i)
     {
         width_aspect = (float)textures_.at(i)->get_width() / (float)textures_.at(i)->get_height();
         max_width += select_scale_ * width_aspect;
@@ -120,4 +135,40 @@ unsigned int TextureManager::select_texture_2d_gui()
     ImGui::Checkbox("Load SRGB", &load_as_srgb_);
 
     return 0;
+}
+
+
+void TextureManager::serialize(YAML::Emitter& out)
+{
+    out << YAML::Key << "Textures" << YAML::Value << YAML::BeginSeq;
+    for (unsigned int i = 0; i < textures_.size(); ++i)
+    {
+        out << YAML::Flow << YAML::BeginSeq;
+        out << textures_.at(i)->get_path() << textures_.at(i)->internal_format << textures_.at(i)->format;
+        out << YAML::EndSeq;
+    }
+    out << YAML::EndSeq;
+}
+
+bool TextureManager::deserialize(YAML::Node& node)
+{
+    if (YAML::Node textures_des = node["Textures"])
+    {
+        for (int i = 0; i < textures_.size(); ++i)
+        {
+            textures_.at(i)->delete_texture();
+        }
+        textures_.clear();
+        
+        for (auto texture_des : textures_des)
+        {
+            YAML::iterator cur_node = texture_des.begin();
+            std::string path = cur_node->as<std::string>();
+            int in_for = (++cur_node)->as<int>();
+            int format = (++cur_node)->as<int>();
+            add_texture(std::make_unique<Texture>(path, in_for, format));
+        }
+    }
+    
+    return true;
 }

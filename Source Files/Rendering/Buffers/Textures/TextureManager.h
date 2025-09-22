@@ -5,9 +5,11 @@
 #include "Cubemap.h"
 #include "Texture.h"
 #include "../../Gui/IGui.h"
+#include "../../World/Loading/ISerializable.h"
 
-class TextureManager : IGui
+class TextureManager : IGui, public ISerializable
 {
+    std::vector<std::unique_ptr<Texture>> essential_textures_;
     std::vector<std::unique_ptr<Texture>> textures_;
     std::vector<std::unique_ptr<Cubemap>> cubemaps_;
     float select_scale_;
@@ -21,6 +23,9 @@ public:
     
     TextureManager(const TextureManager&) = default;
     ~TextureManager() override = default;
+
+    void add_essential_texture(std::unique_ptr<Texture>);
+    Texture* get_essential_texture(int);
     
     void add_texture(std::unique_ptr<Texture>);
     bool add_texture_open_file(bool is_srgb);
@@ -29,7 +34,9 @@ public:
 
     void add_cubemap(std::unique_ptr<Cubemap>);
     Cubemap* get_cubemap(int);
-    
+
+    void serialize(YAML::Emitter& out) override;
+    bool deserialize(YAML::Node& node) override;
     void set_gui() override;
     unsigned int select_texture_2d_gui();
 };

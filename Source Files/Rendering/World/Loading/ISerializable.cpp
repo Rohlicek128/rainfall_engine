@@ -28,7 +28,7 @@ glm::vec3 ISerializable::des_vec3(YAML::Node& node)
 
 glm::vec4 ISerializable::des_vec4(YAML::Node& node)
 {
-    glm::vec4 value = glm::vec4(0.0f);
+    glm::vec4 value;
 
     YAML::const_iterator cur_node = node.begin();
     value.x = cur_node->as<float>();

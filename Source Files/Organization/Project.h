@@ -30,6 +30,6 @@ public:
     void add_empty_scene();
     void reset();
     
-    bool load_scene_from_file();
+    bool load_scene_dialog();
     bool load_scene_from_path(const std::string& file_path);
 };

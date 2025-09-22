@@ -34,7 +34,7 @@ void Project::reset()
     path = "N/A";
 }
 
-bool Project::load_scene_from_file()
+bool Project::load_scene_dialog()
 {
     const std::string open_path = FileDialogs::open_file("Rainfall Scene (*.rain)\0*.rain\0");
     if (!open_path.empty())
@@ -80,7 +80,7 @@ bool Project::load(const std::string& file_path)
     const bool result = deserialize(project);
 
     this->path = file_path;
-    std::cout << "LOADED SCENE: " << file_path << '\n';
+    std::cout << "LOADED PROJECT: " << file_path << '\n';
 
     return result;
 }
@@ -91,15 +91,31 @@ void Project::serialize(YAML::Emitter& out)
 
     out << YAML::Key << "Project" << YAML::Value << name.c_str();
     
-    out << YAML::Key << "Scene Paths" << YAML::Value << YAML::BeginSeq;
+    out << YAML::Key << "Scene paths" << YAML::Value << YAML::BeginSeq;
     for (int i = 0; i < scenes.size(); ++i)
         out << YAML::Value << scenes.at(i)->save_path;
     out << YAML::EndSeq;
+
+    textures->serialize(out);
     
     out << YAML::EndMap;
 }
 
 bool Project::deserialize(YAML::Node& node)
 {
-    return false;
+    if (!node["Project"]) return false;
+    
+    name = node["Project"].as<std::string>();
+
+    if (YAML::Node scenes_des = node["Scene paths"])
+    {
+        for (auto scene_des : scenes_des)
+        {
+            load_scene_from_path(scene_des.as<std::string>());
+        }
+    }
+
+    //textures->deserialize(node);
+    
+    return true;
 }

@@ -19,6 +19,7 @@ public:
     Texture(const std::string&, GLenum = GL_RGB8, GLenum = GL_RGB, GLenum = GL_UNSIGNED_BYTE);
     Texture(int, int, GLenum = GL_RGB8, GLenum = GL_RGB, GLenum = GL_UNSIGNED_BYTE);
     ~Texture() override;
+    void delete_texture();
     std::string& get_path();
     int get_width();
     int get_height();

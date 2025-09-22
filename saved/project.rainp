@@ -1,0 +1,18 @@
+Project: Testing
+Scene paths:
+  - saved/Example.rain
+  - saved/Another.rain
+Textures:
+  - [assets/white1x1.png, 32856, 6408]
+  - [assets/black1x1.png, 32856, 6408]
+  - [assets/missing_texture.png, 35907, 6408]
+  - [assets/chill_guy.jpg, 35905, 6407]
+  - [assets/container_diffuse.png, 35907, 6408]
+  - [assets/container_specular.png, 32856, 6408]
+  - [assets/circuits_normal.jpg, 32849, 6407]
+  - [assets/sofa_normal.jpg, 32849, 6407]
+  - [assets/shrek.png, 35907, 6408]
+  - [assets/black_hole.jpg, 35905, 6407]
+  - [assets/rocky_dirt/rocky_trail_02_diff_1k.jpg, 35905, 6407]
+  - [assets/rocky_dirt/rocky_trail_02_arm_1k.jpg, 32849, 6407]
+  - [assets/rocky_dirt/rocky_trail_02_nor_gl_1k.jpg, 32849, 6407]

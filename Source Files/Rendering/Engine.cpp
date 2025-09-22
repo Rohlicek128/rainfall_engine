@@ -17,9 +17,10 @@ Engine::Engine(const EngineArgs& args) : fps_plot_{}
     set_icon(args.window, "Icon/green_tick.png");
 
     textures_ = TextureManager::get_instance();
-    textures_->add_texture(std::make_unique<Texture>("assets/white1x1.png", GL_RGBA8, GL_RGBA));
-    textures_->add_texture(std::make_unique<Texture>("assets/black1x1.png", GL_RGBA8, GL_RGBA));
-    textures_->add_texture(std::make_unique<Texture>("assets/missing_texture.png", GL_SRGB8_ALPHA8, GL_RGBA));
+    textures_->add_essential_texture(std::make_unique<Texture>("assets/white1x1.png", GL_RGBA8, GL_RGBA));
+    textures_->add_essential_texture(std::make_unique<Texture>("assets/black1x1.png", GL_RGBA8, GL_RGBA));
+    textures_->add_essential_texture(std::make_unique<Texture>("assets/missing_texture.png", GL_SRGB8_ALPHA8, GL_RGBA));
+    
     textures_->add_texture(std::make_unique<Texture>("assets/chill_guy.jpg", GL_SRGB8, GL_RGB));
     textures_->add_texture(std::make_unique<Texture>("assets/container_diffuse.png", GL_SRGB8_ALPHA8, GL_RGBA));
     textures_->add_texture(std::make_unique<Texture>("assets/container_specular.png", GL_RGBA8, GL_RGBA));
@@ -60,7 +61,7 @@ Engine::Engine(const EngineArgs& args) : fps_plot_{}
     project_->assets_mesh->compile();
     
     current_scene_ = nullptr;
-    project_->load_scene_from_path("saved/Example.rain");
+    project_->load("saved/project.rainp");
     
 
     g_buffer_ = std::make_unique<GBuffer>(args.width, args.height);
@@ -173,7 +174,7 @@ void Engine::update(const EngineArgs& args)
         current_scene_->entities.at(1)->transform->update_rot_edit();
     }
     
-    //Input
+    //END
     if (glfwGetKey(args.window, GLFW_KEY_END) == GLFW_PRESS) glfwSetWindowShouldClose(args.window, true);
 
     //ESCAPE
@@ -282,7 +283,8 @@ void Engine::render(EngineArgs& args)
     //Editor
     if (editor_->is_visible)
     {
-        editor_->set_main_dockspace(*project_);
+        editor_->set_main_dockspace(args, *project_);
+        current_scene_ = project_->current_scene;
 
         //Viewport
         const ImVec4 old_bg = ImGui::GetStyle().Colors[2];
@@ -473,13 +475,13 @@ void Engine::set_hardcoded_entities(Scene& scene)
     );
     obj1->add_component<MeshComponent>(0);
     obj1->add_component<MaterialComponent>(glm::vec4(1.0, 1.0, 1.0, 1.0));
-    obj1->add_component<TextureComponent>(GL_TEXTURE_2D, textures_->get_texture(4)->get_handle(),textures_->get_texture(5)->get_handle());
+    obj1->add_component<TextureComponent>(GL_TEXTURE_2D, textures_->get_texture(1)->get_handle(),textures_->get_texture(2)->get_handle());
 
     std::unique_ptr<Entity> obj2 = std::make_unique<Entity>("Cube #2",
         new TransformComponent(glm::vec3(5.0f, 2.0f, 3.0f), glm::vec3(0.0f), glm::vec3(3.0f))
     );
     obj2->add_component<MeshComponent>(0);
-    obj2->add_component<TextureComponent>(GL_TEXTURE_2D, textures_->get_texture(3)->get_handle(), 1);
+    obj2->add_component<TextureComponent>(GL_TEXTURE_2D, textures_->get_texture(0)->get_handle(), 1);
 
     std::unique_ptr<Entity> obj3 = std::make_unique<Entity>("Paper plane #2",
         new TransformComponent(glm::vec3(-2.0f, 1.0f, -2.0f), glm::vec3(0.0f), glm::vec3(0.5f))
