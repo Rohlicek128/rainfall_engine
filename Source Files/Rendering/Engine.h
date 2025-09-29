@@ -21,6 +21,8 @@
 #include "Shaders/Programs/PostProcessProgram.h"
 #include "Shaders/Programs/SkyboxProgram.h"
 #include "../Organization/Project.h"
+#include "Shaders/Programs/ShadowDepthProgram.h"
+#include "Shaders/Shadows/ShadowMap.h"
 
 class Engine
 {
@@ -33,6 +35,9 @@ class Engine
     LightingProgram* lighting_program_;
     SkyboxProgram* skybox_program_;
     PostProcessProgram* post_process_program_;
+    ShadowDepthProgram* shadow_depth_program_;
+
+    ShadowMap* shadow_map_;
     
     std::unique_ptr<Mesh> screen_mesh_;
     

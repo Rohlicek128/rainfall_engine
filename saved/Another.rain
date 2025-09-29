@@ -1,5 +1,5 @@
 Scene: Another
-Selected Entity Id: 60
+Selected Entity Id: 59
 Current Camera Id: 2
 Editor Camera:
   Entity: __editor_camera
@@ -8,14 +8,14 @@ Editor Camera:
   Children Ids: []
   Components:
     - Transform:
-        Position: [-3.352876, 2.1394322, -2.3170457]
-        Rotation: [0.48549652, -0.27816784, 0.82880384]
+        Position: [-3.400589, 1.820018, -3.3551989]
+        Rotation: [0.40718067, -0.22666761, 0.8847744]
         Scale: [1, 1, 1]
     - Camera:
         Enabled: true
         Wireframe: false
-        Yaw: 419.6391
-        Pitch: -16.150887
+        Yaw: 425.28772
+        Pitch: -13.10096
         Fov: 85
         Near Plane: 0.1
         Far Plane: 1000
@@ -28,7 +28,7 @@ Entities:
   - Entity: Ground
     Id: 59
     Is Visible: true
-    Parent Id: 1
+    Parent Id: 15
     Children Ids: []
     Components:
       - Transform:
@@ -50,19 +50,19 @@ Entities:
           Enabled: true
           Type: 3553
           Scale: 38.8
-          Diffuse: 1
-          Roughness: 2
-          Metallic: 2
-          Normal: 8
+          Diffuse: 0
+          Roughness: 1
+          Metallic: 1
+          Normal: 7
   - Entity: Point Light
     Id: 60
     Is Visible: true
-    Parent Id: 1
+    Parent Id: 15
     Children Ids: []
     Components:
       - Transform:
           Position: [1.49, 1.45, 0.27]
-          Rotation: [0, 11827.413, 0]
+          Rotation: [0, 12944.673, 0]
           Scale: [0.2, 0.2, 0.2]
       - Light:
           Enabled: true
@@ -79,7 +79,7 @@ Entities:
   - Entity: Box
     Id: 61
     Is Visible: true
-    Parent Id: 1
+    Parent Id: 15
     Children Ids: []
     Components:
       - Transform:
@@ -96,10 +96,10 @@ Entities:
           Enabled: true
           Type: 3553
           Scale: 1
-          Diffuse: 1
-          Roughness: 2
-          Metallic: 2
-          Normal: 7
+          Diffuse: 0
+          Roughness: 1
+          Metallic: 1
+          Normal: 6
       - Material:
           Enabled: true
           Color: [1, 0.64842325, 0.109510064, 1]
@@ -108,7 +108,7 @@ Entities:
   - Entity: "Point Light #2"
     Id: 63
     Is Visible: true
-    Parent Id: 1
+    Parent Id: 15
     Children Ids: []
     Components:
       - Transform:

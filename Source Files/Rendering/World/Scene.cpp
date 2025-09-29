@@ -116,6 +116,17 @@ Entity* Scene::find_entity_by_id(const unsigned int id)
     return nullptr;
 }
 
+std::vector<Entity*> Scene::get_lights_by_type(const LIGHT_TYPE type)
+{
+    std::vector<Entity*> result;
+    for (Entity* light : lights)
+    {
+        if (const LightComponent* light_comp = light->get_component<LightComponent>(); light_comp->type == type)
+            result.push_back(light);
+    }
+    return result;
+}
+
 void Scene::set_scene_graph()
 {
     if (ImGui::BeginChild("##Entities", ImVec2(0, 0), ImGuiChildFlags_Borders))

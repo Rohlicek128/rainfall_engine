@@ -12,6 +12,7 @@ class Texture : public IBindable
     
     unsigned char* load_image(const std::string&);
 public:
+    unsigned int id;
     GLenum internal_format, format, type;
     int attachment;
     

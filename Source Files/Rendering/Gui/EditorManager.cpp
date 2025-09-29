@@ -37,7 +37,7 @@ void EditorManager::init_imgui(GLFWwindow* window)
 
     ImGui::GetStyle().Colors[ImGuiCol_WindowBg] = {0.08f, 0.1f, 0.13f, 0.9f};
 
-    imgui_io->Fonts->AddFontFromFileTTF("assets/Fonts/Lexend-Regular.ttf", 14);
+    imgui_io->Fonts->AddFontFromFileTTF("assets/Fonts/CascadiaMono-SemiBold.ttf", 13);
     //set_red_style();
 
     ImGuizmo::SetOrthographic(false);

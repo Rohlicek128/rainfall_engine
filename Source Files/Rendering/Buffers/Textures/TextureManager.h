@@ -14,6 +14,7 @@ class TextureManager : IGui, public ISerializable
     std::vector<std::unique_ptr<Cubemap>> cubemaps_;
     float select_scale_;
     bool load_as_srgb_;
+    unsigned int id_counter_;
     
     static TextureManager* instance_ptr_;
 
@@ -24,6 +25,8 @@ public:
     TextureManager(const TextureManager&) = default;
     ~TextureManager() override = default;
 
+    unsigned int get_new_id();
+
     void add_essential_texture(std::unique_ptr<Texture>);
     Texture* get_essential_texture(int);
     
@@ -31,6 +34,7 @@ public:
     bool add_texture_open_file(bool is_srgb);
     Texture* get_texture(int);
     Texture* get_texture_by_handle(unsigned int);
+    Texture* get_texture_by_id(unsigned int);
 
     void add_cubemap(std::unique_ptr<Cubemap>);
     Cubemap* get_cubemap(int);
@@ -38,5 +42,5 @@ public:
     void serialize(YAML::Emitter& out) override;
     bool deserialize(YAML::Node& node) override;
     void set_gui() override;
-    unsigned int select_texture_2d_gui();
+    Texture* select_texture_2d_gui();
 };

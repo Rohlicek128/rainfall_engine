@@ -14,24 +14,12 @@
 
 Engine::Engine(const EngineArgs& args) : fps_plot_{}
 {
-    set_icon(args.window, "Icon/green_tick.png");
+    set_icon(args.window, "assets/Icon/green_tick.png");
 
     textures_ = TextureManager::get_instance();
     textures_->add_essential_texture(std::make_unique<Texture>("assets/white1x1.png", GL_RGBA8, GL_RGBA));
     textures_->add_essential_texture(std::make_unique<Texture>("assets/black1x1.png", GL_RGBA8, GL_RGBA));
     textures_->add_essential_texture(std::make_unique<Texture>("assets/missing_texture.png", GL_SRGB8_ALPHA8, GL_RGBA));
-    
-    textures_->add_texture(std::make_unique<Texture>("assets/chill_guy.jpg", GL_SRGB8, GL_RGB));
-    textures_->add_texture(std::make_unique<Texture>("assets/container_diffuse.png", GL_SRGB8_ALPHA8, GL_RGBA));
-    textures_->add_texture(std::make_unique<Texture>("assets/container_specular.png", GL_RGBA8, GL_RGBA));
-    textures_->add_texture(std::make_unique<Texture>("assets/circuits_normal.jpg", GL_RGB8, GL_RGB));
-    textures_->add_texture(std::make_unique<Texture>("assets/sofa_normal.jpg", GL_RGB8, GL_RGB));
-    textures_->add_texture(std::make_unique<Texture>("assets/shrek.png", GL_SRGB8_ALPHA8, GL_RGBA));
-    textures_->add_texture(std::make_unique<Texture>("assets/black_hole.jpg", GL_SRGB8, GL_RGB));
-
-    textures_->add_texture(std::make_unique<Texture>("assets/rocky_dirt/rocky_trail_02_diff_1k.jpg", GL_SRGB8, GL_RGB));
-    textures_->add_texture(std::make_unique<Texture>("assets/rocky_dirt/rocky_trail_02_arm_1k.jpg", GL_RGB8, GL_RGB));
-    textures_->add_texture(std::make_unique<Texture>("assets/rocky_dirt/rocky_trail_02_nor_gl_1k.jpg", GL_RGB8, GL_RGB));
 
     std::vector<std::string> faces = {"assets/Skybox/0right.jpg", "assets/Skybox/1left.jpg", "assets/Skybox/2top.jpg",
         "assets/Skybox/3bottom.jpg", "assets/Skybox/4front.jpg", "assets/Skybox/5back.jpg"};
@@ -87,7 +75,11 @@ Engine::Engine(const EngineArgs& args) : fps_plot_{}
     post_process_program_ = new PostProcessProgram({{"Screen/screen.vert", GL_VERTEX_SHADER}, {"Screen/screen.frag", GL_FRAGMENT_SHADER}}, args.width, args.height);
     
     skybox_program_ = new SkyboxProgram({{"Skybox/skybox.vert", GL_VERTEX_SHADER}, {"Skybox/skybox.frag", GL_FRAGMENT_SHADER}});
-    
+
+    shadow_depth_program_ = new ShadowDepthProgram(
+        {{"ShadowDepth/shadow_depth.vert", GL_VERTEX_SHADER},
+        {"ShadowDepth/shadow_depth.frag", GL_FRAGMENT_SHADER}});
+    shadow_map_ = new ShadowMap(2048, 2048, 32.0f, -5.0f, 45.0f);
     
     is_fullscreen_ = false;
     fullscreen_toggle_ = true;
@@ -131,9 +123,9 @@ void Engine::update_delta_time()
     delta_time_ = current - last_time_;
     last_time_ = current;
 
-    if ((int)floor(glfwGetTime()) > last_uptime_)
+    if ((int)floor(current) > last_uptime_)
     {
-        last_uptime_ = (int)floor(glfwGetTime());
+        last_uptime_ = (int)floor(current);
         display_frame_count_ = frame_count_;
         frame_count_ = 0;
         max_fps_plot_ = 0;
@@ -152,7 +144,7 @@ void Engine::update_delta_time()
 void Engine::set_icon(GLFWwindow* window, const std::string& path)
 {
     GLFWimage images[1]; 
-    images[0].pixels = stbi_load(("assets/" + path).c_str(), &images[0].width, &images[0].height, nullptr, 4);
+    images[0].pixels = stbi_load(path.c_str(), &images[0].width, &images[0].height, nullptr, 4);
     glfwSetWindowIcon(window, 1, images); 
     stbi_image_free(images[0].pixels);
 }
@@ -252,6 +244,13 @@ void Engine::render(EngineArgs& args)
     const int cur_width = editor_->is_visible ? editor_->viewport_fbo->attached_textures.at(0)->get_width() : args.width;
     const int cur_height = editor_->is_visible ? editor_->viewport_fbo->attached_textures.at(0)->get_height() : args.height;
 
+    //Shadows
+    const std::vector<Entity*> dir_lights = project_->current_scene->get_lights_by_type(DIRECTIONAL);
+    if (shadow_map_->is_visible && !dir_lights.empty())
+    {
+        shadow_map_->render_depth_map(*dir_lights.front(), *project_->current_scene, *shadow_depth_program_);
+    }
+
     //Geometry Pass
     g_buffer_->bind();
     glViewport(0, 0, cur_width, cur_height);
@@ -267,7 +266,9 @@ void Engine::render(EngineArgs& args)
 
     //Lighting Pass
     post_process_program_->bind_framebuffer();
-    lighting_program_->draw(*current_scene_, *screen_mesh_, 0, *g_buffer_);
+    glClearColor(cur_camera_comp->clear_color[0], cur_camera_comp->clear_color[1], cur_camera_comp->clear_color[2], cur_camera_comp->clear_color[3]);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    lighting_program_->draw(*current_scene_, *screen_mesh_, 0, *g_buffer_, *shadow_map_);
     post_process_program_->unbind_framebuffer();
 
     //g_buffer_->blit_framebuffer();
@@ -275,7 +276,7 @@ void Engine::render(EngineArgs& args)
     
     //Post Process Pass
     if (editor_->is_visible) editor_->viewport_fbo->bind();
-    post_process_program_->draw(*screen_mesh_, 0, *cur_camera_comp);
+    post_process_program_->draw(*screen_mesh_, 0, *cur_camera_comp, shadow_map_->is_debug_visible ? shadow_map_->get_depth_map()->attached_textures.at(0)->get_handle() : -1);
     if (editor_->is_visible) editor_->viewport_fbo->unbind();
     
     glViewport(0, 0, args.width, args.height);
@@ -306,6 +307,12 @@ void Engine::render(EngineArgs& args)
         if (current_scene_->current_camera == current_scene_->player_camera) ImGui::GetStyle().Colors[2] = old_bg;
         
         mouse_->set_gui();
+
+        //Shadow temp
+        if (ImGui::Begin("Shadow Map"))
+            shadow_map_->set_gui();
+        ImGui::End();
+        
             
         //Scene
         if (ImGui::Begin("Scene Graph ##ENTITIES_GRAPH"))
@@ -315,7 +322,10 @@ void Engine::render(EngineArgs& args)
         {
             ImGui::SetNextWindowSize(ImVec2(500, 440), ImGuiCond_FirstUseEver);
             if (ImGui::Begin("Scene Settings", &current_scene_->opened_gui))
+            {
                 current_scene_->set_gui();
+                lighting_program_->set_gui();
+            }
             ImGui::End();
         }
         //Inspector

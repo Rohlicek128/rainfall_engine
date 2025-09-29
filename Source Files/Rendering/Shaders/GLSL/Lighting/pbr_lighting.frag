@@ -15,6 +15,13 @@ struct PointLight {
 	vec3 attenuation_params;
 };
 
+struct Fog {
+	bool is_enabled;
+	vec3 color;
+	float end;
+	float density;
+};
+
 in vec2 vTexCoord;
 
 out vec4 pixel_color;
@@ -30,6 +37,12 @@ uniform sampler2D g_normal_metal;
 
 uniform vec3 view_pos;
 uniform vec3 ambient;
+
+uniform sampler2D shadow_map;
+uniform mat4 light_space;
+uniform bool is_shadow;
+
+uniform Fog fog;
 
 const float PI = 3.14159265359;
 
@@ -56,6 +69,30 @@ float geometry_smith(vec3 N, vec3 V, vec3 L, float roughness){
 	return geometry_schlick_ggx(max(dot(N, V), 0.0), roughness) * geometry_schlick_ggx(max(dot(N, L), 0.0), roughness);
 }
 
+float calculate_fog_factor(vec3 frag_pos){
+	float dist_ratio = 4.0 * length(frag_pos - view_pos) / fog.end;
+	return exp(-dist_ratio * fog.density * dist_ratio * fog.density);
+}
+
+float calculate_shadow(vec3 frag_pos, float dot_n_l){
+	vec4 frag_pos_ls = light_space * vec4(frag_pos, 1.0);
+	vec3 projection_coords = (frag_pos_ls.xyz / frag_pos_ls.w) * 0.5 + 0.5;
+	
+	float bias = max(0.05 * (1.0 - dot_n_l), 0.005);
+	//float shadow = projection_coords.z - bias > texture(shadow_map, projection_coords.xy).r ? 1.0 : 0.0;
+	
+	float shadow = 0.0;
+	vec2 texel_size = 1.0 / textureSize(shadow_map, 0);
+	for (int x = -1; x <= 1; ++x){
+		for (int y = -1; y <= 1; ++y){
+			shadow += projection_coords.z - bias > texture(shadow_map, projection_coords.xy + vec2(x, y) * texel_size).r ? 1.0 : 0.0;
+		}
+	}
+	shadow /= 9.0;
+	
+	return projection_coords.z > 1.0 ? 0.0 : shadow;
+}
+
 void main(){
 	//GBuffer
 	vec3 frag_pos = texture(g_position, vTexCoord).rgb;
@@ -79,16 +116,19 @@ void main(){
 
 		vec3 L = normalize(-dir_lights[i].direction);
 		vec3 H = normalize(V + L);
-		vec3 radiance = dir_lights[i].color * max(dot(N, L), 0.0);
+		float dot_n_l = dot(N, L);
+		vec3 radiance = dir_lights[i].color * max(dot_n_l, 0.0);
 
 		vec3 F = fresnel_schlick(max(dot(H, V), 0.0), F0);
 		float NDF = distribution_ggx(N, H, roughness);
 		float G = geometry_smith(N, V, L, roughness);
 
-		vec3 specular = (F * NDF * G) / max(4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0), 0.01);
+		vec3 specular = (F * NDF * G) / max(4.0 * max(dot(N, V), 0.0) * max(dot_n_l, 0.0), 0.01);
 		vec3 kD = (vec3(1.0) - F) * (1.0 - metallic);
+		
+		vec3 shadow = is_shadow ? ambient + (1.0 - calculate_shadow(frag_pos, dot_n_l)) : vec3(1.0);
 
-		Lo += (kD * albedo / PI + specular) * radiance * max(dot(N, L), 0.0);
+		Lo += ((kD * albedo / PI + specular) * radiance * max(dot_n_l, 0.0)) * shadow;
 	}
 	//Point Lights
 	for (int i = 0; i < NR_POINT_LIGHTS; ++i){
@@ -110,8 +150,7 @@ void main(){
 		
 		Lo += (kD * albedo / PI + specular) * radiance * max(dot(N, L), 0.0);
 	}
-	
 	//length(frag_pos - view_pos) depth
     
-	pixel_color = vec4(((ambient * albedo) + Lo), 1.0);
+	pixel_color = vec4(mix(fog.color, ((ambient * albedo) + Lo), (fog.is_enabled ? calculate_fog_factor(frag_pos) : 1.0)), 1.0);
 }

@@ -107,6 +107,8 @@ bool Project::deserialize(YAML::Node& node)
     
     name = node["Project"].as<std::string>();
 
+    textures->deserialize(node);
+
     if (YAML::Node scenes_des = node["Scene paths"])
     {
         for (auto scene_des : scenes_des)
@@ -114,8 +116,6 @@ bool Project::deserialize(YAML::Node& node)
             load_scene_from_path(scene_des.as<std::string>());
         }
     }
-
-    //textures->deserialize(node);
     
     return true;
 }

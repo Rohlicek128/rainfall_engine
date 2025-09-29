@@ -1,4 +1,5 @@
 #pragma once
+#include <glm/fwd.hpp>
 #include <glm/vec3.hpp>
 
 #include "Component.h"
@@ -17,7 +18,6 @@ class LightComponent : public Component
 {
     int type_edit_;
     float* color_edit_;
-    
 public:
     LIGHT_TYPE type;
     glm::vec3 color;
@@ -27,6 +27,8 @@ public:
     LightComponent(const LIGHT_TYPE&, const glm::vec3&, float = 1.0f, const glm::vec3& = glm::vec3(1.0f, 0.5f, 0.3f));
     ~LightComponent() override;
     void set_uniforms(Program*, int, const TransformComponent*);
+
+    glm::mat4 get_light_space_mat(glm::vec3 dir, glm::vec3 cam_pos, float zoom, float near, float far);
 
     std::string get_name() override;
     void set_gui() override;

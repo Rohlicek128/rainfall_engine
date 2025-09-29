@@ -2,7 +2,7 @@
 
 #include "../../Buffers/Textures/TextureManager.h"
 
-TextureComponent::TextureComponent(const int type, const unsigned int diffuse, const unsigned int specular, const unsigned int normal, const int cubemap)
+TextureComponent::TextureComponent(const int type, const int diffuse, const int roughness, const int metal, const int normal, const int cubemap)
 {
     this->type = type;
     if (type == GL_TEXTURE_2D) type_edit_ = 0;
@@ -12,11 +12,12 @@ TextureComponent::TextureComponent(const int type, const unsigned int diffuse, c
 
     scale = 1.0f;
     
-    diffuse_handle_ = diffuse;
-    roughness_handle_ = specular;
-    metallic_handle_ = 2;
-    normal_handle_ = normal;
-    if (cubemap == -1) cubemap_handle_ = texture_manager_->get_cubemap(0)->get_handle();
+    diffuse_texture_ = diffuse == -1 ? texture_manager_->get_essential_texture(0) : texture_manager_->get_texture(diffuse);
+    roughness_texture_ = roughness == -1 ? texture_manager_->get_essential_texture(0) : texture_manager_->get_texture(roughness);
+    metallic_texture_ = metal == -1 ? texture_manager_->get_essential_texture(1) : texture_manager_->get_texture(metal);
+    normal_texture_ = normal == -1 ? texture_manager_->get_essential_texture(0) : texture_manager_->get_texture(normal);
+
+    cubemap_ = cubemap == -1 ? nullptr : texture_manager_->get_cubemap(cubemap);
 }
 
 void TextureComponent::active_bind(const unsigned int offset)
@@ -24,37 +25,37 @@ void TextureComponent::active_bind(const unsigned int offset)
     if (type == GL_TEXTURE_2D)
     {
         glActiveTexture(GL_TEXTURE0 + offset);
-        glBindTexture(type, diffuse_handle_);
+        glBindTexture(type, diffuse_texture_->get_handle());
 
         glActiveTexture(GL_TEXTURE1 + offset);
-        glBindTexture(type, roughness_handle_);
+        glBindTexture(type, roughness_texture_->get_handle());
 
         glActiveTexture(GL_TEXTURE2 + offset);
-        glBindTexture(type, metallic_handle_);
+        glBindTexture(type, metallic_texture_->get_handle());
 
         glActiveTexture(GL_TEXTURE3 + offset);
-        glBindTexture(type, normal_handle_);
+        glBindTexture(type, normal_texture_->get_handle());
     }
     else if (type == GL_TEXTURE_CUBE_MAP)
     {
         glActiveTexture(GL_TEXTURE0 + offset);
-        glBindTexture(type, cubemap_handle_);
+        glBindTexture(type, cubemap_->get_handle());
     }
 }
 
-int TextureComponent::has_normal()
+bool TextureComponent::has_normal()
 {
-    return normal_handle_ == 1 ? 0 : 1;
+    return normal_texture_->get_handle() != texture_manager_->get_essential_texture(0)->get_handle();
 }
 
-int TextureComponent::has_roughness()
+bool TextureComponent::has_roughness()
 {
-    return roughness_handle_ == 2 ? 0 : 1;
+    return roughness_texture_->get_handle() != texture_manager_->get_essential_texture(1)->get_handle();
 }
 
-int TextureComponent::has_metallic()
+bool TextureComponent::has_metallic()
 {
-    return metallic_handle_ == 2 ? 0 : 1;
+    return metallic_texture_->get_handle() != texture_manager_->get_essential_texture(1)->get_handle();
 }
 
 std::string TextureComponent::get_name()
@@ -74,28 +75,30 @@ void TextureComponent::set_gui()
     
     //Diffuse
     ImGui::SeparatorText("Diffuse Map");
-    texture_gui(&diffuse_handle_, "Diffuse");
+    texture_gui(diffuse_texture_, "Diffuse");
     
     //Roughness
     ImGui::SeparatorText("Roughness Map");
-    texture_gui(&roughness_handle_, "Roughness");
-    if (roughness_handle_ == 1) roughness_handle_ = 2;
+    texture_gui(roughness_texture_, "Roughness");
+    if (roughness_texture_->id == texture_manager_->get_essential_texture(0)->id)
+        roughness_texture_ = texture_manager_->get_essential_texture(1);
 
     //Metallic
     ImGui::SeparatorText("Metallic Map");
-    texture_gui(&metallic_handle_, "Metallic");
-    if (metallic_handle_ == 1) metallic_handle_ = 2;
+    texture_gui(metallic_texture_, "Metallic");
+    if (metallic_texture_->id == texture_manager_->get_essential_texture(0)->id)
+        metallic_texture_ = texture_manager_->get_essential_texture(1);
 
     //Normal
     ImGui::SeparatorText("Normal Map");
-    texture_gui(&normal_handle_, "Normal");
+    texture_gui(normal_texture_, "Normal");
 }
 
-void TextureComponent::texture_gui(unsigned int* handle, const std::string& id_name)
+void TextureComponent::texture_gui(Texture*& texture, const std::string& id_name)
 {
     //Image Select
-    Texture* texture = texture_manager_->get_texture_by_handle(*handle);
-    if (texture->get_handle() == 1 || texture->get_handle() == 2)
+    if (texture->id == texture_manager_->get_essential_texture(0)->id ||
+        texture->id == texture_manager_->get_essential_texture(1)->id)
     {
         if (ImGui::Button(("  Select..  ##" + id_name).c_str()))
             ImGui::OpenPopup(("Select " + id_name).c_str());
@@ -103,26 +106,28 @@ void TextureComponent::texture_gui(unsigned int* handle, const std::string& id_n
     else
     {
         float image_size = 85.0f;
-        if (ImGui::ImageButton(("Select ##" + id_name).c_str(), (ImTextureID)(intptr_t)*handle,
-                               {image_size * ((float)texture->get_width() / (float)texture->get_height()),image_size},{0, 1}, {1, 0}))
+        if (ImGui::ImageButton(("Select ##" + id_name).c_str(), (ImTextureID)(intptr_t)texture->get_handle(),
+                               {image_size * ((float)texture->get_width() / (float)texture->get_height()),image_size},
+                               {0, 1}, {1, 0}))
             ImGui::OpenPopup(("Select " + id_name).c_str());
     }
     
     if (ImGui::BeginPopup(("Select " + id_name).c_str()))
     {
-        const unsigned int selected = texture_manager_->select_texture_2d_gui();
-        if (selected != 0) *handle = selected;
+        if (Texture* selected = texture_manager_->select_texture_2d_gui())
+            texture = selected;
         ImGui::EndPopup();
     }
 
     //Info
-    if (texture->get_handle() == 1 || texture->get_handle() == 2) return;
+    if (texture->id == texture_manager_->get_essential_texture(0)->id || texture->id == texture_manager_->get_essential_texture(1)->id)
+        return;
     ImGui::SameLine();
     ImGui::BeginGroup();
     {
-        ImGui::Text(texture->get_path().c_str());
-        if (texture->get_handle() != 3)
+        if (texture->id != texture_manager_->get_essential_texture(2)->id)
         {
+            ImGui::Text("[%i] %s", texture->id, texture->get_path().c_str());
             ImGui::Text("Width: %i", texture->get_width());
             ImGui::Text("Height: %i", texture->get_height());
             //ImGui::Text("Channels: %i", texture->get_nr_channels());
@@ -142,14 +147,14 @@ void TextureComponent::serialize(YAML::Emitter& out)
     out << YAML::Key << "Scale" << YAML::Value << scale;
     if (type == GL_TEXTURE_2D)
     {
-        out << YAML::Key << "Diffuse" << YAML::Value << diffuse_handle_;
-        out << YAML::Key << "Roughness" << YAML::Value << roughness_handle_;
-        out << YAML::Key << "Metallic" << YAML::Value << metallic_handle_;
-        out << YAML::Key << "Normal" << YAML::Value << normal_handle_;
+        out << YAML::Key << "Diffuse" << YAML::Value << diffuse_texture_->id;
+        out << YAML::Key << "Roughness" << YAML::Value << roughness_texture_->id;
+        out << YAML::Key << "Metallic" << YAML::Value << metallic_texture_->id;
+        out << YAML::Key << "Normal" << YAML::Value << normal_texture_->id;
     }
     else if (type == GL_TEXTURE_CUBE_MAP)
     {
-        out << YAML::Key << "Cubemap" << YAML::Value << cubemap_handle_;
+        out << YAML::Key << "Cubemap" << YAML::Value << cubemap_->faces[0]->id;
     }
     
     out << YAML::EndMap;
@@ -164,14 +169,14 @@ bool TextureComponent::deserialize(YAML::Node& node)
     scale = node["Scale"].as<float>();
     if (type == GL_TEXTURE_2D)
     {
-        diffuse_handle_ = node["Diffuse"].as<unsigned int>();
-        roughness_handle_ = node["Roughness"].as<unsigned int>();
-        metallic_handle_ = node["Metallic"].as<unsigned int>();
-        normal_handle_ = node["Normal"].as<unsigned int>();
+        diffuse_texture_ = texture_manager_->get_texture_by_id(node["Diffuse"].as<unsigned int>());
+        roughness_texture_ = texture_manager_->get_texture_by_id(node["Roughness"].as<unsigned int>());
+        metallic_texture_ = texture_manager_->get_texture_by_id(node["Metallic"].as<unsigned int>());
+        normal_texture_ = texture_manager_->get_texture_by_id(node["Normal"].as<unsigned int>());
     }
     else if (type == GL_TEXTURE_CUBE_MAP)
     {
-        cubemap_handle_ = node["Cubemap"].as<unsigned int>();
+        cubemap_ = texture_manager_->get_cubemap(0);
     }
     
     return true;

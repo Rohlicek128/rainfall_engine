@@ -7,6 +7,7 @@
 #include "../Gui/IGui.h"
 #include "Loading/ISerializable.h"
 
+enum LIGHT_TYPE : int;
 class Entity;
 
 class Scene : public IGui, ISerializable
@@ -29,7 +30,6 @@ public:
     Entity* current_camera;
     
     std::unique_ptr<Entity> skybox;
-
     
     bool opened_gui;
     Entity* selected_entity;
@@ -43,6 +43,7 @@ public:
     void add_light(Entity*);
     bool check_light(Entity*);
     Entity* find_entity_by_id(unsigned int);
+    std::vector<Entity*> get_lights_by_type(LIGHT_TYPE type);
 
     void set_scene_graph();
     void set_graph_children(const std::vector<Entity*>&, Entity*&);

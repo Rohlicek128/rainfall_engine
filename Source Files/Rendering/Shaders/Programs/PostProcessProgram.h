@@ -5,7 +5,6 @@ class Framebuffer;
 
 class PostProcessProgram : public Program
 {
-    
 public:
     std::unique_ptr<Framebuffer> framebuffer_;
     PostProcessProgram(const std::vector<Shader>&, int, int);

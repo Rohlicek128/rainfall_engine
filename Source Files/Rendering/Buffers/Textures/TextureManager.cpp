@@ -8,6 +8,7 @@ TextureManager::TextureManager()
 {
     select_scale_ = 100.0f;
     load_as_srgb_ = false;
+    id_counter_ = 0;
 }
 
 TextureManager* TextureManager::get_instance()
@@ -17,6 +18,11 @@ TextureManager* TextureManager::get_instance()
         instance_ptr_ = new TextureManager();
     }
     return instance_ptr_;
+}
+
+unsigned int TextureManager::get_new_id()
+{
+    return id_counter_++;
 }
 
 void TextureManager::add_essential_texture(std::unique_ptr<Texture> texture)
@@ -66,6 +72,20 @@ Texture* TextureManager::get_texture_by_handle(const unsigned int handle)
     return nullptr;
 }
 
+Texture* TextureManager::get_texture_by_id(const unsigned int id)
+{
+    for (int i = 0; i < essential_textures_.size(); ++i)
+    {
+        if (essential_textures_.at(i)->id == id) return essential_textures_.at(i).get();
+    }
+    
+    for (int i = 0; i < textures_.size(); ++i)
+    {
+        if (textures_.at(i)->id == id) return textures_.at(i).get();
+    }
+    return essential_textures_.at(2).get();
+}
+
 void TextureManager::add_cubemap(std::unique_ptr<Cubemap> cubemap)
 {
     cubemaps_.push_back(std::move(cubemap));
@@ -82,7 +102,7 @@ void TextureManager::set_gui()
     select_texture_2d_gui();
 }
 
-unsigned int TextureManager::select_texture_2d_gui()
+Texture* TextureManager::select_texture_2d_gui()
 {
     ImGui::SeparatorText("Select a texture:");
     
@@ -100,7 +120,7 @@ unsigned int TextureManager::select_texture_2d_gui()
             ImVec2(select_scale_ * width_aspect, select_scale_), {0, 1}, {1, 0}))
         {
             ImGui::PopID();
-            return textures_.at(i)->get_handle();
+            return textures_.at(i).get();
         }
         ImGui::PopID();
 
@@ -108,9 +128,10 @@ unsigned int TextureManager::select_texture_2d_gui()
         if (ImGui::BeginItemTooltip())
         {
             ImGui::Text(textures_.at(i)->get_path().c_str());
-            if (textures_.at(i)->get_handle() != 3)
+            if (textures_.at(i)->id != essential_textures_.at(2)->id)
             {
                 ImGui::Text("Handle: %i", textures_.at(i)->get_handle());
+                ImGui::Text("ID: %i", textures_.at(i)->id);
                 ImGui::Text("Width: %i", textures_.at(i)->get_width());
                 ImGui::Text("Height: %i", textures_.at(i)->get_height());
                 ImGui::Text("Channels: %i", textures_.at(i)->get_nr_channels());
@@ -125,7 +146,7 @@ unsigned int TextureManager::select_texture_2d_gui()
         else max_width = 0.0;
     }
     ImGui::NewLine();
-    if (ImGui::Button("  None  ")) return 1;
+    if (ImGui::Button("  None  ")) return get_essential_texture(0);
 
     
     if (ImGui::Button("  Add..  "))
@@ -134,41 +155,60 @@ unsigned int TextureManager::select_texture_2d_gui()
     ImGui::SameLine();
     ImGui::Checkbox("Load SRGB", &load_as_srgb_);
 
-    return 0;
+    return nullptr;
 }
 
 
 void TextureManager::serialize(YAML::Emitter& out)
 {
+    out << YAML::Key << "Texture Manager" << YAML::Value << YAML::BeginMap;
+    out << YAML::Key << "ID Count" << YAML::Value << id_counter_;
+    
     out << YAML::Key << "Textures" << YAML::Value << YAML::BeginSeq;
     for (unsigned int i = 0; i < textures_.size(); ++i)
     {
         out << YAML::Flow << YAML::BeginSeq;
-        out << textures_.at(i)->get_path() << textures_.at(i)->internal_format << textures_.at(i)->format;
+        out << textures_.at(i)->id << textures_.at(i)->get_path() << textures_.at(i)->internal_format << textures_.at(i)->format;
         out << YAML::EndSeq;
     }
     out << YAML::EndSeq;
+    out << YAML::EndMap;
 }
 
 bool TextureManager::deserialize(YAML::Node& node)
 {
-    if (YAML::Node textures_des = node["Textures"])
+    if (!node["Texture Manager"]) return false;
+    
+    YAML::Node manager = node["Texture Manager"];
+    
+    for (int i = 0; i < textures_.size(); ++i)
     {
-        for (int i = 0; i < textures_.size(); ++i)
-        {
-            textures_.at(i)->delete_texture();
-        }
-        textures_.clear();
-        
-        for (auto texture_des : textures_des)
-        {
-            YAML::iterator cur_node = texture_des.begin();
-            std::string path = cur_node->as<std::string>();
-            int in_for = (++cur_node)->as<int>();
-            int format = (++cur_node)->as<int>();
-            add_texture(std::make_unique<Texture>(path, in_for, format));
-        }
+        textures_.at(i)->delete_texture();
     }
+    textures_.clear();
+        
+    for (auto texture_des : manager["Textures"])
+    {
+        YAML::iterator cur_node = texture_des.begin();
+        unsigned int id = cur_node->as<unsigned int>();
+        std::string path = (++cur_node)->as<std::string>();
+        bool skip = false;
+        for (unsigned int i = 0; i < essential_textures_.size(); ++i)
+        {
+            if (path == essential_textures_.at(i)->get_path())
+            {
+                skip = true;
+                break;
+            }
+        }
+        if (skip) continue;
+            
+        int in_for = (++cur_node)->as<int>();
+        int format = (++cur_node)->as<int>();
+        add_texture(std::make_unique<Texture>(path, in_for, format));
+        textures_.back()->id = id;
+    }
+    id_counter_ = manager["ID Count"].as<unsigned int>();
     
     return true;
 }

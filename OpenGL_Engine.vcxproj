@@ -357,8 +357,10 @@
     <ClCompile Include="Source Files\Rendering\Shaders\Programs\GeometryProgram.cpp" />
     <ClCompile Include="Source Files\Rendering\Shaders\Programs\LightingProgram.cpp" />
     <ClCompile Include="Source Files\Rendering\Shaders\Programs\PostProcessProgram.cpp" />
+    <ClCompile Include="Source Files\Rendering\Shaders\Programs\ShadowDepthProgram.cpp" />
     <ClCompile Include="Source Files\Rendering\Shaders\Programs\SkyboxProgram.cpp" />
     <ClCompile Include="Source Files\Rendering\Shaders\Shader.cpp" />
+    <ClCompile Include="Source Files\Rendering\Shaders\Shadows\ShadowMap.cpp" />
     <ClCompile Include="Source Files\Rendering\Window.cpp" />
     <ClCompile Include="Source Files\Rendering\World\Loading\ISerializable.cpp" />
     <ClCompile Include="Source Files\Rendering\World\Mesh.cpp">
@@ -440,6 +442,7 @@
     <ClCompile Include="Source Files\Rendering\World\Scene.cpp" />
     <ClCompile Include="Source Files\Utils\FileDialogs.cpp" />
     <ClCompile Include="Source Files\Utils\MathHelper.cpp" />
+    <ClCompile Include="Source Files\Utils\StringHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\glad\glad.h" />
@@ -524,8 +527,10 @@
     <ClInclude Include="Source Files\Rendering\Shaders\Programs\GeometryProgram.h" />
     <ClInclude Include="Source Files\Rendering\Shaders\Programs\LightingProgram.h" />
     <ClInclude Include="Source Files\Rendering\Shaders\Programs\PostProcessProgram.h" />
+    <ClInclude Include="Source Files\Rendering\Shaders\Programs\ShadowDepthProgram.h" />
     <ClInclude Include="Source Files\Rendering\Shaders\Programs\SkyboxProgram.h" />
     <ClInclude Include="Source Files\Rendering\Shaders\Shader.h" />
+    <ClInclude Include="Source Files\Rendering\Shaders\Shadows\ShadowMap.h" />
     <ClInclude Include="Source Files\Rendering\Window.h" />
     <ClInclude Include="Source Files\Rendering\World\Loading\ISerializable.h" />
     <ClInclude Include="Source Files\Rendering\World\Mesh.h" />
@@ -533,6 +538,7 @@
     <ClInclude Include="Source Files\Rendering\World\Scene.h" />
     <ClInclude Include="Source Files\Utils\FileDialogs.h" />
     <ClInclude Include="Source Files\Utils\MathHelper.h" />
+    <ClInclude Include="Source Files\Utils\StringHelper.h" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="lib\glfw3.dll" />
@@ -545,6 +551,8 @@
     <Content Include="Source Files\Rendering\Shaders\GLSL\Lighting\pbr_lighting.frag" />
     <Content Include="Source Files\Rendering\Shaders\GLSL\Screen\screen.frag" />
     <Content Include="Source Files\Rendering\Shaders\GLSL\Screen\screen.vert" />
+    <Content Include="Source Files\Rendering\Shaders\GLSL\ShadowDepth\shadow_depth.frag" />
+    <Content Include="Source Files\Rendering\Shaders\GLSL\ShadowDepth\shadow_depth.vert" />
     <Content Include="Source Files\Rendering\Shaders\GLSL\Skybox\skybox.frag" />
     <Content Include="Source Files\Rendering\Shaders\GLSL\Skybox\skybox.vert" />
   </ItemGroup>

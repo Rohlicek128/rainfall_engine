@@ -4,6 +4,8 @@
 
 #include <algorithm>
 #include <string>
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/ext/matrix_transform.hpp>
 
 LightComponent::LightComponent(const LIGHT_TYPE& t, const glm::vec3& c, const float i, const glm::vec3& attenuation)
 {
@@ -41,6 +43,16 @@ void LightComponent::set_uniforms(Program* program, const int index, const Trans
         case SPOTLIGHT:
             break;
     }
+}
+
+glm::mat4 LightComponent::get_light_space_mat(const glm::vec3 dir, const glm::vec3 cam_pos, const float zoom, const float near, const float far)
+{
+    if (type != DIRECTIONAL) return {0.0f};
+
+    const glm::mat4 projection = glm::ortho(-zoom, zoom, -zoom, zoom, near, far);
+    const glm::mat4 view = glm::lookAt(-dir + cam_pos, cam_pos, glm::vec3(0.0f, 1.0f, 0.0f));
+
+    return projection * view;
 }
 
 std::string LightComponent::get_name()

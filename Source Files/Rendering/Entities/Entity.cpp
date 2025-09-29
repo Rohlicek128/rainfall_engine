@@ -162,11 +162,11 @@ void Entity::set_gui()
     if (add_selected_ == -1) return;
     switch ((COMPONENTS_IDS)add_selected_)
     {
-        case TRANSFORM: add_component<TransformComponent>(glm::vec3(0.0), glm::vec3(0.0), glm::vec3(1.0));break;
+        case TRANSFORM: add_component<TransformComponent>(glm::vec3(0.0), glm::vec3(0.0), glm::vec3(1.0)); break;
         case MESH: add_component<MeshComponent>(0, GL_TRIANGLES, mesh_); break;
         case CAMERA: add_component<CameraComponent>(transform); break;
         case MATERIAL: add_component<MaterialComponent>(glm::vec4(1.0)); break;
-        case TEXTURE: add_component<TextureComponent>(GL_TEXTURE_2D, 1, 1); break;
+        case TEXTURE: add_component<TextureComponent>(GL_TEXTURE_2D); break;
         case LIGHT: add_component<LightComponent>(POINT, glm::vec3(1.0f)); break;
     }
     add_selected_ = -1;

@@ -4,13 +4,21 @@
 #include "../../Entities/Components/CameraComponent.h"
 #include "../../Entities/Components/LightComponent.h"
 #include "../../Entities/Components/MaterialComponent.h"
+#include "../Shadows/ShadowMap.h"
 
 LightingProgram::LightingProgram(const std::vector<Shader>& shaders) : Program(shaders)
 {
     ambient = glm::vec3(0.01f);
+    ambient_edit_ = new float[] {ambient.x, ambient.y, ambient.z};
+
+    is_fog_enabled_ = true;
+    fog_color_ = glm::vec3(1.0f);
+    fog_color_edit_ = new float[] {fog_color_.x, fog_color_.y, fog_color_.z};
+    fog_end_ = 90.0f;
+    fog_density_ = 0.2f;
 }
 
-void LightingProgram::draw(const Scene& scene, Mesh& screen_mesh, const int quad_index, GBuffer& g_buffer)
+void LightingProgram::draw(const Scene& scene, Mesh& screen_mesh, const int quad_index, GBuffer& g_buffer, ShadowMap& shadow_map)
 {
     glDisable(GL_DEPTH_TEST);
     bind();
@@ -29,6 +37,18 @@ void LightingProgram::draw(const Scene& scene, Mesh& screen_mesh, const int quad
     set_uniform("g_position", 0);
     set_uniform("g_albedo_rough", 1);
     set_uniform("g_normal_metal", 2);
+
+    //Shadow
+    shadow_map.get_depth_map()->attached_textures.at(0)->active_bind(3);
+    set_uniform("shadow_map", 3);
+    set_uniform("light_space", shadow_map.light_space);
+    set_uniform("is_shadow", shadow_map.is_visible);
+
+    //Fog
+    set_uniform("fog.is_enabled", is_fog_enabled_);
+    set_uniform("fog.color", fog_color_);
+    set_uniform("fog.end", fog_end_);
+    set_uniform("fog.density", fog_density_);
 
     if (const ModelData* model_data = screen_mesh.get_model(quad_index))
     {
@@ -66,4 +86,23 @@ void LightingProgram::set_lights_uniforms(const Scene& scene, const LIGHT_TYPE t
             case SPOTLIGHT: break;
         }
     }
+}
+
+
+void LightingProgram::set_gui()
+{
+    ImGui::SeparatorText("Lighting");
+    ImGui::ColorEdit3("Ambient", ambient_edit_);
+    ambient.x = ambient_edit_[0];
+    ambient.y = ambient_edit_[1];
+    ambient.z = ambient_edit_[2];
+
+    ImGui::SeparatorText("Fog");
+    ImGui::Checkbox("Enabled", &is_fog_enabled_);
+    ImGui::ColorEdit3("Color", fog_color_edit_);
+    fog_color_.x = fog_color_edit_[0];
+    fog_color_.y = fog_color_edit_[1];
+    fog_color_.z = fog_color_edit_[2];
+    ImGui::DragFloat("End", &fog_end_, 0.1f, 0, 0, "%.1f");
+    ImGui::DragFloat("Density", &fog_density_, 0.001f, 0, 0, "%.3f");
 }

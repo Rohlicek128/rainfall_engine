@@ -3,6 +3,9 @@
 #include <iostream>
 #include <stb/stb_image.h>
 
+#include "TextureManager.h"
+#include "../../../Utils/StringHelper.h"
+
 Texture::Texture(const GLenum internal_format, const GLenum format, const GLenum type)
 {
     path_ = "N/A";
@@ -13,6 +16,7 @@ Texture::Texture(const GLenum internal_format, const GLenum format, const GLenum
     this->format = format;
     this->type = type;
     attachment = -1;
+    id = TextureManager::get_instance()->get_new_id();
 }
 
 Texture::Texture(const std::string& path, const GLenum internal_format, const GLenum format, const GLenum type)
@@ -22,14 +26,20 @@ Texture::Texture(const std::string& path, const GLenum internal_format, const GL
     this->format = format;
     this->type = type;
     attachment = -1;
+    id = TextureManager::get_instance()->get_new_id();
     
     glGenTextures(1, &handle_);
     Texture::bind();
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    float anisotropy = 0.0f;
+    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &anisotropy);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, anisotropy);
 
     void* data = load_image(path);
     if (data)
@@ -39,9 +49,9 @@ Texture::Texture(const std::string& path, const GLenum internal_format, const GL
     }
     else
     {
-        std::cout << "Loading texture \"" + path + "\": FAILED\n";
+        std::cout << "Loading texture \"" << path << "\": FAILED\n";
         glDeleteTextures(1, &handle_);
-        handle_ = 3;
+        handle_ = TextureManager::get_instance()->get_essential_texture(2)->get_handle();
     }
     
     Texture::unbind();
@@ -59,6 +69,7 @@ Texture::Texture(const int width, const int height, const GLenum internal_format
     this->format = format;
     this->type = type;
     attachment = -1;
+    id = TextureManager::get_instance()->get_new_id();
     
     glGenTextures(1, &handle_);
     Texture::bind();
@@ -97,7 +108,8 @@ int* Texture::get_nr_channels_ptr() { return &nr_channels_; }
 unsigned char* Texture::load_image(const std::string& path)
 {
     stbi_set_flip_vertically_on_load(true);
-    return stbi_load(path.c_str(), &width_, &height_, &nr_channels_, 0);
+    const std::string str = StringHelper::unescape_string(path);
+    return stbi_load(str.c_str(), &width_, &height_, &nr_channels_, 0);
 }
 
 void Texture::active_bind(const unsigned int index)
