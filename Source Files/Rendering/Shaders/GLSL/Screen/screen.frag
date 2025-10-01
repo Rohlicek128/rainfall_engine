@@ -7,7 +7,8 @@ out vec4 pixel_color;
 uniform sampler2D screen_texture;
 
 uniform float gamma;
-uniform float exposure;
+uniform float threshold;
+uniform float key_value;
 
 /*vec3 Tonemap_ACES(vec3 x) {
 	// Narkowicz 2015, "ACES Filmic Tone Mapping Curve"
@@ -19,17 +20,20 @@ uniform float exposure;
 	return (x * (a * x + vec3(b))) / (x * (c * x + vec3(d)) + vec3(e));
 }*/
 
+float calc_auto_exposure(float t, float k){
+	float luminance = dot(textureLod(screen_texture, vec2(0.5), 10.0).rgb, vec3(0.2126, 0.7152, 0.0722));
+	return log2(max((k / max(luminance, 0.005)), 0.0001)) - t;
+}
+
 void main(){
 	vec3 color = texture(screen_texture, vTexCoord).rgb;
 	
 	//Exposure Reinhart
-	vec3 mapped = vec3(1.0) - exp(-color * exposure);
-	//vec3 mapped = Tonemap_ACES(color);
+	//vec3 mapped = vec3(1.0) - exp(-color * luminance);
+	vec3 mapped = exp2(calc_auto_exposure(threshold, key_value)) * color;
 	
 	//Gamma
 	mapped = pow(mapped, vec3(1.0 / gamma));
 	
-	//vec4 val = textureLod(screen_texture, vTexCoord, 0.0);
 	pixel_color = vec4(mapped, 1.0);
-	//pixel_color = vec4(1.0, 0.0, 0.0, 1.0);
 }

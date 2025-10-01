@@ -27,7 +27,8 @@ CameraComponent::CameraComponent(TransformComponent* transform, const ImVec4 cle
     clear_color[3] = clear.w;
 
     gamma = 2.2f;
-    exposure = 1.0f;
+    threshold = 3.0f;
+    key_value = 0.2f;
 }
 
 void CameraComponent::move(GLFWwindow* window, const float delta_time)
@@ -95,9 +96,13 @@ void CameraComponent::set_gui()
 {
     ImGui::SeparatorText("Rendering");
     ImGui::Checkbox("Wireframe", &is_wireframe);
-    ImGui::SliderFloat("Gamma", &gamma, 0.0f, 10.0f, "%.1f");
-    ImGui::SliderFloat("Exposure", &exposure, 0.0f, 100.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
     ImGui::ColorEdit4("Background", clear_color);
+
+    ImGui::SeparatorText("Tone Mapping");
+    ImGui::SliderFloat("Gamma", &gamma, 0.0f, 10.0f, "%.1f");
+    ImGui::SliderFloat("Threshold", &threshold, 0.0f, 15.0f, "%.2f");
+    ImGui::SliderFloat("Key Value", &key_value, 0.0f, 10.0f, "%.3f");
+    
     
     ImGui::SeparatorText("Rotation");
     ImGui::PushItemWidth(150);
@@ -134,7 +139,7 @@ void CameraComponent::serialize(YAML::Emitter& out)
     out << YAML::Key << "Speed" << YAML::Value << speed;
     
     out << YAML::Key << "Gamma" << YAML::Value << gamma;
-    out << YAML::Key << "Exposure" << YAML::Value << exposure;
+    out << YAML::Key << "Exposure" << YAML::Value << threshold;
     
     out << YAML::Key << "Clear Color" << YAML::Value << YAML::Flow << YAML::BeginSeq;
     out << clear_color[0] << clear_color[1] << clear_color[2] << clear_color[3] << YAML::EndSeq;
@@ -159,7 +164,7 @@ bool CameraComponent::deserialize(YAML::Node& node)
     speed = node["Speed"].as<float>();
     
     gamma = node["Gamma"].as<float>();
-    exposure = node["Exposure"].as<float>();
+    threshold = node["Exposure"].as<float>();
     
     if (YAML::Node cur = node["Clear Color"])
     {

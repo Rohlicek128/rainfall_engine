@@ -20,7 +20,8 @@ public:
     float clear_color[4];
 
     float gamma;
-    float exposure;
+    float threshold;
+    float key_value;
 
     bool is_wireframe;
     

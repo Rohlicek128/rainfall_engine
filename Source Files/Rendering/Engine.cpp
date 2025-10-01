@@ -230,10 +230,10 @@ void Engine::update(const EngineArgs& args)
     if (!mouse_->is_visible) camera_component->mouse_move(*mouse_, static_cast<float>(delta_time_));
     
     
-    if (editor_->imgui_io->WantCaptureMouse) return;
+    //if (editor_->imgui_io->WantCaptureMouse) return;
 
-    camera_component->exposure += camera_component->exposure * args.scroll_y * static_cast<float>(delta_time_) * 175.0f;
-    camera_component->exposure = std::max(0.001f, camera_component->exposure);
+    //camera_component->threshold += camera_component->threshold * args.scroll_y * static_cast<float>(delta_time_) * 175.0f;
+    //camera_component->threshold = std::max(0.001f, camera_component->threshold);
 }
 
 void Engine::render(EngineArgs& args)
@@ -266,7 +266,7 @@ void Engine::render(EngineArgs& args)
 
     //Lighting Pass
     post_process_program_->bind_framebuffer();
-    glClearColor(cur_camera_comp->clear_color[0], cur_camera_comp->clear_color[1], cur_camera_comp->clear_color[2], cur_camera_comp->clear_color[3]);
+    //glClearColor(cur_camera_comp->clear_color[0], cur_camera_comp->clear_color[1], cur_camera_comp->clear_color[2], cur_camera_comp->clear_color[3]);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     lighting_program_->draw(*current_scene_, *screen_mesh_, 0, *g_buffer_, *shadow_map_);
     post_process_program_->unbind_framebuffer();
@@ -297,6 +297,7 @@ void Engine::render(EngineArgs& args)
         const ImVec2 size_vp = ImGui::GetContentRegionAvail();
         resize((int)size_vp.x, (int)size_vp.y);
         editor_->viewport_fbo->set_gui();
+        //post_process_program_->framebuffer_->set_gui();
         
         ImGuizmo::SetRect(pos_vp.x, pos_vp.y, size_vp.x, size_vp.y);
         if (current_scene_->selected_entity != nullptr) current_scene_->selected_entity->transform->set_guizmo(*current_scene_->current_camera, editor_->gizmo_operation);
