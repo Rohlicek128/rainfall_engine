@@ -1,12 +1,17 @@
 #include <iostream>
 
-#include "engine/src/render.h"
+//#include <engine/src/Rendering/Engine.h>
+//#include <engine/src/Rendering/Window.h>
 
 
 int main()
 {
-    engine::Renderer r;
-
     std::cout << "Hello from Editor\n";
+
+    //engine::Window window("Rainfall Engine", 1920, 1080);
+    //Engine engine(engine::Window::engine_args);
+
+    //window.run(engine);
+
     return 0;
 }
