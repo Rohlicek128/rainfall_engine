@@ -1,5 +1,6 @@
 #include "Texture.h"
 
+#include <filesystem>
 #include <iostream>
 #include "stb_image.h"
 
@@ -109,7 +110,8 @@ unsigned char* Texture::load_image(const std::string& path)
 {
     stbi_set_flip_vertically_on_load(true);
     const std::string str = StringHelper::unescape_string(path);
-    return stbi_load(str.c_str(), &width_, &height_, &nr_channels_, 0);
+    //std::cout << std::filesystem::current_path().string() << "\n" << path << "\n";
+    return stbi_load(path.c_str(), &width_, &height_, &nr_channels_, 0);
 }
 
 void Texture::active_bind(const unsigned int index)

@@ -7,6 +7,8 @@
 #include "../../Entities/Components/MeshComponent.h"
 #include "../../Entities/Components/TextureComponent.h"
 
+#include <iostream>
+
 GeometryProgram::GeometryProgram(const std::vector<Shader>& shaders) : Program(shaders)
 {
 }
@@ -15,12 +17,12 @@ void GeometryProgram::draw(const Scene& scene, const float aspect_ratio)
 {
     bind();
     scene.mesh->bind();
-    
+
     //Camera
     CameraComponent* camera_component = scene.current_camera->get_component<CameraComponent>();
     set_uniform("view", camera_component->get_view_matrix());
     set_uniform("projection", camera_component->get_projection_matrix(aspect_ratio));
-    
+
     set_uniform("material.diffuse_map", 0);
     set_uniform("material.roughness_map", 1);
     set_uniform("material.metallic_map", 2);
@@ -34,7 +36,7 @@ void GeometryProgram::draw(const Scene& scene, const float aspect_ratio)
         const glm::mat4 model = entity->get_model_matrix();
         set_uniform("model", model);
         set_uniform("inverse_model", glm::mat3(transpose(inverse(model))));
-        
+
         if (TextureComponent* texture = entity->get_enabled_component<TextureComponent>())
         {
             if (texture->type == GL_TEXTURE_2D) texture->active_bind(0);
@@ -52,7 +54,7 @@ void GeometryProgram::draw(const Scene& scene, const float aspect_ratio)
             set_uniform("material.has_normal_map", 0);
             set_uniform("texture_scaling", 1.0f);
         }
-        
+
         if (MaterialComponent* material = entity->get_enabled_component<MaterialComponent>())
         {
             material->set_uniforms(this);
@@ -89,7 +91,7 @@ void GeometryProgram::draw(const Scene& scene, const float aspect_ratio)
         {
             if (!mesh->is_culled) glDisable(GL_CULL_FACE);
             else if (mesh->is_inverted) glCullFace(GL_FRONT);
-            
+
             glDrawElements(mesh->primitive_type, model_data->indices_length,
             GL_UNSIGNED_INT, (void*)(scene.mesh->get_model_indices_offset(mesh->model_index) * sizeof(GLuint)));
 

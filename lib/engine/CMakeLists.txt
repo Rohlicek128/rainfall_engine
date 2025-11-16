@@ -18,7 +18,7 @@ list(APPEND SRCS
 add_library(engine STATIC ${SRCS})
 TARGET_INCLUDE_DIRECTORIES(engine
     PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/Imgui"
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/stb"
 )

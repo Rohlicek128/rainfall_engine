@@ -3,8 +3,8 @@
 
 namespace game::tools
 {
-    inline void printl_message(const std::string& message)
+    inline void printl_message(const std::string& context, const std::string& message)
     {
-        std::cout << "-- " << message << '\n';
+        std::cout << "[" << context << "] " << message << '\n';
     }
 }

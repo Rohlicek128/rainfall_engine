@@ -4,7 +4,7 @@
 class Shader
 {
     unsigned int handle_;
-    std::string read_file(const char*) const;
+    std::string read_file(const char*);
 public:
     Shader(const std::string&, int);
     ~Shader();

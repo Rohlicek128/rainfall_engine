@@ -16,6 +16,7 @@ Entity::Entity(const std::string& name, TransformComponent* transform)
     this->name = name;
     is_visible = true;
     is_root = false;
+    parent = nullptr;
 
     mesh_ = nullptr;
 
@@ -86,7 +87,7 @@ bool Entity::remove_child(Entity* child)
 
 glm::mat4 Entity::get_model_matrix()
 {
-    if (!parent->is_root && parent != nullptr) return parent->get_model_matrix() * transform->get_model_matrix();
+    if (parent != nullptr && !parent->is_root) return parent->get_model_matrix() * transform->get_model_matrix();
     return transform->get_model_matrix();
 }
 
@@ -218,6 +219,7 @@ bool Entity::deserialize(YAML::Node& node)
     name = node["Entity"].as<std::string>();
     id = node["Id"].as<unsigned int>();
     is_visible = node["Is Visible"].as<bool>();
+    parent = nullptr;
 
     if (YAML::Node children_des = node["Children Ids"])
     {

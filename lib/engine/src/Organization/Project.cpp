@@ -58,9 +58,9 @@ bool Project::load_scene_from_path(const std::string& file_path)
 void Project::save(const std::string& file_path)
 {
     YAML::Emitter out;
-    
+
     serialize(out);
-    
+
     std::ofstream file_out(file_path.c_str());
     file_out << out.c_str();
 
@@ -90,21 +90,21 @@ void Project::serialize(YAML::Emitter& out)
     out << YAML::BeginMap;
 
     out << YAML::Key << "Project" << YAML::Value << name.c_str();
-    
+
     out << YAML::Key << "Scene paths" << YAML::Value << YAML::BeginSeq;
     for (int i = 0; i < scenes.size(); ++i)
         out << YAML::Value << scenes.at(i)->save_path;
     out << YAML::EndSeq;
 
     textures->serialize(out);
-    
+
     out << YAML::EndMap;
 }
 
 bool Project::deserialize(YAML::Node& node)
 {
     if (!node["Project"]) return false;
-    
+
     name = node["Project"].as<std::string>();
 
     textures->deserialize(node);
@@ -116,6 +116,6 @@ bool Project::deserialize(YAML::Node& node)
             load_scene_from_path(scene_des.as<std::string>());
         }
     }
-    
+
     return true;
 }

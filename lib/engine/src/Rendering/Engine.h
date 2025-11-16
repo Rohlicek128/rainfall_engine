@@ -8,8 +8,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "stb_image.h"
-
 #include "EngineArgs.h"
 #include "Buffers/Screen/GBuffer.h"
 #include "Buffers/Textures/TextureManager.h"

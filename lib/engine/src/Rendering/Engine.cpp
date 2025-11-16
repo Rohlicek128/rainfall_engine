@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <iostream>
 
+#include <stb_image.h>
+
 #include "ImGuizmo.h"
 #include "Entities/Components/CameraComponent.h"
 #include "Entities/Components/LightComponent.h"
