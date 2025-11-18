@@ -3,7 +3,7 @@
 #include "ImGuizmo.h"
 #include "../../Organization/Project.h"
 #include "../Entities/Components/CameraComponent.h"
-#include "../World/Scene.h"
+#include "engine/world/Scene.h"
 
 #include "../../Utils/FileDialogs.h"
 
@@ -43,7 +43,7 @@ void EditorManager::init_imgui(GLFWwindow* window)
     ImGuizmo::SetOrthographic(false);
 }
 
-void EditorManager::set_main_dockspace(const EngineArgs& args, Project& project)
+void EditorManager::set_main_dockspace(const engine::EngineArgs& args, Project& project)
 {
     ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 

@@ -2,7 +2,8 @@
 
 #include <iostream>
 
-#include <glad/glad.h>
+#include <glad.h>
+
 
 class MaterialComponent;
 
@@ -15,7 +16,7 @@ Program::Program(const std::vector<Shader>& shaders)
     glLinkProgram(handle_);
 
     is_successful();
-    
+
     for (int i = 0; i < shaders.size(); ++i)
         glDetachShader(handle_, shaders[i].get_handle());
 }

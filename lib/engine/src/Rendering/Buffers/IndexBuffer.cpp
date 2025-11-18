@@ -1,6 +1,6 @@
 #include "IndexBuffer.h"
 
-#include <glad/glad.h>
+#include <glad.h>
 
 IndexBuffer::IndexBuffer(unsigned int data[], const unsigned int length)
 {

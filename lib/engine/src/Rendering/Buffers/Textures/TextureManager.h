@@ -5,7 +5,7 @@
 #include "Cubemap.h"
 #include "Texture.h"
 #include "../../Gui/IGui.h"
-#include "../../World/Loading/ISerializable.h"
+#include "engine/core/ISerializable.h"
 
 class TextureManager : IGui, public ISerializable
 {
@@ -15,13 +15,13 @@ class TextureManager : IGui, public ISerializable
     float select_scale_;
     bool load_as_srgb_;
     unsigned int id_counter_;
-    
+
     static TextureManager* instance_ptr_;
 
     TextureManager();
 public:
     static TextureManager* get_instance();
-    
+
     TextureManager(const TextureManager&) = default;
     ~TextureManager() override = default;
 
@@ -29,7 +29,7 @@ public:
 
     void add_essential_texture(std::unique_ptr<Texture>);
     Texture* get_essential_texture(int);
-    
+
     void add_texture(std::unique_ptr<Texture>);
     bool add_texture_open_file(bool is_srgb);
     Texture* get_texture(int);

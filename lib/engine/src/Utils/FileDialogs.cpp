@@ -1,13 +1,14 @@
 #include "FileDialogs.h"
-#include "../Rendering/Window.h"
+#include "engine/rendering/Window.h"
+#include "../Rendering/EngineArgs.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <commdlg.h>
 
-#include <GLFW/glfw3.h>
+#include <glfw3.h>
 #define GLFW_EXPOSE_NATIVE_WIN32
-#include <GLFW/glfw3native.h>
+#include <glfw3native.h>
 
 std::string FileDialogs::open_file(const char* filter)
 {

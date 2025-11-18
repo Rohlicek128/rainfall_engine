@@ -3,7 +3,8 @@
 #include <fstream>
 #include <iostream>
 
-#include "glad/glad.h"
+#include <glad.h>
+
 
 std::string Shader::read_file(const char* path)
 {

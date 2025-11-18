@@ -1,6 +1,9 @@
-#include "Window.h"
+#include "engine/rendering/Window.h"
 
 #include <iostream>
+
+#include "engine/rendering/Renderer.h"
+#include "EngineArgs.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -32,13 +35,13 @@ namespace engine
         glfwTerminate();
     }
 
-    void Window::run(Engine& engine)
+    void Window::run(Renderer& renderer, Scene& scene)
     {
         is_running_ = true;
         while (is_running_ && !glfwWindowShouldClose(engine_args.window))
         {
-            engine.update(engine_args);
-            engine.render(engine_args);
+            renderer.update();
+            renderer.render(scene);
         }
     }
 
@@ -80,6 +83,21 @@ namespace engine
 
         return window;
     }
+
+    bool Window::set_icon(const std::string& path)
+    {
+        GLFWimage images[1];
+
+        void* data = stbi_load(path.c_str(), &images[0].width, &images[0].height, nullptr, 4);
+        if (!data) return false;
+
+        images[0].pixels = static_cast<unsigned char*>(data);
+        glfwSetWindowIcon(engine_args.window, 1, images);
+        stbi_image_free(images[0].pixels);
+
+        return true;
+    }
+
 
     void Window::framebuffer_size_callback(GLFWwindow*, int width, int height)
     {

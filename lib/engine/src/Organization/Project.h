@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "../Rendering/World/Loading/ISerializable.h"
+#include "engine/core/ISerializable.h"
 
 class Scene;
 class TextureManager;
@@ -16,7 +16,7 @@ class Project : ISerializable
 public:
     std::string name;
     std::string path;
-    
+
     std::vector<std::unique_ptr<Scene>> scenes;
     Scene* current_scene;
 
@@ -29,7 +29,7 @@ public:
     bool load(const std::string& file_path);
     void add_empty_scene();
     void reset();
-    
+
     bool load_scene_dialog();
     bool load_scene_from_path(const std::string& file_path);
 };

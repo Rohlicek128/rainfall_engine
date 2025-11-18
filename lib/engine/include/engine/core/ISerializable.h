@@ -13,7 +13,7 @@ public:
     YAML::Emitter& emit_out(YAML::Emitter&, const glm::vec4&);
     glm::vec3 des_vec3(YAML::Node&);
     glm::vec4 des_vec4(YAML::Node&);
-    
+
     virtual void serialize(YAML::Emitter& out) = 0;
     virtual bool deserialize(YAML::Node& node) = 0;
 };

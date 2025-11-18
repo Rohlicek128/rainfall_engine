@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "../Gui/IGui.h"
-#include "../World/Loading/ISerializable.h"
+#include "engine/core/ISerializable.h"
 #include "Components/TransformComponent.h"
 
 class Mesh;
@@ -17,7 +17,7 @@ class Entity : public IGui, public ISerializable
 
     std::vector<unsigned int> children_ids_;
     Mesh* mesh_;
-    
+
     bool check_search_string(const char*, const char*, int);
 protected:
     static unsigned int global_id_;
@@ -29,7 +29,7 @@ public:
     bool is_root;
     Entity* parent;
     std::vector<Entity*> children;
-    
+
     TransformComponent* transform;
     std::vector<std::unique_ptr<Component>> components;
 
@@ -43,20 +43,20 @@ public:
     void insert_component(C&);
     template<typename C>
     C* get_component();
-    
+
     template<typename C>
     C* contains_component();
     Component* contains_component_enum(const COMPONENTS_IDS&);
     template<typename C>
     C* get_enabled_component();
-    
+
     void set_mesh_to_component(Mesh*);
     std::vector<unsigned int> get_children_ids();
-    
+
     bool add_child(Entity*);
     bool remove_child(Entity*);
     glm::mat4 get_model_matrix();
-    
+
     void set_gui() override;
     void serialize(YAML::Emitter& out) override;
     bool deserialize(YAML::Node& node) override;

@@ -19,8 +19,11 @@ add_library(engine STATIC ${SRCS})
 TARGET_INCLUDE_DIRECTORIES(engine
     PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/glfw"
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/glad"
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/Imgui"
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/stb"
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/yaml-cpp"
 )
 
 target_link_libraries(engine PRIVATE

@@ -2,6 +2,7 @@
 #include "../Program.h"
 
 class Framebuffer;
+class CameraComponent;
 
 class PostProcessProgram : public Program
 {

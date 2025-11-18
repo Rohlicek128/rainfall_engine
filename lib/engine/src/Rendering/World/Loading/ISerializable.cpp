@@ -1,4 +1,4 @@
-#include "ISerializable.h"
+#include "engine/core/ISerializable.h"
 
 YAML::Emitter& ISerializable::emit_out(YAML::Emitter& out, const glm::vec3& value)
 {
@@ -15,7 +15,7 @@ YAML::Emitter& ISerializable::emit_out(YAML::Emitter& out, const glm::vec4& valu
 glm::vec3 ISerializable::des_vec3(YAML::Node& node)
 {
     if (!node.IsSequence()) return glm::vec3(0.0f);
-    
+
     glm::vec3 value;
 
     YAML::iterator cur_node = node.begin();

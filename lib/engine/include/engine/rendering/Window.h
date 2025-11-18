@@ -1,16 +1,18 @@
 #pragma once
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include <glad.h>
+#include <glfw3.h>
 
 #include <string>
 
-#include "Engine.h"
-#include "EngineArgs.h"
+class Scene;
 
 
 namespace engine
 {
+    class Renderer;
+    class EngineArgs;
+
     class Window
     {
         bool is_running_;
@@ -26,7 +28,9 @@ namespace engine
         Window(const std::string&, int, int);
         ~Window();
 
-        void run(Engine& engine);
+        void run(Renderer& renderer, Scene& scene);
         void stop();
+
+        bool set_icon(const std::string& path);
     };
 }

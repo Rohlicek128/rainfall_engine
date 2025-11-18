@@ -4,6 +4,7 @@
 #include "../../Entities/Components/CameraComponent.h"
 #include "../../Entities/Components/LightComponent.h"
 #include "../../Entities/Components/MaterialComponent.h"
+#include "../../World/Mesh.h"
 #include "../Shadows/ShadowMap.h"
 
 LightingProgram::LightingProgram(const std::vector<Shader>& shaders) : Program(shaders)

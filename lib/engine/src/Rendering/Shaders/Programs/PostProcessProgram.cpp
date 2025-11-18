@@ -1,9 +1,10 @@
 #include "PostProcessProgram.h"
 
-#include <glad/glad.h>
+#include <glad.h>
 
 #include "../../Buffers/Screen/Framebuffer.h"
 #include "../../Entities/Components/CameraComponent.h"
+#include "../../World/Mesh.h"
 
 PostProcessProgram::PostProcessProgram(const std::vector<Shader>& shaders, int width, int height) : Program(shaders)
 {
@@ -15,7 +16,7 @@ PostProcessProgram::PostProcessProgram(const std::vector<Shader>& shaders, int w
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glBindTexture(GL_TEXTURE_2D, 0);
-    
+
     framebuffer_->attach_renderbuffer(std::make_unique<Renderbuffer>(width, height, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT));
     framebuffer_->set_draw_buffers();
     framebuffer_->check_completeness();
@@ -26,7 +27,7 @@ void PostProcessProgram::draw(Mesh& mesh, const int quad_index, const CameraComp
     framebuffer_->attached_textures.back()->bind();
     glGenerateMipmap(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, 0);
-    
+
     glDisable(GL_DEPTH_TEST);
     bind();
     mesh.bind();
@@ -35,7 +36,7 @@ void PostProcessProgram::draw(Mesh& mesh, const int quad_index, const CameraComp
     if (texture_handle == -1) glBindTexture(GL_TEXTURE_2D, framebuffer_->attached_textures.at(0)->get_handle());
     else glBindTexture(GL_TEXTURE_2D, texture_handle);
     set_uniform("screen_texture", 0);
-    
+
     set_uniform("gamma", camera_component.gamma);
     set_uniform("threshold", camera_component.threshold);
     set_uniform("key_value", camera_component.key_value);

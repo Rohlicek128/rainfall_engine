@@ -6,6 +6,7 @@
 #include "../../Entities/Components/MaterialComponent.h"
 #include "../../Entities/Components/MeshComponent.h"
 #include "../../Entities/Components/TextureComponent.h"
+#include "../../World/Mesh.h"
 
 #include <iostream>
 

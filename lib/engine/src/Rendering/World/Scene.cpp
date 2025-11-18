@@ -1,4 +1,6 @@
-#include "Scene.h"
+#include "engine/world/Scene.h"
+
+#include "Mesh.h"
 
 #include <fstream>
 #include <iostream>

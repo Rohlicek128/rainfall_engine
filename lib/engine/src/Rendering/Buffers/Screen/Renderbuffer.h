@@ -1,13 +1,13 @@
 #pragma once
 #include "../IBindable.h"
-#include "glad/glad.h"
+#include <glad.h>
 
 class Renderbuffer : public IBindable
 {
     int width_, height_;
     GLenum format_;
     GLenum attachment_;
-    
+
 public:
     Renderbuffer(int, int, GLenum, GLenum);
     ~Renderbuffer() override = default;

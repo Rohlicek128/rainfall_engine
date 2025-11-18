@@ -27,7 +27,7 @@ public:
     EditorManager(bool, int, int);
     ~EditorManager() = default;
     void init_imgui(GLFWwindow*);
-    void set_main_dockspace(const EngineArgs&, Project&);
+    void set_main_dockspace(const engine::EngineArgs&, Project&);
 
     void set_red_style();
 

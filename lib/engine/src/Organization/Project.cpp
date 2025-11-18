@@ -3,7 +3,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "../Rendering/World/Scene.h"
+#include "engine/world/Scene.h"
 #include "../Rendering/World/Mesh.h"
 #include "../Rendering/Buffers/Textures/TextureManager.h"
 

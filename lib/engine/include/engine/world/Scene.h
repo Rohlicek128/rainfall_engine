@@ -3,15 +3,17 @@
 #include <string>
 #include <vector>
 
-#include "Mesh.h"
-#include "../Gui/IGui.h"
-#include "Loading/ISerializable.h"
+
+#include "../src/Rendering/Gui/IGui.h"
+#include "../core/ISerializable.h"
 
 namespace lights
 {
     enum class LIGHT_TYPE : int;
 }
 class Entity;
+class Mesh;
+
 
 class Scene : public IGui, ISerializable
 {

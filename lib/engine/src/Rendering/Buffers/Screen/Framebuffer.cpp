@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "glad/glad.h"
+#include <glad.h>
 
 Framebuffer::Framebuffer()
 {
@@ -39,7 +39,7 @@ bool Framebuffer::check_completeness()
     if(!result)
         std::cout << "ERROR::FRAMEBUFFER::H" << handle_ << " Framebuffer is not complete!\n";
     unbind();
-    
+
     return result;
 }
 
@@ -76,7 +76,7 @@ void Framebuffer::resize(const int w, const int h)
         unbind();
     }
     check_completeness();
-    
+
     if (attached_renderbuffer == nullptr || (attached_renderbuffer->get_width() == w && attached_renderbuffer->get_height() == h)) return;
     attached_renderbuffer->resize(w, h);
     bind();
@@ -98,7 +98,7 @@ void Framebuffer::unbind()
 void Framebuffer::set_gui()
 {
     if (attached_textures.at(0) == nullptr) return;
-    
+
     ImGui::Image((ImTextureID)(intptr_t)attached_textures.at(0)->get_handle(),
         {(float)attached_textures.at(0)->get_width(), (float)attached_textures.at(0)->get_height()},{0, 1}, {1, 0});
 }

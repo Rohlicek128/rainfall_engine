@@ -1,6 +1,7 @@
 #include "VertexArray.h"
 
-#include "glad/glad.h"
+#include <glad.h>
+
 
 VertexArray::VertexArray(VertexBuffer* vbo, const std::vector<VertexAttribute>& attributes)
 {
@@ -20,7 +21,7 @@ VertexArray::VertexArray(VertexBuffer* vbo, const std::vector<VertexAttribute>& 
         glEnableVertexAttribArray(i);
         offset += attributes[i].lenght;
     }
-    
+
     vbo->unbind();
     VertexArray::unbind();
 }

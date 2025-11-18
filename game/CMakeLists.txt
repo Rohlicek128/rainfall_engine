@@ -4,7 +4,7 @@ FILE(GLOB_RECURSE SRCS "src/*.cpp")
 ADD_EXECUTABLE("game" ${SRCS})
 
 TARGET_INCLUDE_DIRECTORIES("game" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/")
-target_link_libraries("game" "engine")
+target_link_libraries("game" PRIVATE "engine")
 
 add_custom_command(
     TARGET game POST_BUILD
@@ -23,5 +23,4 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_SOURCE_DIR}/game/saved"
         "$<TARGET_FILE_DIR:game>/saved"
-
 )
