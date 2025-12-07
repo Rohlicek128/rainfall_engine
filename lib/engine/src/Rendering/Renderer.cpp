@@ -20,7 +20,9 @@
 #include "Entities/Components/CameraComponent.h"
 #include "Entities/Components/LightComponent.h"
 
-#include "World/Mesh.h"
+#include "engine/managers/Mesh.h"
+
+#include "Entities/Entity.h"
 
 
 namespace engine
@@ -90,7 +92,7 @@ namespace engine
         camera_toggle_ = true;
         can_escape_ = true;
 
-        delta_time_ = 0.0f;
+        delta_time = 0.0f;
         last_time_ = 0.0;
 
         display_frame_count_ = 0;
@@ -109,7 +111,7 @@ namespace engine
     void Renderer::update_delta_time()
     {
         const double current = glfwGetTime();
-        delta_time_ = current - last_time_;
+        delta_time = current - last_time_;
         last_time_ = current;
 
         if ((int)floor(current) > last_uptime_)
@@ -173,7 +175,10 @@ namespace engine
 
     void Renderer::render(Scene& scene)
     {
-        const CameraComponent* cur_camera_comp = scene.current_camera->get_component<CameraComponent>();
+        CameraComponent* cur_camera_comp = scene.current_camera->get_component<CameraComponent>();
+        cur_camera_comp->move(window_->engine_args.window, static_cast<float>(delta_time));
+        if (!mouse_->is_visible) cur_camera_comp->mouse_move(*mouse_, static_cast<float>(delta_time));
+
         const int cur_width = window_->engine_args.width;
         const int cur_height = window_->engine_args.height;
 

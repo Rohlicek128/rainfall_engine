@@ -1,4 +1,4 @@
-#include "VertexAttribute.h"
+#include "engine/managers/VertexAttribute.h"
 
 VertexAttribute::VertexAttribute(const std::string& name, int lenght)
 {

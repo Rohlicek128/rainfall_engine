@@ -35,26 +35,29 @@ Texture* TextureManager::get_essential_texture(const int index)
     return essential_textures_.at(index).get();
 }
 
-void TextureManager::add_texture(std::unique_ptr<Texture> texture)
+Texture* TextureManager::add_texture(std::unique_ptr<Texture> texture)
 {
     textures_.push_back(std::move(texture));
+    return textures_.back().get();
 }
 
-bool TextureManager::add_texture_open_file(const bool is_srgb)
+Texture* TextureManager::add_texture_open_file(const bool is_srgb)
 {
     const std::string path = FileDialogs::open_file("Image File (*.jpg;*.png)\0*.jpg;*.png\0");
-    if (path.empty()) return false;
+    if (path.empty()) return nullptr;
 
     const bool is_png = !path.compare(path.length() - 3, 3, "png");
     int i_format = is_png ? (is_srgb ? GL_SRGB8_ALPHA8 : GL_RGBA8) : GL_RGB8;
     int format = is_png ? GL_RGBA : GL_RGB;
     add_texture(std::make_unique<Texture>(path, i_format, format));
-    
-    return true;
+
+    return textures_.back().get();
 }
 
 Texture* TextureManager::get_texture(const int index)
 {
+    if (index < 0 || index >= textures_.size())
+        return essential_textures_.at(2).get();
     return textures_.at(index).get();
 }
 
@@ -64,7 +67,7 @@ Texture* TextureManager::get_texture_by_handle(const unsigned int handle)
     {
         if (essential_textures_.at(i)->get_handle() == handle) return essential_textures_.at(i).get();
     }
-    
+
     for (int i = 0; i < textures_.size(); ++i)
     {
         if (textures_.at(i)->get_handle() == handle) return textures_.at(i).get();
@@ -78,7 +81,7 @@ Texture* TextureManager::get_texture_by_id(const unsigned int id)
     {
         if (essential_textures_.at(i)->id == id) return essential_textures_.at(i).get();
     }
-    
+
     for (int i = 0; i < textures_.size(); ++i)
     {
         if (textures_.at(i)->id == id) return textures_.at(i).get();
@@ -105,7 +108,7 @@ void TextureManager::set_gui()
 Texture* TextureManager::select_texture_2d_gui()
 {
     ImGui::SeparatorText("Select a texture:");
-    
+
     ImGui::SliderFloat("Scale", &select_scale_, 30.0f, 400.0f, "%.0f");
     float max_width = 0.0;
 
@@ -137,18 +140,18 @@ Texture* TextureManager::select_texture_2d_gui()
                 ImGui::Text("Channels: %i", textures_.at(i)->get_nr_channels());
             }
             else ImGui::Text("FAILED TO LOAD");
-            
-            
+
+
             ImGui::EndTooltip();
         }
-        
+
         if (max_width <= 800.0 - select_scale_) ImGui::SameLine();
         else max_width = 0.0;
     }
     ImGui::NewLine();
     if (ImGui::Button("  None  ")) return get_essential_texture(0);
 
-    
+
     if (ImGui::Button("  Add..  "))
         add_texture_open_file(load_as_srgb_);
 
@@ -163,7 +166,7 @@ void TextureManager::serialize(YAML::Emitter& out)
 {
     out << YAML::Key << "Texture Manager" << YAML::Value << YAML::BeginMap;
     out << YAML::Key << "ID Count" << YAML::Value << id_counter_;
-    
+
     out << YAML::Key << "Textures" << YAML::Value << YAML::BeginSeq;
     for (unsigned int i = 0; i < textures_.size(); ++i)
     {
@@ -178,15 +181,15 @@ void TextureManager::serialize(YAML::Emitter& out)
 bool TextureManager::deserialize(YAML::Node& node)
 {
     if (!node["Texture Manager"]) return false;
-    
+
     YAML::Node manager = node["Texture Manager"];
-    
+
     for (int i = 0; i < textures_.size(); ++i)
     {
         textures_.at(i)->delete_texture();
     }
     textures_.clear();
-        
+
     for (auto texture_des : manager["Textures"])
     {
         YAML::iterator cur_node = texture_des.begin();
@@ -202,13 +205,13 @@ bool TextureManager::deserialize(YAML::Node& node)
             }
         }
         if (skip) continue;
-            
+
         int in_for = (++cur_node)->as<int>();
         int format = (++cur_node)->as<int>();
         add_texture(std::make_unique<Texture>(path, in_for, format));
         textures_.back()->id = id;
     }
     id_counter_ = manager["ID Count"].as<unsigned int>();
-    
+
     return true;
 }

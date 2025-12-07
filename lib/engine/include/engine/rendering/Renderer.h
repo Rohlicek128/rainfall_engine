@@ -50,7 +50,6 @@ namespace engine
 
         TextureManager* textures_;
 
-        double delta_time_;
         double last_time_;
 
         int frame_count_;
@@ -67,6 +66,8 @@ namespace engine
         void update_delta_time();
         void resize(int, int);
     public:
+        double delta_time;
+
         Renderer(Window& window);
         ~Renderer() = default;
 

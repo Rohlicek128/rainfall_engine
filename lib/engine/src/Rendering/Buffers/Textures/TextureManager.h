@@ -30,8 +30,8 @@ public:
     void add_essential_texture(std::unique_ptr<Texture>);
     Texture* get_essential_texture(int);
 
-    void add_texture(std::unique_ptr<Texture>);
-    bool add_texture_open_file(bool is_srgb);
+    Texture* add_texture(std::unique_ptr<Texture>);
+    Texture* add_texture_open_file(bool is_srgb);
     Texture* get_texture(int);
     Texture* get_texture_by_handle(unsigned int);
     Texture* get_texture_by_id(unsigned int);

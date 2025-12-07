@@ -1,6 +1,7 @@
 #include "ShadowDepthProgram.h"
 #include "../../Entities/Components/MeshComponent.h"
-#include "../../World/Mesh.h"
+#include "engine/managers/Mesh.h"
+#include "../../Entities/Entity.h"
 #include <glad.h>
 
 ShadowDepthProgram::ShadowDepthProgram(const std::vector<Shader>& shaders) : Program(shaders)

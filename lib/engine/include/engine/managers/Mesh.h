@@ -6,11 +6,14 @@
 #include <glm/vec3.hpp>
 
 #include "ModelData.h"
-#include "../Buffers/IndexBuffer.h"
-#include "../Buffers/VertexArray.h"
-#include "../Entities/Entity.h"
+#include "VertexAttribute.h"
 
-class Mesh : public IGui
+
+class VertexArray;
+class VertexBuffer;
+class IndexBuffer;
+
+class Mesh //: public IGui
 {
     VertexArray* vao_;
     VertexBuffer* vbo_;
@@ -28,7 +31,7 @@ class Mesh : public IGui
     unsigned int get_indices_length();
 public:
     std::vector<VertexAttribute> attributes;
-    
+
     Mesh(const std::vector<VertexAttribute>&, bool = false);
     void bind();
     void unbind();
@@ -39,6 +42,8 @@ public:
     void add_model(const std::string&, float[], int, unsigned int[], int);
     ModelData* get_model(int);
 
+    void set_default_models();
+
     int select_mesh_gui();
-    void set_gui() override;
+    //void set_gui() override;
 };

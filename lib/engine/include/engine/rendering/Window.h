@@ -10,13 +10,10 @@ class Scene;
 
 namespace engine
 {
-    class Renderer;
     class EngineArgs;
 
     class Window
     {
-        bool is_running_;
-
         GLFWwindow* init_window(const char* window_name, const int width, const int height);
 
         static void framebuffer_size_callback(GLFWwindow*, int width, int height);
@@ -28,8 +25,7 @@ namespace engine
         Window(const std::string&, int, int);
         ~Window();
 
-        void run(Renderer& renderer, Scene& scene);
-        void stop();
+        bool should_close();
 
         bool set_icon(const std::string& path);
     };

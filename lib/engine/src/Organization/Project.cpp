@@ -4,7 +4,7 @@
 #include <fstream>
 
 #include "engine/world/Scene.h"
-#include "../Rendering/World/Mesh.h"
+#include "engine/managers/Mesh.h"
 #include "../Rendering/Buffers/Textures/TextureManager.h"
 
 #include "../Utils/FileDialogs.h"
@@ -22,7 +22,8 @@ Project::Project(const std::string& name)
 
 void Project::add_empty_scene()
 {
-    scenes.push_back(std::make_unique<Scene>("Untitled", assets_mesh.get()));
+    scenes.push_back(std::make_unique<Scene>("Untitled"));
+    scenes.back()->set_mesh(*assets_mesh);
     current_scene = scenes.back().get();
 }
 
@@ -44,7 +45,8 @@ bool Project::load_scene_dialog()
 
 bool Project::load_scene_from_path(const std::string& file_path)
 {
-    scenes.push_back(std::make_unique<Scene>("Untitled", assets_mesh.get()));
+    scenes.push_back(std::make_unique<Scene>("Untitled"));
+    scenes.back()->set_mesh(*assets_mesh);
     if (!scenes.back()->load(file_path))
     {
         scenes.erase(scenes.begin() + scenes.size() - 1);

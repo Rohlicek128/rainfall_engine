@@ -39,8 +39,10 @@ public:
     bool opened_gui;
     Entity* selected_entity;
 
-    Scene(const std::string&, Mesh*);
+    Scene(const std::string&);
     ~Scene() override = default;
+
+    void set_mesh(Mesh& mesh);
 
     void add_entity(std::unique_ptr<Entity>);
     void remove_entity(Entity*);

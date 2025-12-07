@@ -4,7 +4,7 @@
 
 #include "../../Buffers/Screen/Framebuffer.h"
 #include "../../Entities/Components/CameraComponent.h"
-#include "../../World/Mesh.h"
+#include "engine/managers/Mesh.h"
 
 PostProcessProgram::PostProcessProgram(const std::vector<Shader>& shaders, int width, int height) : Program(shaders)
 {

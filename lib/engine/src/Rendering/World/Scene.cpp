@@ -1,24 +1,23 @@
 #include "engine/world/Scene.h"
 
-#include "Mesh.h"
+#include "engine/managers/Mesh.h"
 
 #include <fstream>
 #include <iostream>
 #include <utility>
 
 #include "../Entities/Entity.h"
-#include "../World/Mesh.h"
+#include "engine/managers/Mesh.h"
 
 #include "../Entities/Components/CameraComponent.h"
 #include "../Entities/Components/LightComponent.h"
 #include "../Entities/Components/TextureComponent.h"
 #include "../Entities/Components/MeshComponent.h"
 
-Scene::Scene(const std::string& name, Mesh* mesh)
+Scene::Scene(const std::string& name)
 {
     this->name = name;
     this->save_path = "N/A";
-    this->mesh = mesh;
 
     root_entity = std::make_unique<Entity>("__root", new TransformComponent(glm::vec3(0.0f), glm::vec3(0.0f) ,glm::vec3(0.0f)));
     root_entity->is_root = true;
@@ -33,11 +32,16 @@ Scene::Scene(const std::string& name, Mesh* mesh)
     skybox = std::make_unique<Entity>("__skybox",
         new TransformComponent(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f))
         );
-    skybox->add_component<MeshComponent>(0, GL_TRIANGLES, this->mesh);
+    //skybox->add_component<MeshComponent>(0, GL_TRIANGLES, this->mesh);
     skybox->add_component<TextureComponent>(0x8513, 1, 1);
 
     opened_gui = false;
     selected_entity = nullptr;
+}
+
+void Scene::set_mesh(Mesh& mesh)
+{
+    this->mesh = &mesh;
 }
 
 void Scene::add_entity(std::unique_ptr<Entity> entity)

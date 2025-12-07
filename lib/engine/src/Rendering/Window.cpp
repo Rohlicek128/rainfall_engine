@@ -27,7 +27,6 @@ namespace engine
             exit(-1);
         }
         engine_args.window = window;
-        is_running_ = false;
     }
 
     Window::~Window()
@@ -35,19 +34,9 @@ namespace engine
         glfwTerminate();
     }
 
-    void Window::run(Renderer& renderer, Scene& scene)
+    bool Window::should_close()
     {
-        is_running_ = true;
-        while (is_running_ && !glfwWindowShouldClose(engine_args.window))
-        {
-            renderer.update();
-            renderer.render(scene);
-        }
-    }
-
-    void Window::stop()
-    {
-        is_running_ = false;
+        return glfwWindowShouldClose(engine_args.window);
     }
 
     GLFWwindow* Window::init_window(const char* window_name, const int width, const int height)
