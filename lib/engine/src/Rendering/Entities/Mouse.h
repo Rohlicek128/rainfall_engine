@@ -1,5 +1,5 @@
 #pragma once
-#include "../Gui/IGui.h"
+#include "engine/core/IGui.h"
 
 class Mouse : public IGui
 {
@@ -10,7 +10,7 @@ public:
 
     bool first_move;
     bool is_visible;
-    
+
     Mouse(int, int, float, bool = true);
     ~Mouse() override = default;
     void set_gui() override;

@@ -1,10 +1,11 @@
 #include "LightingProgram.h"
 
 #include "../../Buffers/Textures/Texture.h"
+#include "engine/world/Entity.h"
 #include "../../Entities/Components/CameraComponent.h"
 #include "../../Entities/Components/LightComponent.h"
 #include "../../Entities/Components/MaterialComponent.h"
-#include "../../World/Mesh.h"
+#include "engine/managers/Mesh.h"
 #include "../Shadows/ShadowMap.h"
 
 LightingProgram::LightingProgram(const std::vector<Shader>& shaders) : Program(shaders)

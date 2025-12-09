@@ -2,7 +2,7 @@
 
 #include "../Buffers/IndexBuffer.h"
 #include "../Buffers/VertexArray.h"
-#include "../Entities/Entity.h"
+#include "engine/world/Entity.h"
 
 #include <iostream>
 

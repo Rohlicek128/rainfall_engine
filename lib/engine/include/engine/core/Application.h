@@ -2,6 +2,7 @@
 
 #include "engine/managers/ResourceManager.h"
 #include "engine/managers/SceneManager.h"
+#include "engine/world/Entity.h"
 #include <memory>
 
 

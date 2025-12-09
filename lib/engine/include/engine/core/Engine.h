@@ -3,7 +3,7 @@
 #include <engine/rendering/Window.h>
 #include <engine/rendering/Renderer.h>
 #include <engine/world/Scene.h>
-#include <engine/src/Rendering/Entities/Entity.h>
+#include <engine/world/Entity.h>
 #include <engine/src/Rendering/Buffers/Screen/GBuffer.h>
 
 #include <type_traits>

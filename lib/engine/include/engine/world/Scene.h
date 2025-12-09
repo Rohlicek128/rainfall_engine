@@ -4,7 +4,7 @@
 #include <vector>
 
 
-#include "../src/Rendering/Gui/IGui.h"
+#include "../core/IGui.h"
 #include "../core/ISerializable.h"
 
 namespace lights
@@ -45,6 +45,7 @@ public:
     void set_mesh(Mesh& mesh);
 
     void add_entity(std::unique_ptr<Entity>);
+    Entity* create_entity(const std::string& name = "Unnamed");
     void remove_entity(Entity*);
     void remove_entity(int);
     void add_light(Entity*);

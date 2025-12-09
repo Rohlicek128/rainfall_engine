@@ -1,12 +1,14 @@
 #include "GeometryProgram.h"
 
 #include "../../Buffers/Textures/Texture.h"
+#include "engine/world/Entity.h"
 #include "../../Entities/Components/CameraComponent.h"
 #include "../../Entities/Components/LightComponent.h"
 #include "../../Entities/Components/MaterialComponent.h"
 #include "../../Entities/Components/MeshComponent.h"
 #include "../../Entities/Components/TextureComponent.h"
-#include "../../World/Mesh.h"
+#include "engine/managers/Mesh.h"
+#include "engine/world/Scene.h"
 
 #include <iostream>
 

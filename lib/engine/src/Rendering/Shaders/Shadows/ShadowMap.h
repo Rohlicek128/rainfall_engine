@@ -2,7 +2,7 @@
 #include <memory>
 #include <glm/mat4x4.hpp>
 
-#include "../../Gui/IGui.h"
+#include "engine/core/IGui.h"
 
 class Entity;
 class Scene;
@@ -18,12 +18,12 @@ public:
     bool is_visible;
     bool is_debug_visible;
     glm::mat4 light_space;
-    
+
     ShadowMap(int width, int height, float zoom, float near, float far);
     ~ShadowMap() override = default;
-    
+
     void render_depth_map(Entity& light, const Scene& scene, ShadowDepthProgram& program);
     Framebuffer* get_depth_map();
-    
+
     void set_gui() override;
 };

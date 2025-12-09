@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Component.h"
+#include "engine/world/Component.h"
 
 class Mesh;
 

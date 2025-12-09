@@ -3,9 +3,9 @@
 #include <string>
 #include <vector>
 
-#include "../Gui/IGui.h"
+#include "../core/IGui.h"
 #include "engine/core/ISerializable.h"
-#include "Components/TransformComponent.h"
+#include "TransformComponent.h"
 
 class Mesh;
 

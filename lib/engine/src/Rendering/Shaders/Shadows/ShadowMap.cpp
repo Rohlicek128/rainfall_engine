@@ -1,7 +1,7 @@
 #include "ShadowMap.h"
 
 #include "../../Buffers/Screen/Framebuffer.h"
-#include "../../Entities/Entity.h"
+#include "engine/world/Entity.h"
 #include "../../Entities/Components/LightComponent.h"
 #include "../Programs/ShadowDepthProgram.h"
 

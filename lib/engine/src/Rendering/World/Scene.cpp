@@ -6,7 +6,7 @@
 #include <iostream>
 #include <utility>
 
-#include "../Entities/Entity.h"
+#include "engine/world/Entity.h"
 #include "engine/managers/Mesh.h"
 
 #include "../Entities/Components/CameraComponent.h"
@@ -51,6 +51,16 @@ void Scene::add_entity(std::unique_ptr<Entity> entity)
     entities.back()->set_mesh_to_component(mesh);
 
     if (entities.back()->contains_component<LightComponent>()) add_light(entities.back().get());
+}
+
+Entity* Scene::create_entity(const std::string& name)
+{
+    std::unique_ptr<Entity> entity = std::make_unique<Entity>(name,
+        new TransformComponent(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f), glm::vec3(1.0f))
+    );
+
+    add_entity(std::move(entity));
+    return entities.back().get();
 }
 
 void Scene::remove_entity(Entity* entity)

@@ -2,7 +2,7 @@
 #include <glm/fwd.hpp>
 #include <glm/vec3.hpp>
 
-#include "Component.h"
+#include "engine/world/Component.h"
 
 class Program;
 class TransformComponent;

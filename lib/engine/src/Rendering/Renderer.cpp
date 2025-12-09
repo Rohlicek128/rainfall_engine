@@ -22,7 +22,7 @@
 
 #include "engine/managers/Mesh.h"
 
-#include "Entities/Entity.h"
+#include "engine/world/Entity.h"
 
 
 namespace engine

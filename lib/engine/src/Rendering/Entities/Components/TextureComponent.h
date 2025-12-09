@@ -1,5 +1,5 @@
 #pragma once
-#include "Component.h"
+#include "engine/world/Component.h"
 #include <string>
 
 class Texture;
@@ -9,12 +9,12 @@ class TextureManager;
 class TextureComponent : public Component
 {
     int type_edit_;
-    
+
     Texture* diffuse_texture_;
     Texture* roughness_texture_;
     Texture* metallic_texture_;
     Texture* normal_texture_;
-    
+
     Cubemap* cubemap_;
 
     TextureManager* texture_manager_;
@@ -23,7 +23,7 @@ class TextureComponent : public Component
 public:
     float scale;
     int type;
-    
+
     TextureComponent(int type, int diffuse = -1, int roughness = -1, int metal = -1, int normal = -1, int cubemap = -1);
     ~TextureComponent() override = default;
     void active_bind(unsigned int);

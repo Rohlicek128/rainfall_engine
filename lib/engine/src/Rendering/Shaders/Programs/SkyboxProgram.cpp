@@ -1,4 +1,3 @@
-#include "../../Entities/Entity.h"
 #include "SkyboxProgram.h"
 
 #include "../../Buffers/Textures/Texture.h"
@@ -8,6 +7,7 @@
 #include "../../Entities/Components/MeshComponent.h"
 #include "../../Entities/Components/TextureComponent.h"
 #include "engine/managers/Mesh.h"
+#include "engine/world/Entity.h"
 
 
 SkyboxProgram::SkyboxProgram(const std::vector<Shader>& shaders) : Program(shaders)

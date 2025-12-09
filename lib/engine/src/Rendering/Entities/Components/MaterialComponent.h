@@ -1,7 +1,7 @@
 #pragma once
 #include <glm/vec4.hpp>
 
-#include "Component.h"
+#include "engine/world/Component.h"
 #include "../../Shaders/Program.h"
 
 class MaterialComponent : public Component
@@ -11,7 +11,7 @@ public:
     glm::vec4 color;
     float roughness;
     float metallic;
-    
+
     MaterialComponent(glm::vec4, float = 1.0f, float = 0.0f);
     ~MaterialComponent() override;
     void set_uniforms(Program*);

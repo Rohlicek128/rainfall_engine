@@ -26,6 +26,9 @@ namespace engine
 
         bool switch_to(const std::string& name);
         bool load_scene(const std::string& path, bool make_current = false);
-        bool load_scene(std::unique_ptr<Scene> scene, bool make_current);
+        bool load_scene(std::unique_ptr<Scene> scene, bool make_current = false);
+
+        Scene* get_scene(const std::string& name);
+        Scene* create_scene(const std::string& name, bool make_current = false);
     };
 }

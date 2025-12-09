@@ -4,7 +4,7 @@
 
 #include "Cubemap.h"
 #include "Texture.h"
-#include "../../Gui/IGui.h"
+#include "engine/core/IGui.h"
 #include "engine/core/ISerializable.h"
 
 class TextureManager : IGui, public ISerializable

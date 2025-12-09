@@ -1,5 +1,5 @@
 #pragma once
-#include "../../Gui/IGui.h"
+#include "../core/IGui.h"
 #include "engine/core/ISerializable.h"
 
 class TransformComponent;

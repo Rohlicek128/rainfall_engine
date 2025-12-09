@@ -1,6 +1,6 @@
 #include "LightComponent.h"
 #include "../../Shaders/Program.h"
-#include "../../Entities/Components/TransformComponent.h"
+#include "engine/world/TransformComponent.h"
 
 #include <algorithm>
 #include <string>

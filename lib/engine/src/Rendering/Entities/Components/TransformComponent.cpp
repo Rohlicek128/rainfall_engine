@@ -1,4 +1,4 @@
-#include "TransformComponent.h"
+#include "engine/world/TransformComponent.h"
 #include "CameraComponent.h"
 #include  "ImGuizmo.h"
 #include "../../../Utils/MathHelper.h"
@@ -7,7 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "../Entity.h"
+#include "engine/world/Entity.h"
 
 TransformComponent::TransformComponent(const glm::vec3 pos, const glm::vec3 rot, const glm::vec3 sca)
 {

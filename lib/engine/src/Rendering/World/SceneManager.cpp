@@ -16,11 +16,16 @@ namespace engine
         return current_scene_;
     }
 
+    Scene* SceneManager::get_scene(const std::string& name)
+    {
+        if (!scenes_.contains(name)) return nullptr;
+
+        return scenes_.at(name).get();
+    }
+
     bool SceneManager::switch_to(const std::string& name)
     {
-        if (!scenes_.contains(name)) return false;
-        
-        Scene* desired_scene = scenes_.at(name).get();
+        Scene* desired_scene = get_scene(name);
 
         if (desired_scene)
         {
@@ -57,5 +62,16 @@ namespace engine
         if (make_current && result.second) switch_to(name);
 
         return result.second;
+    }
+
+    Scene* SceneManager::create_scene(const std::string& name, bool make_current)
+    {
+        std::unique_ptr<Scene> scene = std::make_unique<Scene>(name);
+        scene->set_mesh(*resource_manager_->get_mesh_manager());
+
+        auto result = scenes_.emplace(name, std::move(scene));
+        if (make_current && result.second) switch_to(name);
+
+        return get_scene(name);
     }
 }

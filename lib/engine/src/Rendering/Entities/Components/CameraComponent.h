@@ -1,6 +1,6 @@
 #pragma once
-#include "Component.h"
-#include "TransformComponent.h"
+#include "engine/world/Component.h"
+#include "engine/world/TransformComponent.h"
 #include "../Mouse.h"
 
 #include <glfw3.h>
