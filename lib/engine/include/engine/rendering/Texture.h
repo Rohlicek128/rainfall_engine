@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-#include "../IBindable.h"
+#include "engine/core/IBindable.h"
 
 #include <glad.h>
 

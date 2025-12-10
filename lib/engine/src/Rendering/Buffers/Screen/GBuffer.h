@@ -1,6 +1,6 @@
 #pragma once
 #include "Framebuffer.h"
-#include "../IBindable.h"
+#include "engine/core/IBindable.h"
 
 class GBuffer : public IBindable, public IGui
 {
@@ -10,7 +10,7 @@ public:
     Texture* position_texture;
     Texture* albedo_rough_texture;
     Texture* normal_metal_texture;
-    
+
     GBuffer(int width, int height);
     ~GBuffer() override = default;
     void resize(int, int);

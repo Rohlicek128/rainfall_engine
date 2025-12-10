@@ -2,8 +2,8 @@
 #include <memory>
 #include <vector>
 
-#include "Cubemap.h"
-#include "Texture.h"
+#include "engine/rendering/Texture.h"
+#include "engine/rendering/Cubemap.h"
 #include "engine/core/IGui.h"
 #include "engine/core/ISerializable.h"
 

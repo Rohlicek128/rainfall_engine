@@ -11,7 +11,7 @@ TextureComponent::TextureComponent(const int type, const int diffuse, const int 
     texture_manager_ = TextureManager::get_instance();
 
     scale = 1.0f;
-    
+
     diffuse_texture_ = diffuse == -1 ? texture_manager_->get_essential_texture(0) : texture_manager_->get_texture(diffuse);
     roughness_texture_ = roughness == -1 ? texture_manager_->get_essential_texture(0) : texture_manager_->get_texture(roughness);
     metallic_texture_ = metal == -1 ? texture_manager_->get_essential_texture(1) : texture_manager_->get_texture(metal);
@@ -19,6 +19,25 @@ TextureComponent::TextureComponent(const int type, const int diffuse, const int 
 
     cubemap_ = cubemap == -1 ? nullptr : texture_manager_->get_cubemap(cubemap);
 }
+
+TextureComponent::TextureComponent(Texture* diffuse, Texture* roughness, Texture* metal, Texture* normal, int type)
+{
+    this->type = type;
+    if (type == GL_TEXTURE_2D) type_edit_ = 0;
+    else type_edit_ = 1;
+
+    texture_manager_ = TextureManager::get_instance();
+
+    scale = 1.0f;
+
+    diffuse_texture_ = diffuse ? diffuse : texture_manager_->get_essential_texture(0);
+    roughness_texture_ = roughness ? roughness : texture_manager_->get_essential_texture(0);
+    metallic_texture_ = metal ? metal : texture_manager_->get_essential_texture(1);
+    normal_texture_ = normal ? normal : texture_manager_->get_essential_texture(0);
+
+    cubemap_ = nullptr;
+}
+
 
 void TextureComponent::active_bind(const unsigned int offset)
 {
@@ -72,11 +91,11 @@ void TextureComponent::set_gui()
 
     //Scale
     ImGui::DragFloat("Scale", &scale, 0.01f, 0, 0, "%.2f");
-    
+
     //Diffuse
     ImGui::SeparatorText("Diffuse Map");
     texture_gui(diffuse_texture_, "Diffuse");
-    
+
     //Roughness
     ImGui::SeparatorText("Roughness Map");
     texture_gui(roughness_texture_, "Roughness");
@@ -111,7 +130,7 @@ void TextureComponent::texture_gui(Texture*& texture, const std::string& id_name
                                {0, 1}, {1, 0}))
             ImGui::OpenPopup(("Select " + id_name).c_str());
     }
-    
+
     if (ImGui::BeginPopup(("Select " + id_name).c_str()))
     {
         if (Texture* selected = texture_manager_->select_texture_2d_gui())
@@ -156,7 +175,7 @@ void TextureComponent::serialize(YAML::Emitter& out)
     {
         out << YAML::Key << "Cubemap" << YAML::Value << cubemap_->faces[0]->id;
     }
-    
+
     out << YAML::EndMap;
     out << YAML::EndMap;
 }
@@ -164,7 +183,7 @@ void TextureComponent::serialize(YAML::Emitter& out)
 bool TextureComponent::deserialize(YAML::Node& node)
 {
     is_enabled = node["Enabled"].as<bool>();
-    
+
     type = node["Type"].as<int>();
     scale = node["Scale"].as<float>();
     if (type == GL_TEXTURE_2D)
@@ -178,6 +197,6 @@ bool TextureComponent::deserialize(YAML::Node& node)
     {
         cubemap_ = texture_manager_->get_cubemap(0);
     }
-    
+
     return true;
 }

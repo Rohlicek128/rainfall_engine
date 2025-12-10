@@ -25,6 +25,7 @@ public:
     int type;
 
     TextureComponent(int type, int diffuse = -1, int roughness = -1, int metal = -1, int normal = -1, int cubemap = -1);
+    TextureComponent(Texture* diffuse = nullptr, Texture* roughness = nullptr, Texture* metal = nullptr, Texture* normal = nullptr, int type = 0xde1);
     ~TextureComponent() override = default;
     void active_bind(unsigned int);
     bool has_normal();

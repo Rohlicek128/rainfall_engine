@@ -16,10 +16,6 @@ add_custom_command(
         "${CMAKE_SOURCE_DIR}/lib/engine/src/Rendering/Shaders/GLSL"
         "$<TARGET_FILE_DIR:game>/shaders"
 
-    COMMAND ${CMAKE_COMMAND} -E copy
-        "${CMAKE_SOURCE_DIR}/lib/engine/imgui.ini"
-        "$<TARGET_FILE_DIR:game>"
-
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_SOURCE_DIR}/game/saved"
         "$<TARGET_FILE_DIR:game>/saved"

@@ -7,7 +7,8 @@ namespace game
 {
     class ExampleGame : public engine::Application
     {
-        float count;
+        Entity* box_;
+        Entity* light_;
 
     public:
         void on_start() override;

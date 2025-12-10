@@ -5,8 +5,8 @@
 
 #include <string>
 
-class Scene;
 
+class Scene;
 
 namespace engine
 {
@@ -25,6 +25,7 @@ namespace engine
         Window(const std::string&, int, int);
         ~Window();
 
+        GLFWwindow* get_glfw_window();
         bool should_close();
 
         bool set_icon(const std::string& path);

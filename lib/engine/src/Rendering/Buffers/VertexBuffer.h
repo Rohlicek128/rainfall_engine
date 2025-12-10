@@ -1,12 +1,12 @@
 #pragma once
-#include "IBindable.h"
+#include "engine/core/IBindable.h"
 
 class VertexBuffer : public IBindable
 {
     unsigned int handle_;
 public:
     int data_length;
-    
+
     VertexBuffer(float[], unsigned int);
     ~VertexBuffer() override;
     void bind() override;

@@ -34,6 +34,11 @@ namespace engine
         glfwTerminate();
     }
 
+    GLFWwindow* Window::get_glfw_window()
+    {
+        return engine_args.window;
+    }
+
     bool Window::should_close()
     {
         return glfwWindowShouldClose(engine_args.window);

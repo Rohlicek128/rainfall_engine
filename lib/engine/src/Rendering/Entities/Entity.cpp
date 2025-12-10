@@ -1,7 +1,5 @@
 #include "engine/world/Entity.h"
 
-#include <iostream>
-
 #include "Components/CameraComponent.h"
 #include "Components/LightComponent.h"
 #include "Components/MaterialComponent.h"

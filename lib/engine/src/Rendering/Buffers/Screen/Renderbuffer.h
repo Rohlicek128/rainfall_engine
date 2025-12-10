@@ -1,5 +1,5 @@
 #pragma once
-#include "../IBindable.h"
+#include "engine/core/IBindable.h"
 #include <glad.h>
 
 class Renderbuffer : public IBindable

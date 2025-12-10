@@ -3,9 +3,9 @@
 #include <vector>
 
 #include "Renderbuffer.h"
-#include "../IBindable.h"
+#include "engine/core/IBindable.h"
 #include "engine/core/IGui.h"
-#include "../Textures/Texture.h"
+#include "engine/rendering/Texture.h"
 
 class Framebuffer : public IBindable, public IGui
 {

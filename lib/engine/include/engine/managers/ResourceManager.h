@@ -4,10 +4,10 @@
 #include <string>
 
 #include "Mesh.h"
+#include "../rendering/Texture.h"
 
 
 class TextureManager;
-class Texture;
 
 namespace engine
 {

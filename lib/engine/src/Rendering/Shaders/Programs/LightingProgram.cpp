@@ -1,6 +1,6 @@
 #include "LightingProgram.h"
 
-#include "../../Buffers/Textures/Texture.h"
+#include "engine/rendering/Texture.h"
 #include "engine/world/Entity.h"
 #include "../../Entities/Components/CameraComponent.h"
 #include "../../Entities/Components/LightComponent.h"
