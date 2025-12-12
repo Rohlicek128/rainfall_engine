@@ -1,0 +1,6 @@
+out/
+out_ninja/
+compile_commands.json
+.cache/
+.zed/
+.vscode/
