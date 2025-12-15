@@ -73,5 +73,6 @@ namespace engine
 
         void update();
         void render(Scene& scene);
+        void swap_and_poll();
     };
 }

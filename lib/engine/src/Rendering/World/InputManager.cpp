@@ -27,12 +27,13 @@ namespace engine
 
     bool InputManager::get_key_toggle(int key)
     {
-        if (glfwGetKey(window_, key) == GLFW_PRESS && toggled_keys_.find(key) == toggled_keys_.end())
+        int key_state = glfwGetKey(window_, key);
+        if (key_state == GLFW_PRESS && toggled_keys_.find(key) == toggled_keys_.end())
         {
             toggled_keys_.insert(key);
             return true;
         }
-        else if (glfwGetKey(window_, key) == GLFW_RELEASE && toggled_keys_.find(key) != toggled_keys_.end())
+        else if (key_state == GLFW_RELEASE && toggled_keys_.find(key) != toggled_keys_.end())
             toggled_keys_.erase(key);
 
         return false;
@@ -40,7 +41,7 @@ namespace engine
 
     bool InputManager::get_key_with_timeout(int key, int timeout_ms)
     {
-        bool pressed = glfwGetKey(window_, key);
+        bool pressed = glfwGetKey(window_, key) == GLFW_PRESS;
         if (timeout_keys_.find(key) == timeout_keys_.end())
         {
             if (pressed) timeout_keys_.emplace(key, 0.0f);

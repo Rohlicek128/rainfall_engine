@@ -17,7 +17,7 @@ Shader::Shader(const std::string& path, const int type)
 {
     handle_ = glCreateShader(type);
 
-    const std::string str = read_file(("shaders/" + path).c_str());
+    const std::string str = read_file(("engine/shaders/" + path).c_str());
     const char* source = str.c_str();
     glShaderSource(handle_, 1, &source, nullptr);
     glCompileShader(handle_);

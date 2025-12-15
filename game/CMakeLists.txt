@@ -13,10 +13,14 @@ add_custom_command(
         "$<TARGET_FILE_DIR:game>/assets"
 
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_SOURCE_DIR}/lib/engine/src/Rendering/Shaders/GLSL"
-        "$<TARGET_FILE_DIR:game>/shaders"
-
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_SOURCE_DIR}/game/saved"
         "$<TARGET_FILE_DIR:game>/saved"
+
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/lib/engine/src/Rendering/Shaders/GLSL"
+        "$<TARGET_FILE_DIR:game>/engine/shaders"
+
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/lib/engine/assets"
+        "$<TARGET_FILE_DIR:game>/engine/assets"
 )

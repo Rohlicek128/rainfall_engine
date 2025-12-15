@@ -32,13 +32,13 @@ namespace engine
         window_ = &window;
 
         textures_ = TextureManager::get_instance();
-        textures_->add_essential_texture(std::make_unique<Texture>("assets/white1x1.png", GL_RGBA8, GL_RGBA));
-        textures_->add_essential_texture(std::make_unique<Texture>("assets/black1x1.png", GL_RGBA8, GL_RGBA));
-        textures_->add_essential_texture(std::make_unique<Texture>("assets/missing_texture.png", GL_SRGB8_ALPHA8, GL_RGBA));
+        textures_->add_essential_texture(std::make_unique<Texture>("engine/assets/white1x1.png", GL_RGBA8, GL_RGBA));
+        textures_->add_essential_texture(std::make_unique<Texture>("engine/assets/black1x1.png", GL_RGBA8, GL_RGBA));
+        textures_->add_essential_texture(std::make_unique<Texture>("engine/assets/missing_texture.png", GL_SRGB8_ALPHA8, GL_RGBA));
 
-        std::vector<std::string> faces = {"assets/Skybox/0right.jpg", "assets/Skybox/1left.jpg", "assets/Skybox/2top.jpg",
-            "assets/Skybox/3bottom.jpg", "assets/Skybox/4front.jpg", "assets/Skybox/5back.jpg"};
-        textures_->add_cubemap(std::make_unique<Cubemap>(faces, GL_SRGB8, GL_RGB, GL_UNSIGNED_BYTE));
+        //std::vector<std::string> faces = {"assets/Skybox/0right.jpg", "assets/Skybox/1left.jpg", "assets/Skybox/2top.jpg",
+        //    "assets/Skybox/3bottom.jpg", "assets/Skybox/4front.jpg", "assets/Skybox/5back.jpg"};
+        //textures_->add_cubemap(std::make_unique<Cubemap>(faces, GL_SRGB8, GL_RGB, GL_UNSIGNED_BYTE));
 
 
         viewport_ = new GLint[2]{window_->engine_args.width, window_->engine_args.height};
@@ -138,6 +138,9 @@ namespace engine
         update_delta_time();
         mouse_->pos_x = window_->engine_args.mouse_x;
         mouse_->pos_y = window_->engine_args.mouse_y;
+
+        if (viewport_[0] != window_->engine_args.width || viewport_[1] != window_->engine_args.height)
+            resize(window_->engine_args.width, window_->engine_args.height);
         viewport_[0] = window_->engine_args.width;
         viewport_[1] = window_->engine_args.height;
 
@@ -215,7 +218,10 @@ namespace engine
 
 
         glViewport(0, 0, window_->engine_args.width, window_->engine_args.height);
+    }
 
+    void Renderer::swap_and_poll()
+    {
         window_->engine_args.scroll_x = 0.0f;
         window_->engine_args.scroll_y = 0.0f;
 
