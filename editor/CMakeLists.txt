@@ -10,5 +10,9 @@ add_custom_command(
     TARGET editor POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_SOURCE_DIR}/lib/engine/src/Rendering/Shaders/GLSL"
-        "$<TARGET_FILE_DIR:editor>/shaders"
+        "$<TARGET_FILE_DIR:editor>/engine/shaders"
+
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/lib/engine/assets"
+        "$<TARGET_FILE_DIR:editor>/engine/assets"
 )

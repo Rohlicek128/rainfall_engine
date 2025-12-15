@@ -20,7 +20,6 @@ namespace game
         box_->add_component<MeshComponent>(0, GL_TRIANGLES, resource_manager->get_mesh_manager());
 
         Texture* texture = resource_manager->load_texture("assets/chill_guy.jpg", "jpg");
-        tools::printl_message("EXAMPLE", std::to_string(texture->id));
         box_->add_component<TextureComponent>(texture);
 
 
@@ -44,7 +43,7 @@ namespace game
         if (input_manager->get_key_with_timeout(GLFW_KEY_R, 100))
         {
             box_->transform->position.x += 0.5f;
-            tools::printl_message("EXAMPLE", "R");
+            //tools::printl_message("EXAMPLE", "R");
         }
         if (input_manager->get_key_toggle(GLFW_KEY_T))
         {

@@ -6,4 +6,4 @@ project("rainfall")
 
 add_subdirectory(lib)
 add_subdirectory(game)
-# add_subdirectory(editor)
+add_subdirectory(editor)

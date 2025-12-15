@@ -24,7 +24,7 @@ namespace engine
 
         A app;
         app.set_window(window.get_glfw_window());
-        
+
         app.on_start();
         app.resource_manager->get_mesh_manager()->compile();
 
@@ -37,6 +37,7 @@ namespace engine
 
             // Render
             renderer.render(*app.scene_manager->get_current_scene());
+            renderer.swap_and_poll();
         }
 
         // Shutdown
