@@ -4,10 +4,9 @@
 
 #include "engine/rendering/Texture.h"
 #include "engine/rendering/Cubemap.h"
-#include "engine/core/IGui.h"
 #include "engine/core/ISerializable.h"
 
-class TextureManager : IGui, public ISerializable
+class TextureManager : public ISerializable
 {
     std::vector<std::unique_ptr<Texture>> essential_textures_;
     std::vector<std::unique_ptr<Texture>> textures_;
@@ -41,6 +40,4 @@ public:
 
     void serialize(YAML::Emitter& out) override;
     bool deserialize(YAML::Node& node) override;
-    void set_gui() override;
-    Texture* select_texture_2d_gui();
 };

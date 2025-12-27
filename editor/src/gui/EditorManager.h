@@ -3,11 +3,15 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-#include "../Buffers/Screen/Framebuffer.h"
+//#include "../Buffers/Screen/Framebuffer.h"
 
 class Mesh;
 class Project;
-#include "../EngineArgs.h"
+
+namespace engine
+{
+    class EngineArgs;
+}
 
 class EditorManager
 {
@@ -22,7 +26,7 @@ public:
 
     ImGuiIO* imgui_io;
 
-    std::unique_ptr<Framebuffer> viewport_fbo;
+    //std::unique_ptr<Framebuffer> viewport_fbo;
 
     EditorManager(bool, int, int);
     ~EditorManager() = default;

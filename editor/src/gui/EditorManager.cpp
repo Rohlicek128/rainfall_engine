@@ -1,11 +1,11 @@
 #include "EditorManager.h"
 
 #include "ImGuizmo.h"
-#include "../../Organization/Project.h"
-#include "../Entities/Components/CameraComponent.h"
+#include "../../lib/engine/src/Organization/Project.h"
 #include "engine/world/Scene.h"
 
-#include "../../Utils/FileDialogs.h"
+#include "../../lib/engine/src/Utils/FileDialogs.h"
+#include "../../lib/engine/src/Rendering/EngineArgs.h"
 
 EditorManager::EditorManager(const bool visible, int width, int height)
 {
@@ -18,10 +18,10 @@ EditorManager::EditorManager(const bool visible, int width, int height)
 
     gizmo_operation = ImGuizmo::OPERATION::TRANSLATE;
 
-    viewport_fbo = std::make_unique<Framebuffer>();
-    viewport_fbo->attach_texture_2d(std::make_unique<Texture>(width, height, GL_RGBA8, GL_RGBA), GL_COLOR_ATTACHMENT0);
-    viewport_fbo->set_draw_buffers();
-    viewport_fbo->check_completeness();
+    //viewport_fbo = std::make_unique<Framebuffer>();
+    //viewport_fbo->attach_texture_2d(std::make_unique<Texture>(width, height, GL_RGBA8, GL_RGBA), GL_COLOR_ATTACHMENT0);
+    //viewport_fbo->set_draw_buffers();
+    //viewport_fbo->check_completeness();
 }
 
 void EditorManager::init_imgui(GLFWwindow* window)

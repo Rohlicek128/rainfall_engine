@@ -94,11 +94,3 @@ void Framebuffer::unbind()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
-
-void Framebuffer::set_gui()
-{
-    if (attached_textures.at(0) == nullptr) return;
-
-    ImGui::Image((ImTextureID)(intptr_t)attached_textures.at(0)->get_handle(),
-        {(float)attached_textures.at(0)->get_width(), (float)attached_textures.at(0)->get_height()},{0, 1}, {1, 0});
-}

@@ -17,8 +17,8 @@
 #include "Shaders/Programs/ShadowDepthProgram.h"
 #include "Shaders/Shadows/ShadowMap.h"
 
-#include "Entities/Components/CameraComponent.h"
-#include "Entities/Components/LightComponent.h"
+#include "engine/world/Components/CameraComponent.h"
+#include "engine/world/Components/LightComponent.h"
 
 #include "engine/managers/Mesh.h"
 

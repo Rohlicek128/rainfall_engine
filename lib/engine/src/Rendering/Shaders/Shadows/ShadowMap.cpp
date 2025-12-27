@@ -2,7 +2,7 @@
 
 #include "../../Buffers/Screen/Framebuffer.h"
 #include "engine/world/Entity.h"
-#include "../../Entities/Components/LightComponent.h"
+#include "engine/world/Components/LightComponent.h"
 #include "../Programs/ShadowDepthProgram.h"
 
 ShadowMap::ShadowMap(const int width, const int height, const float zoom, const float near, const float far)
@@ -51,14 +51,4 @@ void ShadowMap::render_depth_map(Entity& light, const Scene& scene, ShadowDepthP
 Framebuffer* ShadowMap::get_depth_map()
 {
     return depth_map_.get();
-}
-
-void ShadowMap::set_gui()
-{
-    ImGui::Checkbox("Visible", &is_visible);
-    ImGui::Checkbox("Debug", &is_debug_visible);
-    ImGui::Text("Width: %i, Height: %i", width_, height_);
-    ImGui::DragFloat("Zoom", &zoom_, 0.1f, 0, 0, "%.1f");
-    ImGui::DragFloat("Near Plane", &near_plane_, 0.01f, 0, 0, "%.2f");
-    ImGui::DragFloat("Far Plane", &far_plane_, 0.01f, 0, 0, "%.2f");
 }

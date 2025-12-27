@@ -3,13 +3,12 @@
 #include <string>
 #include <vector>
 
-#include "../core/IGui.h"
 #include "engine/core/ISerializable.h"
-#include "TransformComponent.h"
+#include "components/TransformComponent.h"
 
 class Mesh;
 
-class Entity : public IGui, public ISerializable
+class Entity : public ISerializable
 {
     int add_selected_;
     char component_search_[64] = "";
@@ -57,7 +56,6 @@ public:
     bool remove_child(Entity*);
     glm::mat4 get_model_matrix();
 
-    void set_gui() override;
     void serialize(YAML::Emitter& out) override;
     bool deserialize(YAML::Node& node) override;
 };

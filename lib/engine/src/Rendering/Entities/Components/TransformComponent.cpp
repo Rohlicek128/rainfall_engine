@@ -1,6 +1,6 @@
-#include "engine/world/TransformComponent.h"
-#include "CameraComponent.h"
-#include  "ImGuizmo.h"
+#include "engine/world/components/TransformComponent.h"
+#include "engine/world/components/CameraComponent.h"
+
 #include "../../../Utils/MathHelper.h"
 
 #include <glm/glm.hpp>
@@ -50,58 +50,10 @@ void TransformComponent::update_sca_edit(const float scaler)
     sca_edit_[2] = scale.z * scaler;
 }
 
-void TransformComponent::set_guizmo(Entity& camera, const int operation)
-{
-    if (operation == -1) return;
-
-    ImGuizmo::SetDrawlist();
-
-    const ImVec2 size = ImGui::GetWindowSize();
-
-    const glm::mat4& projection = camera.get_component<CameraComponent>()->get_projection_matrix(size.x / size.y);
-    const glm::mat4& view = camera.get_component<CameraComponent>()->get_view_matrix(); // glm::inverse(camera->transform->get_model_matrix())
-    glm::mat4 transform = get_model_matrix();
-
-    ImGuizmo::Enable(true);
-    ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection),
-        (ImGuizmo::OPERATION)operation, ImGuizmo::LOCAL, glm::value_ptr(transform));
-
-    if (ImGuizmo::IsUsing())
-    {
-        glm::vec3 tra, rot, sca;
-        MathHelper::decompose(transform, tra, rot, sca);
-
-        this->position = tra;
-        this->rotation += rot - this->rotation;
-        this->scale = sca;
-    }
-
-}
 
 std::string TransformComponent::get_name()
 {
     return "Transform";
-}
-
-void TransformComponent::set_gui()
-{
-    if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
-    {
-        ImGui::DragFloat3("Position", pos_edit_, 0.01f);
-        position.x = pos_edit_[0];
-        position.y = pos_edit_[1];
-        position.z = pos_edit_[2];
-
-        ImGui::DragFloat3("Rotation", rot_edit_, 0.1f);
-        rotation.x = rot_edit_[0];
-        rotation.y = rot_edit_[1];
-        rotation.z = rot_edit_[2];
-
-        ImGui::DragFloat3("Scale", sca_edit_, 0.01f);
-        scale.x = sca_edit_[0];
-        scale.y = sca_edit_[1];
-        scale.z = sca_edit_[2];
-    }
 }
 
 void TransformComponent::serialize(YAML::Emitter& out)

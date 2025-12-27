@@ -1,11 +1,13 @@
-#include "CameraComponent.h"
+#include "engine/world/components/CameraComponent.h"
+
+#include "../Mouse.h"
 
 #include <algorithm>
 #include <string>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-CameraComponent::CameraComponent(TransformComponent* transform, const ImVec4 clear)
+CameraComponent::CameraComponent(TransformComponent* transform, const glm::vec4 clear)
 {
     transform_ = transform;
     up = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -92,43 +94,13 @@ std::string CameraComponent::get_name()
     return "Camera";
 }
 
-void CameraComponent::set_gui()
-{
-    ImGui::SeparatorText("Rendering");
-    ImGui::Checkbox("Wireframe", &is_wireframe);
-    ImGui::ColorEdit4("Background", clear_color);
-
-    ImGui::SeparatorText("Tone Mapping");
-    ImGui::SliderFloat("Gamma", &gamma, 0.0f, 10.0f, "%.1f");
-    ImGui::SliderFloat("Threshold", &threshold, 0.0f, 15.0f, "%.2f");
-    ImGui::SliderFloat("Key Value", &key_value, 0.0f, 10.0f, "%.3f");
-    
-    
-    ImGui::SeparatorText("Rotation");
-    ImGui::PushItemWidth(150);
-    ImGui::DragFloat("Yaw", &yaw, 0.1f);
-    ImGui::SameLine();
-    ImGui::DragFloat("Pitch", &pitch, 0.1f);
-    ImGui::PopItemWidth();
-    set_yaw_pitch(yaw, pitch);
-    
-    ImGui::SeparatorText("Field of View");
-    ImGui::SliderFloat("##Fov", &fov, 10.0f, 125.0f, "%.1f");
-
-    ImGui::SeparatorText("Clipping Planes");
-    ImGui::DragFloat("Near Plane", &near_plane, 0.01f, 0.01f, 100.0f);
-    ImGui::DragFloat("Far Plane", &far_plane, 10.0f, 10.0f, 1000000.0f);
-
-    ImGui::SeparatorText("Movement");
-    ImGui::DragFloat("Speed", &speed, 0.1f, 0.1f, 500.0f);
-}
 
 void CameraComponent::serialize(YAML::Emitter& out)
 {
     out << YAML::BeginMap;
     out << YAML::Key << get_name() << YAML::Value << YAML::BeginMap;
     out << YAML::Key << "Enabled" << YAML::Value << is_enabled;
-    
+
     out << YAML::Key << "Wireframe" << YAML::Value << is_wireframe;
 
     out << YAML::Key << "Yaw" << YAML::Value << yaw;
@@ -137,16 +109,16 @@ void CameraComponent::serialize(YAML::Emitter& out)
     out << YAML::Key << "Near Plane" << YAML::Value << near_plane;
     out << YAML::Key << "Far Plane" << YAML::Value << far_plane;
     out << YAML::Key << "Speed" << YAML::Value << speed;
-    
+
     out << YAML::Key << "Gamma" << YAML::Value << gamma;
     out << YAML::Key << "Exposure" << YAML::Value << threshold;
-    
+
     out << YAML::Key << "Clear Color" << YAML::Value << YAML::Flow << YAML::BeginSeq;
     out << clear_color[0] << clear_color[1] << clear_color[2] << clear_color[3] << YAML::EndSeq;
 
     out << YAML::Key << "Up Vector" << YAML::Value;
     emit_out(out, up);
-    
+
     out << YAML::EndMap;
     out << YAML::EndMap;
 }
@@ -162,10 +134,10 @@ bool CameraComponent::deserialize(YAML::Node& node)
     near_plane = node["Near Plane"].as<float>();
     far_plane = node["Far Plane"].as<float>();
     speed = node["Speed"].as<float>();
-    
+
     gamma = node["Gamma"].as<float>();
     threshold = node["Exposure"].as<float>();
-    
+
     if (YAML::Node cur = node["Clear Color"])
     {
         const glm::vec4 clear = des_vec4(cur);
@@ -176,6 +148,6 @@ bool CameraComponent::deserialize(YAML::Node& node)
     }
     if (YAML::Node cur = node["Up Vector"])
         up = des_vec3(cur);
-    
+
     return true;
 }

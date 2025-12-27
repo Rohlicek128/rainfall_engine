@@ -4,7 +4,6 @@
 #include <vector>
 
 
-#include "../core/IGui.h"
 #include "../core/ISerializable.h"
 
 namespace lights
@@ -15,7 +14,7 @@ class Entity;
 class Mesh;
 
 
-class Scene : public IGui, ISerializable
+class Scene : ISerializable
 {
     char name_edit_[64] = "Untitled";
 
@@ -60,6 +59,4 @@ public:
     void reset();
     void save(const std::string& path);
     bool load(const std::string& path);
-
-    void set_gui() override;
 };

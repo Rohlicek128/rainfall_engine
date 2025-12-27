@@ -1,4 +1,6 @@
-#include "MaterialComponent.h"
+#include "engine/world/components/MaterialComponent.h"
+
+#include "../../Shaders/Program.h"
 
 MaterialComponent::MaterialComponent(const glm::vec4 color, const float roughness, const float metallic)
 {
@@ -27,18 +29,6 @@ std::string MaterialComponent::get_name()
     return "Material";
 }
 
-void MaterialComponent::set_gui()
-{
-    ImGui::ColorEdit4("Color", color_edit_);
-    color.r = color_edit_[0];
-    color.g = color_edit_[1];
-    color.b = color_edit_[2];
-    color.a = color_edit_[3];
-
-    //ImGui::SliderFloat("Shininess", &metallic, 1.0f, 1024.0f, "%.1f", ImGuiSliderFlags_Logarithmic);
-    ImGui::SliderFloat("Roughness", &roughness, 0.0f, 1.0f, "%.2f");
-    ImGui::SliderFloat("Metallic", &metallic, 0.0f, 1.0f, "%.2f");
-}
 
 void MaterialComponent::serialize(YAML::Emitter& out)
 {
@@ -50,7 +40,7 @@ void MaterialComponent::serialize(YAML::Emitter& out)
     emit_out(out, color);
     out << YAML::Key << "Roughness" << YAML::Value << roughness;
     out << YAML::Key << "Metallic" << YAML::Value << metallic;
-    
+
     out << YAML::EndMap;
     out << YAML::EndMap;
 }
@@ -69,6 +59,6 @@ bool MaterialComponent::deserialize(YAML::Node& node)
     }
     roughness = node["Roughness"].as<float>();
     metallic = node["Metallic"].as<float>();
-    
+
     return true;
 }

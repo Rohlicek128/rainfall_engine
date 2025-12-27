@@ -1,8 +1,10 @@
 #pragma once
 #include <glm/vec4.hpp>
 
-#include "engine/world/Component.h"
-#include "../../Shaders/Program.h"
+#include "Component.h"
+
+
+class Program;
 
 class MaterialComponent : public Component
 {
@@ -17,7 +19,6 @@ public:
     void set_uniforms(Program*);
 
     std::string get_name() override;
-    void set_gui() override;
     void serialize(YAML::Emitter& out) override;
     bool deserialize(YAML::Node& node) override;
 };

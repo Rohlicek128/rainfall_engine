@@ -2,11 +2,11 @@
 
 #include "engine/rendering/Texture.h"
 #include "engine/world/Entity.h"
-#include "../../Entities/Components/CameraComponent.h"
-#include "../../Entities/Components/LightComponent.h"
-#include "../../Entities/Components/MaterialComponent.h"
-#include "../../Entities/Components/MeshComponent.h"
-#include "../../Entities/Components/TextureComponent.h"
+#include "engine/world/Components/CameraComponent.h"
+#include "engine/world/Components/LightComponent.h"
+#include "engine/world/Components/MaterialComponent.h"
+#include "engine/world/Components/MeshComponent.h"
+#include "engine/world/Components/TextureComponent.h"
 #include "engine/managers/Mesh.h"
 #include "engine/world/Scene.h"
 

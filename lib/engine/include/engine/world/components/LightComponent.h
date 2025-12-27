@@ -2,7 +2,7 @@
 #include <glm/fwd.hpp>
 #include <glm/vec3.hpp>
 
-#include "engine/world/Component.h"
+#include "Component.h"
 
 class Program;
 class TransformComponent;
@@ -34,7 +34,6 @@ public:
     glm::mat4 get_light_space_mat(glm::vec3 dir, glm::vec3 cam_pos, float zoom, float near, float far);
 
     std::string get_name() override;
-    void set_gui() override;
     void serialize(YAML::Emitter& out) override;
     bool deserialize(YAML::Node& node) override;
 };

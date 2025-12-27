@@ -1,10 +1,10 @@
 #pragma once
-#include "engine/world/Component.h"
-#include "engine/world/TransformComponent.h"
-#include "../Mouse.h"
+#include "Component.h"
+#include "TransformComponent.h"
 
 #include <glfw3.h>
 
+class Mouse;
 
 class CameraComponent : public Component
 {
@@ -26,7 +26,7 @@ public:
 
     bool is_wireframe;
 
-    CameraComponent(TransformComponent*, ImVec4 = {0.1f, 0.1f, 0.1f, 1.0f});
+    CameraComponent(TransformComponent*, glm::vec4 = {0.1f, 0.1f, 0.1f, 1.0f});
     ~CameraComponent() override = default;
 
     void move(GLFWwindow*, float);
@@ -36,7 +36,6 @@ public:
     glm::mat4 get_projection_matrix(float);
 
     std::string get_name() override;
-    void set_gui() override;
     void serialize(YAML::Emitter& out) override;
     bool deserialize(YAML::Node& node) override;
 };

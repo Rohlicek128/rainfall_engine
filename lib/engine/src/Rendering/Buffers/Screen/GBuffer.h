@@ -2,7 +2,7 @@
 #include "Framebuffer.h"
 #include "engine/core/IBindable.h"
 
-class GBuffer : public IBindable, public IGui
+class GBuffer : public IBindable
 {
     int selected_texture_;
     std::unique_ptr<Framebuffer> framebuffer_;
@@ -19,6 +19,4 @@ public:
     void active_bind();
     void bind() override;
     void unbind() override;
-
-    void set_gui() override;
 };

@@ -1,10 +1,10 @@
 #include "engine/world/Entity.h"
 
-#include "Components/CameraComponent.h"
-#include "Components/LightComponent.h"
-#include "Components/MaterialComponent.h"
-#include "Components/TextureComponent.h"
-#include "Components/MeshComponent.h"
+#include "engine/world/Components/CameraComponent.h"
+#include "engine/world/Components/LightComponent.h"
+#include "engine/world/Components/MaterialComponent.h"
+#include "engine/world/Components/TextureComponent.h"
+#include "engine/world/Components/MeshComponent.h"
 
 unsigned int Entity::global_id_ = 0;
 
@@ -87,88 +87,6 @@ glm::mat4 Entity::get_model_matrix()
 {
     if (parent != nullptr && !parent->is_root) return parent->get_model_matrix() * transform->get_model_matrix();
     return transform->get_model_matrix();
-}
-
-void Entity::set_gui()
-{
-    ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * 2.0f);
-    ImGui::Selectable(name.c_str());
-    ImGui::PopFont();
-    if (ImGui::BeginPopupContextItem())
-    {
-        ImGui::InputText("##InputName", name_edit_, std::size(name_edit_));
-        ImGui::SetNextItemShortcut(ImGuiKey_Enter);
-        if (ImGui::Button("Rename"))
-        {
-            name = name_edit_;
-            ImGui::CloseCurrentPopup();
-        }
-        ImGui::EndPopup();
-    }
-    ImGui::SetItemTooltip("Right-click to Rename");
-
-    ImGui::TextDisabled("ID: %i", id);
-
-    ImGui::Separator();
-
-    ImGui::Checkbox("Is Visible", &is_visible);
-
-    transform->set_gui();
-
-    bool is_opened;
-    for (int i = 0; i < components.size(); ++i)
-    {
-        ImGui::Checkbox(("##EnabledEC" + std::to_string(i + 1)).c_str(), &components.at(i)->is_enabled);
-        ImGui::SameLine();
-
-        is_opened = true;
-        if (ImGui::CollapsingHeader(components.at(i)->get_name().c_str(), &is_opened, ImGuiTreeNodeFlags_DefaultOpen))
-        {
-            if (!components.at(i)->is_enabled) ImGui::BeginDisabled();
-            components.at(i)->set_gui();
-            if (!components.at(i)->is_enabled) ImGui::EndDisabled();
-        }
-        if (!is_opened)
-        {
-            components.erase(components.begin() + i);
-            break;
-        }
-    }
-
-    //Add Component
-    ImGui::Separator();
-    if (ImGui::BeginMenu("Add Component"))
-    {
-        ImGui::SeparatorText("Select a Component:");
-        ImGui::InputTextWithHint("##Search", "Search", component_search_, std::size(component_search_));
-
-        ImGui::BeginChild("##SelectComponent", ImVec2(-FLT_MIN, 7 * ImGui::GetTextLineHeightWithSpacing()), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeY);
-        for (int i = 1; i < 6; ++i)
-        {
-            if (contains_component_enum((COMPONENTS_IDS)i)) continue;
-            if (strcmp(component_search_, "") != 0 &&
-                !check_search_string(to_string((COMPONENTS_IDS)i), component_search_, std::size(component_search_)))
-                continue;
-
-            if (ImGui::Selectable(to_string((COMPONENTS_IDS)i), add_selected_ == i)) add_selected_ = i;
-            if (add_selected_ == i) ImGui::SetItemDefaultFocus();
-
-        }
-        ImGui::EndChild();
-        ImGui::EndMenu();
-    }
-
-    if (add_selected_ == -1) return;
-    switch ((COMPONENTS_IDS)add_selected_)
-    {
-        case TRANSFORM: add_component<TransformComponent>(glm::vec3(0.0), glm::vec3(0.0), glm::vec3(1.0)); break;
-        case MESH: add_component<MeshComponent>(0, GL_TRIANGLES, mesh_); break;
-        case CAMERA: add_component<CameraComponent>(transform); break;
-        case MATERIAL: add_component<MaterialComponent>(glm::vec4(1.0)); break;
-        case TEXTURE: add_component<TextureComponent>(GL_TEXTURE_2D); break;
-        case LIGHT: add_component<LightComponent>(lights::LIGHT_TYPE::POINT, glm::vec3(1.0f)); break;
-    }
-    add_selected_ = -1;
 }
 
 bool Entity::check_search_string(const char* whole, const char* part, const int part_lenght)

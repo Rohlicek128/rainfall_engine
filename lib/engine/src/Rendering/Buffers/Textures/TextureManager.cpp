@@ -100,68 +100,6 @@ Cubemap* TextureManager::get_cubemap(const int index)
 }
 
 
-void TextureManager::set_gui()
-{
-    select_texture_2d_gui();
-}
-
-Texture* TextureManager::select_texture_2d_gui()
-{
-    ImGui::SeparatorText("Select a texture:");
-
-    ImGui::SliderFloat("Scale", &select_scale_, 30.0f, 400.0f, "%.0f");
-    float max_width = 0.0;
-
-    float width_aspect = 0.0f;
-    for (int i = 0; i < textures_.size(); ++i)
-    {
-        width_aspect = (float)textures_.at(i)->get_width() / (float)textures_.at(i)->get_height();
-        max_width += select_scale_ * width_aspect;
-        //Image
-        ImGui::PushID(i);
-        if (ImGui::ImageButton("", (ImTextureID)(intptr_t)textures_.at(i)->get_handle(),
-            ImVec2(select_scale_ * width_aspect, select_scale_), {0, 1}, {1, 0}))
-        {
-            ImGui::PopID();
-            return textures_.at(i).get();
-        }
-        ImGui::PopID();
-
-        //Tooltip
-        if (ImGui::BeginItemTooltip())
-        {
-            ImGui::Text(textures_.at(i)->get_path().c_str());
-            if (textures_.at(i)->id != essential_textures_.at(2)->id)
-            {
-                ImGui::Text("Handle: %i", textures_.at(i)->get_handle());
-                ImGui::Text("ID: %i", textures_.at(i)->id);
-                ImGui::Text("Width: %i", textures_.at(i)->get_width());
-                ImGui::Text("Height: %i", textures_.at(i)->get_height());
-                ImGui::Text("Channels: %i", textures_.at(i)->get_nr_channels());
-            }
-            else ImGui::Text("FAILED TO LOAD");
-
-
-            ImGui::EndTooltip();
-        }
-
-        if (max_width <= 800.0 - select_scale_) ImGui::SameLine();
-        else max_width = 0.0;
-    }
-    ImGui::NewLine();
-    if (ImGui::Button("  None  ")) return get_essential_texture(0);
-
-
-    if (ImGui::Button("  Add..  "))
-        add_texture_open_file(load_as_srgb_);
-
-    ImGui::SameLine();
-    ImGui::Checkbox("Load SRGB", &load_as_srgb_);
-
-    return nullptr;
-}
-
-
 void TextureManager::serialize(YAML::Emitter& out)
 {
     out << YAML::Key << "Texture Manager" << YAML::Value << YAML::BeginMap;

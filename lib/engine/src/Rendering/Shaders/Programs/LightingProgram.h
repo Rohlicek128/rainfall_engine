@@ -9,7 +9,7 @@ namespace lights
 }
 
 
-class LightingProgram : public Program, public IGui
+class LightingProgram : public Program
 {
     float* ambient_edit_;
 
@@ -29,6 +29,4 @@ public:
     ~LightingProgram() override = default;
 
     void draw(const Scene&, Mesh&, int, GBuffer&, ShadowMap&);
-
-    void set_gui() override;
 };

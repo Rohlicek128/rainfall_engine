@@ -1,6 +1,6 @@
 #include "EditorEngine.h"
 
-#include "engine/src/Rendering/Entities/Components/MeshComponent.h"
+#include "engine/world/Components/MeshComponent.h"
 
 
 namespace editor

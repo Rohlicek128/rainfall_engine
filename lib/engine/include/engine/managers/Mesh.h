@@ -13,7 +13,7 @@ class VertexArray;
 class VertexBuffer;
 class IndexBuffer;
 
-class Mesh //: public IGui
+class Mesh
 {
     VertexArray* vao_;
     VertexBuffer* vbo_;
@@ -43,7 +43,4 @@ public:
     ModelData* get_model(int);
 
     void set_default_models();
-
-    int select_mesh_gui();
-    //void set_gui() override;
 };

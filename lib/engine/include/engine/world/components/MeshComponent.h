@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engine/world/Component.h"
+#include "Component.h"
 
 class Mesh;
 
@@ -21,7 +21,6 @@ public:
     void set_mesh_manager(Mesh*&);
 
     std::string get_name() override;
-    void set_gui() override;
     void serialize(YAML::Emitter& out) override;
     bool deserialize(YAML::Node& node) override;
 };

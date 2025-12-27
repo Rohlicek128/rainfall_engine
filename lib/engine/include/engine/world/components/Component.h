@@ -1,5 +1,4 @@
 #pragma once
-#include "../core/IGui.h"
 #include "engine/core/ISerializable.h"
 
 class TransformComponent;
@@ -28,7 +27,7 @@ inline const char* to_string(const COMPONENTS_IDS e)
     }
 }
 
-class Component : public IGui, public ISerializable
+class Component : public ISerializable
 {
 public:
     bool is_enabled = true;

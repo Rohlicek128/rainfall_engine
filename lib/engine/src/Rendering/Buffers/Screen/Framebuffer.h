@@ -4,10 +4,9 @@
 
 #include "Renderbuffer.h"
 #include "engine/core/IBindable.h"
-#include "engine/core/IGui.h"
 #include "engine/rendering/Texture.h"
 
-class Framebuffer : public IBindable, public IGui
+class Framebuffer : public IBindable
 {
 public:
     std::vector<std::unique_ptr<Texture>> attached_textures;
@@ -25,5 +24,4 @@ public:
     void resize(int, int);
     void bind() override;
     void unbind() override;
-    void set_gui() override;
 };

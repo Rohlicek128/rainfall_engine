@@ -1,7 +1,7 @@
 #include "ExampleGame.h"
-#include "engine/src/Rendering/Entities/Components/LightComponent.h"
-#include "engine/src/Rendering/Entities/Components/MeshComponent.h"
-#include "engine/src/Rendering/Entities/Components/TextureComponent.h"
+#include "engine/world/Components/LightComponent.h"
+#include "engine/world/Components/MeshComponent.h"
+#include "engine/world/Components/TextureComponent.h"
 #include "glfw3.h"
 
 #include <cmath>

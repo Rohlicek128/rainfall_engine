@@ -1,5 +1,5 @@
 #include "ShadowDepthProgram.h"
-#include "../../Entities/Components/MeshComponent.h"
+#include "engine/world/Components/MeshComponent.h"
 #include "engine/managers/Mesh.h"
 #include "engine/world/Entity.h"
 #include <glad.h>

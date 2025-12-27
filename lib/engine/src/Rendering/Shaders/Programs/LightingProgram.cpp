@@ -2,9 +2,9 @@
 
 #include "engine/rendering/Texture.h"
 #include "engine/world/Entity.h"
-#include "../../Entities/Components/CameraComponent.h"
-#include "../../Entities/Components/LightComponent.h"
-#include "../../Entities/Components/MaterialComponent.h"
+#include "engine/world/Components/CameraComponent.h"
+#include "engine/world/Components/LightComponent.h"
+#include "engine/world/Components/MaterialComponent.h"
 #include "engine/managers/Mesh.h"
 #include "../Shadows/ShadowMap.h"
 
@@ -88,23 +88,4 @@ void LightingProgram::set_lights_uniforms(const Scene& scene, const lights::LIGH
             case lights::LIGHT_TYPE::SPOTLIGHT: break;
         }
     }
-}
-
-
-void LightingProgram::set_gui()
-{
-    ImGui::SeparatorText("Lighting");
-    ImGui::ColorEdit3("Ambient", ambient_edit_);
-    ambient.x = ambient_edit_[0];
-    ambient.y = ambient_edit_[1];
-    ambient.z = ambient_edit_[2];
-
-    ImGui::SeparatorText("Fog");
-    ImGui::Checkbox("Enabled", &is_fog_enabled_);
-    ImGui::ColorEdit3("Color", fog_color_edit_);
-    fog_color_.x = fog_color_edit_[0];
-    fog_color_.y = fog_color_edit_[1];
-    fog_color_.z = fog_color_edit_[2];
-    ImGui::DragFloat("End", &fog_end_, 0.1f, 0, 0, "%.1f");
-    ImGui::DragFloat("Density", &fog_density_, 0.001f, 0, 0, "%.3f");
 }

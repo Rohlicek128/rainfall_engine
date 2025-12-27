@@ -1,5 +1,5 @@
 #pragma once
-#include "engine/world/Component.h"
+#include "Component.h"
 #include <string>
 
 class Texture;
@@ -19,7 +19,6 @@ class TextureComponent : public Component
 
     TextureManager* texture_manager_;
 
-    void texture_gui(Texture*&, const std::string&);
 public:
     float scale;
     int type;
@@ -33,7 +32,6 @@ public:
     bool has_metallic();
 
     std::string get_name() override;
-    void set_gui() override;
     void serialize(YAML::Emitter& out) override;
     bool deserialize(YAML::Node& node) override;
 };

@@ -1,8 +1,8 @@
-#include "LightComponent.h"
+#include "engine/world/components/LightComponent.h"
 #include "../../Shaders/Program.h"
-#include "engine/world/TransformComponent.h"
+#include "engine/world/components/TransformComponent.h"
 
-#include <algorithm>
+
 #include <string>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
@@ -60,35 +60,6 @@ std::string LightComponent::get_name()
     return "Light";
 }
 
-void LightComponent::set_gui()
-{
-    const char* type_names[] = { "Directional", "Point", "Spotlight" };
-    ImGui::Combo("Type", &type_edit_, type_names, std::size(type_names));
-    type = (lights::LIGHT_TYPE)type_edit_;
-
-    ImGui::SeparatorText("Color");
-
-    ImGui::ColorEdit3("Color", color_edit_);
-    color.x = color_edit_[0];
-    color.y = color_edit_[1];
-    color.z = color_edit_[2];
-
-
-    if (ImGui::Button("R")) intensity = 1.0f;
-    ImGui::SameLine();
-    ImGui::DragFloat("Intensity", &intensity, 0.01f, 0, 0, "%.1f");
-    intensity = std::max(intensity, 0.0f);
-
-    if (type == lights::LIGHT_TYPE::POINT)
-    {
-        ImGui::SeparatorText("Attenuation");
-        ImGui::PushItemWidth(200);
-        ImGui::DragFloat("Constant", &attenuation_params.x, 0.01f, 0, 0, "%.4f");
-        ImGui::DragFloat("Linear", &attenuation_params.y, 0.001f, 0, 0, "%.4f");
-        ImGui::DragFloat("Quadratic", &attenuation_params.z, 0.0001f, 0, 0, "%.4f");
-        ImGui::PopItemWidth();
-    }
-}
 
 void LightComponent::serialize(YAML::Emitter& out)
 {
