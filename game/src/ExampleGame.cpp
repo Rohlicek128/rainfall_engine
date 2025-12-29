@@ -7,6 +7,8 @@
 #include <cmath>
 #include <utils.h>
 
+#include "TestScript.h"
+
 
 namespace game
 {
@@ -21,6 +23,7 @@ namespace game
 
         Texture* texture = resource_manager->load_texture("assets/chill_guy.jpg", "jpg");
         box_->add_component<TextureComponent>(texture);
+        box_->add_component<TestScript>();
 
 
         light_ = scene->create_entity("Light");

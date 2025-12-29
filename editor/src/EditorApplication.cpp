@@ -1,4 +1,5 @@
 #include "EditorApplication.h"
+
 #include "engine/rendering/Renderer.h"
 #include "gui/panels/PerformancePanel.h"
 #include "gui/panels/ViewportPanel.h"
@@ -14,7 +15,7 @@
 
 namespace editor
 {
-    void EditorApplication::on_start()
+    EditorApplication::EditorApplication()
     {
         working_dir_ = "C:\\Files\\Code\\C++\\rainfall_engine\\game\\";
 
@@ -22,6 +23,11 @@ namespace editor
         performance_panel_ = std::make_unique<PerformancePanel>();
 
 
+        show_imgui_demo_ = false;
+    }
+
+    void EditorApplication::on_start()
+    {
         scene_manager->create_scene("editor", true);
         //scene_manager->load_scene(working_dir_ + "saved\\Another.rain", true);
 
@@ -31,8 +37,7 @@ namespace editor
 
         auto light = scene_manager->get_current_scene()->create_entity("Light");
         light->transform->scale *= 0.2f;
-        light->transform->position.x = 3.0f;
-        light->transform->position.z = 2.0f;
+        light->transform->position = glm::vec3(3.0f, 2.0f, 2.5f);
         light->add_component<MeshComponent>(0, 4, resource_manager->get_mesh_manager());
         light->add_component<LightComponent>(lights::LIGHT_TYPE::POINT, glm::vec3(1.0f, 1.0f, 1.0f));
         light->get_component<LightComponent>()->intensity = 5.0f;
@@ -50,6 +55,9 @@ namespace editor
 
         viewport_panel_->draw(*renderer.get_render_fbo());
         performance_panel_->draw(viewport_panel_->pos, renderer);
+
+
+        if (show_imgui_demo_) ImGui::ShowDemoWindow(&show_imgui_demo_);
     }
 
 
@@ -143,7 +151,7 @@ namespace editor
                 //ImGui::MenuItem("Show GBuffer Inspector", "CTRL+G", &show_g_buffer_inspector);
 
                 //ImGui::Separator();
-                //ImGui::MenuItem("Show ImGui Demo", "CTRL+D", &show_imgui_demo);
+                ImGui::MenuItem("Show ImGui Demo", "CTRL+D", &show_imgui_demo_);
 
                 ImGui::EndMenu();
             }

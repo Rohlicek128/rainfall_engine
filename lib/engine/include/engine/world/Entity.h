@@ -5,6 +5,7 @@
 
 #include "engine/core/ISerializable.h"
 #include "components/TransformComponent.h"
+#include "engine/world/components/BehaviorComponent.h"
 
 class Mesh;
 
@@ -65,6 +66,11 @@ void Entity::add_component(Args&&... args)
 {
     static_assert(std::is_base_of_v<Component, C>, "C must derive from Component");
     components.push_back(std::make_unique<C>(std::forward<Args>(args)...));
+
+    if (std::is_base_of_v<BehaviorComponent, C>)
+    {
+        get_component<BehaviorComponent>()->set_owner_entity(*this);
+    }
 }
 
 template<typename C>

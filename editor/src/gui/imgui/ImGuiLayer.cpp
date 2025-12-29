@@ -35,8 +35,8 @@ namespace editor
 
         ImGui::GetStyle().Colors[ImGuiCol_WindowBg] = {0.08f, 0.1f, 0.13f, 0.9f};
 
-        //imgui_io->Fonts->AddFontFromFileTTF("assets/Fonts/CascadiaMono-SemiBold.ttf", 13);
-        //set_red_style();
+        imgui_io->Fonts->AddFontFromFileTTF("editor/assets/fonts/CascadiaMono-SemiBold.ttf", 13);
+        set_red_style();
 
         //ImGuizmo::SetOrthographic(false);
 

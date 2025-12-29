@@ -18,8 +18,8 @@ namespace engine
 
 
         // Start
-        engine::Window window("Rainfall Engine", 1660, 1080);
-        engine::Renderer renderer(window);
+        Window window("Rainfall Engine", 1660, 1080);
+        Renderer renderer(window);
 
         A app;
         app.set_window(window.get_glfw_window());
@@ -29,13 +29,15 @@ namespace engine
 
         while (app.is_running() && !window.should_close())
         {
+            renderer.set_current_scene(*app.scene_manager->get_current_scene());
+
             // Update
             renderer.update();
             app.input_manager->set_delta_time(renderer.delta_time);
             app.on_update(renderer.delta_time);
 
             // Render
-            renderer.render(*app.scene_manager->get_current_scene());
+            renderer.render();
             renderer.swap_and_poll();
         }
 

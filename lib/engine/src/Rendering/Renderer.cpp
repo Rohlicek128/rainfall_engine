@@ -22,6 +22,7 @@
 
 #include "engine/world/Entity.h"
 #include "engine/managers/Mesh.h"
+#include "engine/world/components/BehaviorComponent.h"
 
 
 namespace engine
@@ -118,6 +119,17 @@ namespace engine
         glPointSize(5.0f);
     }
 
+    Renderer::~Renderer()
+    {
+        //Behaviors
+        for (int i = 0; i < current_scene_->entities.size(); ++i)
+        {
+            BehaviorComponent* behavior = current_scene_->entities.at(i)->get_enabled_component<BehaviorComponent>();
+            if (behavior) behavior->on_shutdown();
+        }
+    }
+
+
     void Renderer::update_delta_time()
     {
         const double current = glfwGetTime();
@@ -140,6 +152,11 @@ namespace engine
             }
         }
         frame_count_++;
+    }
+
+    void Renderer::set_current_scene(Scene& scene)
+    {
+        current_scene_ = &scene;
     }
 
 
@@ -184,11 +201,23 @@ namespace engine
             else glfwSetWindowMonitor(window_->engine_args.window, nullptr, 50, 50, window_->engine_args.width, window_->engine_args.height, GLFW_DONT_CARE);
         }
         else if (!fullscreen_toggle_ && glfwGetKey(window_->engine_args.window, GLFW_KEY_F11) == GLFW_RELEASE) fullscreen_toggle_ = true;
+
+
+        //Behaviors
+        for (int i = 0; i < current_scene_->entities.size(); ++i)
+        {
+            BehaviorComponent* behavior = current_scene_->entities.at(i)->get_enabled_component<BehaviorComponent>();
+            if (behavior)
+            {
+                if (!behavior->is_active()) behavior->start();
+                behavior->on_update(delta_time);
+            }
+        }
     }
 
-    void Renderer::render(Scene& scene)
+    void Renderer::render()
     {
-        CameraComponent* cur_camera_comp = scene.current_camera->get_component<CameraComponent>();
+        CameraComponent* cur_camera_comp = current_scene_->current_camera->get_component<CameraComponent>();
         cur_camera_comp->move(window_->engine_args.window, static_cast<float>(delta_time));
         if (!mouse_->is_visible) cur_camera_comp->mouse_move(*mouse_, static_cast<float>(delta_time));
 
@@ -196,10 +225,10 @@ namespace engine
         const int cur_height = window_->engine_args.height;
 
         //Shadows
-        const std::vector<Entity*> dir_lights = scene.get_lights_by_type(lights::LIGHT_TYPE::DIRECTIONAL);
+        const std::vector<Entity*> dir_lights = current_scene_->get_lights_by_type(lights::LIGHT_TYPE::DIRECTIONAL);
         if (shadow_map_->is_visible && !dir_lights.empty())
         {
-            shadow_map_->render_depth_map(*dir_lights.front(), scene, *shadow_depth_program_);
+            shadow_map_->render_depth_map(*dir_lights.front(), *current_scene_, *shadow_depth_program_);
         }
 
         //Geometry Pass
@@ -210,7 +239,7 @@ namespace engine
 
         if (cur_camera_comp->is_wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-        geometry_program_->draw(scene, (float)cur_width / (float)cur_height);
+        geometry_program_->draw(*current_scene_, (float)cur_width / (float)cur_height);
 
         if (cur_camera_comp->is_wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         g_buffer_->unbind();
@@ -219,7 +248,7 @@ namespace engine
         post_process_program_->bind_framebuffer();
         //glClearColor(cur_camera_comp->clear_color[0], cur_camera_comp->clear_color[1], cur_camera_comp->clear_color[2], cur_camera_comp->clear_color[3]);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        lighting_program_->draw(scene, *screen_mesh_, 0, *g_buffer_, *shadow_map_);
+        lighting_program_->draw(*current_scene_, *screen_mesh_, 0, *g_buffer_, *shadow_map_);
         post_process_program_->unbind_framebuffer();
 
 

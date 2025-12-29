@@ -32,6 +32,8 @@ namespace engine
 
     class Renderer
     {
+        Scene* current_scene_;
+
         Window* window_;
 
         GeometryProgram* geometry_program_;
@@ -73,10 +75,12 @@ namespace engine
         float fps_plot[30];
 
         Renderer(Window& window, bool render_to_fbo = false);
-        ~Renderer() = default;
+        ~Renderer();
+
+        void set_current_scene(Scene& scene);
 
         void update();
-        void render(Scene& scene);
+        void render();
         void swap_and_poll();
 
         Framebuffer* get_render_fbo();

@@ -23,9 +23,12 @@ namespace editor
         std::unique_ptr<ViewportPanel> viewport_panel_;
         std::unique_ptr<PerformancePanel> performance_panel_;
 
-        void draw_dockspace();
+        bool show_imgui_demo_;
 
+        void draw_dockspace();
     public:
+        EditorApplication();
+
         void on_start() override;
         void on_update(const float delta_time) override;
         void on_render(engine::Renderer& renderer);

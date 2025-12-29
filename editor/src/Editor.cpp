@@ -18,6 +18,8 @@ namespace editor
     {
         // Start
         engine::Window window("Rainfall Editor", 1660, 1080);
+        window.set_icon("editor/assets/cdicon.jpg");
+
         engine::Renderer renderer(window, true);
         ImGuiLayer layer;
 
@@ -29,6 +31,8 @@ namespace editor
 
         while (app.is_running() && !window.should_close())
         {
+            renderer.set_current_scene(*app.scene_manager->get_current_scene());
+
             // Update
             renderer.update();
             app.input_manager->set_delta_time(renderer.delta_time);
@@ -36,7 +40,7 @@ namespace editor
 
             // Render
             layer.on_begin_frame();
-            renderer.render(*app.scene_manager->get_current_scene());
+            renderer.render();
             app.on_render(renderer);
             layer.on_end_frame();
 
