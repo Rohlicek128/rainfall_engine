@@ -1,6 +1,6 @@
 #include "TextureManager.h"
 
-#include "../../../Utils/FileDialogs.h"
+#include "engine/utils/FileDialogs.h"
 
 TextureManager* TextureManager::instance_ptr_ = nullptr;
 
@@ -43,7 +43,7 @@ Texture* TextureManager::add_texture(std::unique_ptr<Texture> texture)
 
 Texture* TextureManager::add_texture_open_file(const bool is_srgb)
 {
-    const std::string path = FileDialogs::open_file("Image File (*.jpg;*.png)\0*.jpg;*.png\0");
+    const std::string path = engine::FileDialogs::open_file("Image File (*.jpg;*.png)\0*.jpg;*.png\0");
     if (path.empty()) return nullptr;
 
     const bool is_png = !path.compare(path.length() - 3, 3, "png");

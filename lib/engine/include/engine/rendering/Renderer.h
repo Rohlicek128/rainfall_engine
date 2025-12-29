@@ -3,6 +3,11 @@
 #include <glad.h>
 #include <glfw3.h>
 
+#include "../world/Scene.h"
+#include "../world/Entity.h"
+#include "GBuffer.h"
+#include "engine/rendering/Framebuffer.h"
+
 #include <deque>
 #include <memory>
 
@@ -13,15 +18,12 @@ class SkyboxProgram;
 class PostProcessProgram;
 class ShadowDepthProgram;
 
-class GBuffer;
 class ShadowMap;
 
 class Mesh;
 class TextureManager;
 
 class Mouse;
-
-class Scene;
 
 
 namespace engine
@@ -51,28 +53,32 @@ namespace engine
         TextureManager* textures_;
 
         double last_time_;
-
         int frame_count_;
-        int display_frame_count_;
         int last_uptime_;
-        int max_fps_plot_;
-        float fps_plot_[30];
         std::deque<int> fps_history_;
 
         bool is_fullscreen_;
         bool fullscreen_toggle_;
         bool can_escape_;
 
+        bool render_to_fbo_;
+        std::unique_ptr<Framebuffer> render_fbo_;
+
         void update_delta_time();
         void resize(int, int);
     public:
         double delta_time;
+        int display_frame_count;
+        int max_fps_plot;
+        float fps_plot[30];
 
-        Renderer(Window& window);
+        Renderer(Window& window, bool render_to_fbo = false);
         ~Renderer() = default;
 
         void update();
         void render(Scene& scene);
         void swap_and_poll();
+
+        Framebuffer* get_render_fbo();
     };
 }

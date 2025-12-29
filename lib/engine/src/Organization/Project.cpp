@@ -7,7 +7,7 @@
 #include "engine/managers/Mesh.h"
 #include "../Rendering/Buffers/Textures/TextureManager.h"
 
-#include "../Utils/FileDialogs.h"
+#include "engine/utils/FileDialogs.h"
 
 Project::Project(const std::string& name)
 {
@@ -37,7 +37,7 @@ void Project::reset()
 
 bool Project::load_scene_dialog()
 {
-    const std::string open_path = FileDialogs::open_file("Rainfall Scene (*.rain)\0*.rain\0");
+    const std::string open_path = engine::FileDialogs::open_file("Rainfall Scene (*.rain)\0*.rain\0");
     if (!open_path.empty())
         load_scene_from_path(open_path);
     return false;

@@ -2,7 +2,7 @@
 
 #include <glad.h>
 
-#include "../../Buffers/Screen/Framebuffer.h"
+#include "engine/rendering/Framebuffer.h"
 #include "engine/world/Components/CameraComponent.h"
 #include "engine/managers/Mesh.h"
 

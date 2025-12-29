@@ -1,4 +1,5 @@
-#include "FileDialogs.h"
+#include "engine/utils/FileDialogs.h"
+
 #include "engine/rendering/Window.h"
 #include "../Rendering/EngineArgs.h"
 
@@ -10,40 +11,43 @@
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <glfw3native.h>
 
-std::string FileDialogs::open_file(const char* filter)
+namespace engine
 {
-    OPENFILENAMEA ofn;
-    CHAR sz_file[260] = {};
-    ZeroMemory(&ofn, sizeof(OPENFILENAME));
-    ofn.lStructSize = sizeof(OPENFILENAME);
-    ofn.hwndOwner = glfwGetWin32Window(engine::Window::engine_args.window);
-    ofn.lpstrFile = sz_file;
-    ofn.nMaxFile = sizeof(sz_file);
-    ofn.lpstrFilter = filter;
-    ofn.nFilterIndex = 1;
-    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
-    if (GetOpenFileNameA(&ofn) == TRUE)
+    std::string FileDialogs::open_file(const char* filter)
     {
-        return ofn.lpstrFile;
+        OPENFILENAMEA ofn;
+        CHAR sz_file[260] = {};
+        ZeroMemory(&ofn, sizeof(OPENFILENAME));
+        ofn.lStructSize = sizeof(OPENFILENAME);
+        ofn.hwndOwner = glfwGetWin32Window(engine::Window::engine_args.window);
+        ofn.lpstrFile = sz_file;
+        ofn.nMaxFile = sizeof(sz_file);
+        ofn.lpstrFilter = filter;
+        ofn.nFilterIndex = 1;
+        ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
+        if (GetOpenFileNameA(&ofn) == TRUE)
+        {
+            return ofn.lpstrFile;
+        }
+        return {};
     }
-    return {};
-}
 
-std::string FileDialogs::save_file(const char* filter)
-{
-    OPENFILENAMEA ofn;
-    CHAR sz_file[260] = {};
-    ZeroMemory(&ofn, sizeof(OPENFILENAME));
-    ofn.lStructSize = sizeof(OPENFILENAME);
-    ofn.hwndOwner = glfwGetWin32Window(engine::Window::engine_args.window);
-    ofn.lpstrFile = sz_file;
-    ofn.nMaxFile = sizeof(sz_file);
-    ofn.lpstrFilter = filter;
-    ofn.nFilterIndex = 1;
-    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
-    if (GetSaveFileNameA(&ofn) == TRUE)
+    std::string FileDialogs::save_file(const char* filter)
     {
-        return ofn.lpstrFile;
+        OPENFILENAMEA ofn;
+        CHAR sz_file[260] = {};
+        ZeroMemory(&ofn, sizeof(OPENFILENAME));
+        ofn.lStructSize = sizeof(OPENFILENAME);
+        ofn.hwndOwner = glfwGetWin32Window(engine::Window::engine_args.window);
+        ofn.lpstrFile = sz_file;
+        ofn.nMaxFile = sizeof(sz_file);
+        ofn.lpstrFilter = filter;
+        ofn.nFilterIndex = 1;
+        ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
+        if (GetSaveFileNameA(&ofn) == TRUE)
+        {
+            return ofn.lpstrFile;
+        }
+        return {};
     }
-    return {};
 }

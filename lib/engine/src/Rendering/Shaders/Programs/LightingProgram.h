@@ -1,8 +1,8 @@
 #pragma once
 #include "../Program.h"
-#include "../../Buffers/Screen/GBuffer.h"
 
 class ShadowMap;
+class GBuffer;
 namespace lights
 {
     enum class LIGHT_TYPE : int;

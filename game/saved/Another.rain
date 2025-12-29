@@ -46,14 +46,6 @@ Entities:
           Color: [0.021393748, 0.048393935, 0.080691636, 1]
           Roughness: 0.48
           Metallic: 0
-      - Texture:
-          Enabled: true
-          Type: 3553
-          Scale: 38.8
-          Diffuse: 0
-          Roughness: 1
-          Metallic: 1
-          Normal: 7
   - Entity: Point Light
     Id: 60
     Is Visible: true
@@ -92,14 +84,6 @@ Entities:
           Primitive: 4
           Is Culled: true
           Is Inverted: false
-      - Texture:
-          Enabled: true
-          Type: 3553
-          Scale: 1
-          Diffuse: 0
-          Roughness: 1
-          Metallic: 1
-          Normal: 6
       - Material:
           Enabled: true
           Color: [1, 0.64842325, 0.109510064, 1]

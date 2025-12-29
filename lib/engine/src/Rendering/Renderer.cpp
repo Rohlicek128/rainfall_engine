@@ -1,12 +1,12 @@
 #include "engine/rendering/Renderer.h"
 
 #include <glad.h>
+#include <memory>
 
+#include "engine/rendering/Framebuffer.h"
 #include "engine/rendering/Window.h"
 #include "EngineArgs.h"
 #include "engine/world/Scene.h"
-
-#include "Buffers/Screen/GBuffer.h"
 #include "Buffers/Textures/TextureManager.h"
 
 #include "Entities/Mouse.h"
@@ -20,16 +20,16 @@
 #include "engine/world/Components/CameraComponent.h"
 #include "engine/world/Components/LightComponent.h"
 
-#include "engine/managers/Mesh.h"
-
 #include "engine/world/Entity.h"
+#include "engine/managers/Mesh.h"
 
 
 namespace engine
 {
-    Renderer::Renderer(Window& window)
+    Renderer::Renderer(Window& window, bool render_to_fbo)
     {
         window_ = &window;
+        render_to_fbo_ = render_to_fbo;
 
         textures_ = TextureManager::get_instance();
         textures_->add_essential_texture(std::make_unique<Texture>("engine/assets/white1x1.png", GL_RGBA8, GL_RGBA));
@@ -39,6 +39,16 @@ namespace engine
         //std::vector<std::string> faces = {"assets/Skybox/0right.jpg", "assets/Skybox/1left.jpg", "assets/Skybox/2top.jpg",
         //    "assets/Skybox/3bottom.jpg", "assets/Skybox/4front.jpg", "assets/Skybox/5back.jpg"};
         //textures_->add_cubemap(std::make_unique<Cubemap>(faces, GL_SRGB8, GL_RGB, GL_UNSIGNED_BYTE));
+
+
+        render_fbo_ = nullptr;
+        if (render_to_fbo)
+        {
+            render_fbo_ = std::make_unique<Framebuffer>();
+            render_fbo_->attach_texture_2d(std::make_unique<Texture>(window_->engine_args.width, window_->engine_args.height, GL_RGBA8, GL_RGBA), GL_COLOR_ATTACHMENT0);
+            render_fbo_->set_draw_buffers();
+            render_fbo_->check_completeness();
+        }
 
 
         viewport_ = new GLint[2]{window_->engine_args.width, window_->engine_args.height};
@@ -95,10 +105,10 @@ namespace engine
         delta_time = 0.0f;
         last_time_ = 0.0;
 
-        display_frame_count_ = 0;
+        display_frame_count = 0;
         frame_count_ = 0;
         last_uptime_ = 0;
-        max_fps_plot_ = 0;
+        max_fps_plot = 0;
 
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
@@ -117,16 +127,16 @@ namespace engine
         if ((int)floor(current) > last_uptime_)
         {
             last_uptime_ = (int)floor(current);
-            display_frame_count_ = frame_count_;
+            display_frame_count = frame_count_;
             frame_count_ = 0;
-            max_fps_plot_ = 0;
+            max_fps_plot = 0;
 
-            fps_history_.push_back(display_frame_count_);
-            if (fps_history_.size() > std::size(fps_plot_)) fps_history_.pop_front();
+            fps_history_.push_back(display_frame_count);
+            if (fps_history_.size() > std::size(fps_plot)) fps_history_.pop_front();
             for (unsigned int i = 0; i < fps_history_.size(); ++i)
             {
-                fps_plot_[i] = (float)fps_history_.at(i);
-                max_fps_plot_ = std::max<int>(fps_history_.at(i), max_fps_plot_);
+                fps_plot[i] = (float)fps_history_.at(i);
+                max_fps_plot = std::max<int>(fps_history_.at(i), max_fps_plot);
             }
         }
         frame_count_++;
@@ -214,8 +224,9 @@ namespace engine
 
 
         //Post Process Pass
+        if (render_to_fbo_) render_fbo_->bind();
         post_process_program_->draw(*screen_mesh_, 0, *cur_camera_comp, shadow_map_->is_debug_visible ? shadow_map_->get_depth_map()->attached_textures.at(0)->get_handle() : -1);
-
+        if (render_to_fbo_) render_fbo_->unbind();
 
         glViewport(0, 0, window_->engine_args.width, window_->engine_args.height);
     }
@@ -233,5 +244,12 @@ namespace engine
     {
         g_buffer_->resize(width, height);
         post_process_program_->resize(width, height);
+        if (render_to_fbo_) render_fbo_->resize(width, height);
+    }
+
+    Framebuffer* Renderer::get_render_fbo()
+    {
+        if (!render_to_fbo_) return nullptr;
+        return render_fbo_.get();
     }
 }

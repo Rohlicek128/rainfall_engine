@@ -7,6 +7,7 @@
 #include "engine/world/Components/MaterialComponent.h"
 #include "engine/managers/Mesh.h"
 #include "../Shadows/ShadowMap.h"
+#include "engine/rendering/GBuffer.h"
 
 LightingProgram::LightingProgram(const std::vector<Shader>& shaders) : Program(shaders)
 {

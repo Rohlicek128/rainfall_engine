@@ -1,6 +1,8 @@
 #pragma once
 #include "engine/core/IBindable.h"
-#include <glad.h>
+
+
+typedef unsigned int GLenum;
 
 class Renderbuffer : public IBindable
 {

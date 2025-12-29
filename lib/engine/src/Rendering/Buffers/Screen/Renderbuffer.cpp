@@ -1,12 +1,15 @@
-#include "Renderbuffer.h"
+#include "engine/rendering/Renderbuffer.h"
 
-Renderbuffer::Renderbuffer(const int width, const int height, const GLenum format, const GLenum attachment)
+#include <glad.h>
+
+
+Renderbuffer::Renderbuffer(const int width, const int height, const unsigned int format, const unsigned int attachment)
 {
     width_ = width;
     height_ = height;
     format_ = format;
     attachment_ = attachment;
-    
+
     glGenRenderbuffers(1, &handle_);
     Renderbuffer::bind();
     glRenderbufferStorage(GL_RENDERBUFFER, format_, width_, height_);
@@ -17,7 +20,7 @@ void Renderbuffer::resize(const int width, const int height)
 {
     width_ = width;
     height_ = height;
-    
+
     glDeleteRenderbuffers(1, &handle_);
     glGenRenderbuffers(1, &handle_);
     bind();

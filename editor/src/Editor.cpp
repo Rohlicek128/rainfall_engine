@@ -1,28 +1,28 @@
-#pragma once
+#include "Editor.h"
+
+#include "EditorApplication.h"
+#include "gui/imgui/ImGuiLayer.h"
 
 #include <engine/rendering/Window.h>
 #include <engine/rendering/Renderer.h>
-#include <engine/world/Scene.h>
-#include <engine/world/Entity.h>
-
-#include <type_traits>
-#include "Application.h"
 
 
-namespace engine
+namespace editor
 {
-    template <typename A>
-    void Run()
+    Editor::Editor()
     {
-        static_assert(std::is_base_of_v<Application, A>, "A must derive from Application");
+        working_dir_ = "C:\\Files\\Code\\C++\\rainfall_engine\\game\\";
+    }
 
-
+    void Editor::run(EditorApplication& app)
+    {
         // Start
-        engine::Window window("Rainfall Engine", 1660, 1080);
-        engine::Renderer renderer(window);
+        engine::Window window("Rainfall Editor", 1660, 1080);
+        engine::Renderer renderer(window, true);
+        ImGuiLayer layer;
 
-        A app;
         app.set_window(window.get_glfw_window());
+        layer.init(window.get_glfw_window());
 
         app.on_start();
         app.resource_manager->get_mesh_manager()->compile();
@@ -35,11 +35,16 @@ namespace engine
             app.on_update(renderer.delta_time);
 
             // Render
+            layer.on_begin_frame();
             renderer.render(*app.scene_manager->get_current_scene());
+            app.on_render(renderer);
+            layer.on_end_frame();
+
             renderer.swap_and_poll();
         }
 
         // Shutdown
         app.on_shutdown();
+        layer.shutdown();
     }
 }

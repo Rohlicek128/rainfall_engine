@@ -5,8 +5,8 @@
 MaterialComponent::MaterialComponent(const glm::vec4 color, const float roughness, const float metallic)
 {
     this->color = color;
-    this->metallic = metallic;
     this->roughness = roughness;
+    this->metallic = metallic;
 
     color_edit_ = new float[] {color.r, color.g, color.b, color.a};
 }

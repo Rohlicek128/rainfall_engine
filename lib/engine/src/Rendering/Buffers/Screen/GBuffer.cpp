@@ -1,4 +1,4 @@
-#include "GBuffer.h"
+#include "engine/rendering/GBuffer.h"
 
 GBuffer::GBuffer(int width, int height)
 {
