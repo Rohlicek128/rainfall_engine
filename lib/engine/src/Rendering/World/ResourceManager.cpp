@@ -15,6 +15,12 @@ namespace engine
         texture_manager_ = TextureManager::get_instance();
     }
 
+    void ResourceManager::reset()
+    {
+        texture_manager_->reset();
+    }
+
+
     Mesh* ResourceManager::get_mesh_manager()
     {
         return mesh_manager_.get();

@@ -4,6 +4,7 @@
 
 #include "engine/rendering/Renderer.h"
 #include "EngineArgs.h"
+#include "glfw3.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -50,6 +51,7 @@ namespace engine
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
         //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
         GLFWwindow* window = glfwCreateWindow(width, height, window_name, nullptr, nullptr);
@@ -73,7 +75,7 @@ namespace engine
         engine_args.width = width;
         engine_args.height = height;
 
-        glfwSetWindowPos(window, 50, 50);
+        //glfwSetWindowPos(window, 250, 50);
 
         return window;
     }

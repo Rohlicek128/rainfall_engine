@@ -8,7 +8,6 @@ class Program;
 
 class MaterialComponent : public Component
 {
-    float* color_edit_;
 public:
     glm::vec4 color;
     float roughness;

@@ -12,7 +12,7 @@
 namespace engine
 {
     template <typename A>
-    void Run()
+    void run()
     {
         static_assert(std::is_base_of_v<Application, A>, "A must derive from Application");
 

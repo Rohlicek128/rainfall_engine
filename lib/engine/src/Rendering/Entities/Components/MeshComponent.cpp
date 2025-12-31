@@ -11,13 +11,13 @@ MeshComponent::MeshComponent(const int index, const int type, Mesh* mesh)
     is_culled = true;
     is_shaded = true;
 
-    mesh_ = mesh;
-    is_mesh_view_open_ = false;
+    this->mesh = mesh;
+    is_mesh_view_open = false;
 }
 
 void MeshComponent::set_mesh_manager(Mesh*& mesh)
 {
-    mesh_ = mesh;
+    this->mesh = mesh;
 }
 
 std::string MeshComponent::get_name()

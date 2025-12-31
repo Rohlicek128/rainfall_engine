@@ -19,8 +19,6 @@ namespace lights
 
 class LightComponent : public Component
 {
-    int type_edit_;
-    float* color_edit_;
 public:
     lights::LIGHT_TYPE type;
     glm::vec3 color;

@@ -13,15 +13,9 @@ LightComponent::LightComponent(const lights::LIGHT_TYPE& t, const glm::vec3& c, 
     color = c;
     intensity = i;
     attenuation_params = attenuation;
-
-    type_edit_ = static_cast<int>(type);
-    color_edit_ = new float[] {color.x, color.y, color.z};
 }
 
-LightComponent::~LightComponent()
-{
-    //delete[] color_edit_;
-}
+LightComponent::~LightComponent() = default;
 
 void LightComponent::set_uniforms(Program* program, const int index, const TransformComponent* transform)
 {
@@ -86,13 +80,9 @@ bool LightComponent::deserialize(YAML::Node& node)
     is_enabled = node["Enabled"].as<bool>();
 
     type = (lights::LIGHT_TYPE)node["Type"].as<int>();
-    type_edit_ = static_cast<int>(type);
     if (YAML::Node cur = node["Color"])
     {
         color = des_vec3(cur);
-        color_edit_[0] = color.x;
-        color_edit_[1] = color.y;
-        color_edit_[2] = color.z;
     }
 
     intensity = node["Intensity"].as<float>();

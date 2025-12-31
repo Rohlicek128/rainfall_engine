@@ -14,10 +14,6 @@ TransformComponent::TransformComponent(const glm::vec3 pos, const glm::vec3 rot,
     position = pos;
     rotation = rot;
     scale = sca;
-
-    pos_edit_ = new float[] {position.x, position.y, position.z};
-    rot_edit_ = new float[] {rotation.x, rotation.y, rotation.z};
-    sca_edit_ = new float[] {scale.x, scale.y, scale.z};
 }
 
 glm::mat4 TransformComponent::get_model_matrix()
@@ -33,21 +29,21 @@ glm::mat4 TransformComponent::get_model_matrix()
 
 void TransformComponent::update_pos_edit(const float scaler)
 {
-    pos_edit_[0] = position.x * scaler;
-    pos_edit_[1] = position.y * scaler;
-    pos_edit_[2] = position.z * scaler;
+    //pos_edit_[0] = position.x * scaler;
+    //pos_edit_[1] = position.y * scaler;
+    //pos_edit_[2] = position.z * scaler;
 }
 void TransformComponent::update_rot_edit(const float scaler)
 {
-    rot_edit_[0] = rotation.x * scaler;
-    rot_edit_[1] = rotation.y * scaler;
-    rot_edit_[2] = rotation.z * scaler;
+    //rot_edit_[0] = rotation.x * scaler;
+    //rot_edit_[1] = rotation.y * scaler;
+    //rot_edit_[2] = rotation.z * scaler;
 }
 void TransformComponent::update_sca_edit(const float scaler)
 {
-    sca_edit_[0] = scale.x * scaler;
-    sca_edit_[1] = scale.y * scaler;
-    sca_edit_[2] = scale.z * scaler;
+    //sca_edit_[0] = scale.x * scaler;
+    //sca_edit_[1] = scale.y * scaler;
+    //sca_edit_[2] = scale.z * scaler;
 }
 
 

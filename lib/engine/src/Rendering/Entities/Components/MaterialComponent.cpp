@@ -7,14 +7,9 @@ MaterialComponent::MaterialComponent(const glm::vec4 color, const float roughnes
     this->color = color;
     this->roughness = roughness;
     this->metallic = metallic;
-
-    color_edit_ = new float[] {color.r, color.g, color.b, color.a};
 }
 
-MaterialComponent::~MaterialComponent()
-{
-    //delete[] color_edit_;
-}
+MaterialComponent::~MaterialComponent() = default;
 
 void MaterialComponent::set_uniforms(Program* program)
 {
@@ -52,10 +47,6 @@ bool MaterialComponent::deserialize(YAML::Node& node)
     if (YAML::Node cur = node["Color"])
     {
         color = des_vec4(cur);
-        color_edit_[0] = color.r;
-        color_edit_[1] = color.g;
-        color_edit_[2] = color.b;
-        color_edit_[3] = color.a;
     }
     roughness = node["Roughness"].as<float>();
     metallic = node["Metallic"].as<float>();

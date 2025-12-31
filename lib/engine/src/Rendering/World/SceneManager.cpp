@@ -11,6 +11,13 @@ namespace engine
         current_scene_ = nullptr;
     }
 
+    void SceneManager::reset()
+    {
+        scenes_.clear();
+        current_scene_ = nullptr;
+    }
+
+
     Scene* SceneManager::get_current_scene()
     {
         return current_scene_;
@@ -21,6 +28,11 @@ namespace engine
         if (!scenes_.contains(name)) return nullptr;
 
         return scenes_.at(name).get();
+    }
+
+    std::unordered_map<std::string, std::unique_ptr<Scene>>* SceneManager::get_all_scenes()
+    {
+        return &scenes_;
     }
 
     bool SceneManager::switch_to(const std::string& name)

@@ -9,14 +9,11 @@
 
 namespace editor
 {
-    Editor::Editor()
-    {
-        working_dir_ = "C:\\Files\\Code\\C++\\rainfall_engine\\game\\";
-    }
-
-    void Editor::run(EditorApplication& app)
+    void run()
     {
         // Start
+        EditorApplication app;
+
         engine::Window window("Rainfall Editor", 1660, 1080);
         window.set_icon("editor/assets/cdicon.jpg");
 

@@ -15,13 +15,11 @@ Entity::Entity(const std::string& name, TransformComponent* transform)
     is_visible = true;
     is_root = false;
     parent = nullptr;
+    owner = nullptr;
 
     mesh_ = nullptr;
 
     this->transform = transform;
-
-    add_selected_ = -1;
-    name.copy(name_edit_, std::size(name_edit_));
 }
 
 Entity::~Entity()
@@ -47,9 +45,9 @@ Component* Entity::contains_component_enum(const COMPONENTS_IDS& components_id)
     return nullptr;
 }
 
-void Entity::set_mesh_to_component(Mesh* mesh)
+void Entity::set_mesh_to_component(Mesh& mesh)
 {
-    mesh_ = mesh;
+    mesh_ = &mesh;
     if (MeshComponent* mesh_component = get_component<MeshComponent>())
         mesh_component->set_mesh_manager(mesh_);
 }
@@ -89,15 +87,6 @@ glm::mat4 Entity::get_model_matrix()
     return transform->get_model_matrix();
 }
 
-bool Entity::check_search_string(const char* whole, const char* part, const int part_lenght)
-{
-    for (int i = 0; i < part_lenght; ++i)
-    {
-        if (part[i] == '\0') break;
-        if (tolower(part[i]) != tolower(whole[i]) ) return false;
-    }
-    return true;
-}
 
 void Entity::serialize(YAML::Emitter& out)
 {

@@ -6,25 +6,22 @@
 #include "engine/core/ISerializable.h"
 #include "components/TransformComponent.h"
 #include "engine/world/components/BehaviorComponent.h"
+#include "engine/world/Scene.h"
 
 class Mesh;
 
 class Entity : public ISerializable
 {
-    int add_selected_;
-    char component_search_[64] = "";
-    char name_edit_[64] = "";
-
     std::vector<unsigned int> children_ids_;
     Mesh* mesh_;
-
-    bool check_search_string(const char*, const char*, int);
 protected:
     static unsigned int global_id_;
 public:
     unsigned int id;
     std::string name;
     bool is_visible;
+
+    Scene* owner;
 
     bool is_root;
     Entity* parent;
@@ -50,7 +47,7 @@ public:
     template<typename C>
     C* get_enabled_component();
 
-    void set_mesh_to_component(Mesh*);
+    void set_mesh_to_component(Mesh&);
     std::vector<unsigned int> get_children_ids();
 
     bool add_child(Entity*);
@@ -68,9 +65,9 @@ void Entity::add_component(Args&&... args)
     components.push_back(std::make_unique<C>(std::forward<Args>(args)...));
 
     if (std::is_base_of_v<BehaviorComponent, C>)
-    {
-        get_component<BehaviorComponent>()->set_owner_entity(*this);
-    }
+        dynamic_cast<BehaviorComponent*>(components.back().get())->set_owner_entity(*this);
+
+    if (owner) owner->on_add_component<C>(this);
 }
 
 template<typename C>
@@ -79,6 +76,11 @@ void Entity::insert_component(C& component)
     static_assert(std::is_base_of_v<Component, C>, "C must derive from Component");
     std::unique_ptr<C> comp = std::make_unique<C>(component);
     components.push_back(std::move(comp));
+    
+    if (std::is_base_of_v<BehaviorComponent, C>)
+        dynamic_cast<BehaviorComponent*>(components.back().get())->set_owner_entity(*this);
+
+    if (owner) owner->on_add_component<C>(this);
 }
 
 template<typename C>

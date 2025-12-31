@@ -67,7 +67,6 @@ namespace engine
         std::unique_ptr<Framebuffer> render_fbo_;
 
         void update_delta_time();
-        void resize(int, int);
     public:
         double delta_time;
         int display_frame_count;
@@ -78,11 +77,12 @@ namespace engine
         ~Renderer();
 
         void set_current_scene(Scene& scene);
+        Framebuffer* get_render_fbo();
 
         void update();
         void render();
         void swap_and_poll();
 
-        Framebuffer* get_render_fbo();
+        void resize(int, int);
     };
 }

@@ -1,6 +1,6 @@
 #include "engine/rendering/Texture.h"
 
-#include <filesystem>
+#include <limits>
 #include <iostream>
 #include "stb_image.h"
 
@@ -50,9 +50,10 @@ Texture::Texture(const std::string& path, const GLenum internal_format, const GL
     }
     else
     {
-        std::cout << "Loading texture \"" << path << "\": FAILED\n";
+        std::cout << "[ENGINE] Loading texture \"" << path << "\": FAILED\n";
         glDeleteTextures(1, &handle_);
-        handle_ = TextureManager::get_instance()->get_essential_texture(2)->get_handle();
+        Texture* missing_texture = TextureManager::get_instance()->get_essential_texture(2);
+        handle_ = missing_texture ? missing_texture->get_handle() : std::numeric_limits<unsigned int>::max();
     }
 
     Texture::unbind();

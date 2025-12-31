@@ -13,6 +13,7 @@
 #include "engine/world/Components/LightComponent.h"
 #include "engine/world/Components/TextureComponent.h"
 #include "engine/world/Components/MeshComponent.h"
+#include "engine/world/components/BehaviorComponent.h"
 
 Scene::Scene(const std::string& name)
 {
@@ -34,23 +35,30 @@ Scene::Scene(const std::string& name)
         );
     //skybox->add_component<MeshComponent>(0, GL_TRIANGLES, this->mesh);
     skybox->add_component<TextureComponent>(0x8513, 1, 1);
-
-    opened_gui = false;
-    selected_entity = nullptr;
 }
 
 void Scene::set_mesh(Mesh& mesh)
 {
     this->mesh = &mesh;
+
+    for (int i = 0; i < entities.size(); ++i)
+    {
+        entities.at(i)->set_mesh_to_component(*this->mesh);
+    }
 }
 
 void Scene::add_entity(std::unique_ptr<Entity> entity)
 {
     if (entity->parent == nullptr) root_entity->add_child(entity.get());
     entities.push_back(std::move(entity));
-    entities.back()->set_mesh_to_component(mesh);
+    entities.back()->owner = this;
 
-    if (entities.back()->contains_component<LightComponent>()) add_light(entities.back().get());
+    entities.back()->set_mesh_to_component(*mesh);
+
+    if (entities.back()->contains_component<LightComponent>())
+        lights.push_back(entities.back().get());
+    if (entities.back()->contains_component<BehaviorComponent>())
+        behaviors.push_back(entities.back().get());
 }
 
 Entity* Scene::create_entity(const std::string& name)
@@ -98,11 +106,6 @@ void Scene::remove_entity(const int index)
     entities.resize(entities.size() - 1);
 }
 
-void Scene::add_light(Entity* light)
-{
-    lights.push_back(light);
-}
-
 bool Scene::check_light(Entity* light)
 {
     if (!light->contains_component<LightComponent>()) return false;
@@ -119,7 +122,7 @@ bool Scene::check_light(Entity* light)
             return false;
     }
 
-    add_light(light);
+    lights.push_back(light);
     return true;
 }
 
@@ -143,6 +146,18 @@ std::vector<Entity*> Scene::get_lights_by_type(const lights::LIGHT_TYPE type)
     return result;
 }
 
+void Scene::set_player_camera(Entity& camera)
+{
+    if (!camera.contains_component<CameraComponent>()) return;
+    player_camera = &camera;
+    current_camera = player_camera;
+}
+
+void Scene::set_mesh_to_entity(Entity* entity)
+{
+    entity->set_mesh_to_component(*mesh);
+}
+
 
 void Scene::reset()
 {
@@ -152,7 +167,6 @@ void Scene::reset()
 
     player_camera = nullptr;
     current_camera = editor_camera.get();
-    selected_entity = nullptr;
 
     name = "Untitled";
     strcpy_s(name_edit_, name.c_str());
@@ -168,7 +182,7 @@ void Scene::save(const std::string& path)
     file_out << out.c_str();
 
     save_path = path;
-    std::cout << "SAVED SCENE: " << path << '\n';
+    std::cout << "[ENGINE] Scene: SAVED from " << path << '\n';
 }
 
 bool Scene::load(const std::string& path)
@@ -183,7 +197,7 @@ bool Scene::load(const std::string& path)
     const bool result = deserialize(scene);
 
     save_path = path;
-    std::cout << "LOADED SCENE: " << path << '\n';
+    std::cout << "[ENGINE] Scene: LOADED from " << path << '\n';
 
     return result;
 }
@@ -193,7 +207,7 @@ void Scene::serialize(YAML::Emitter& out)
     out << YAML::BeginMap;
 
     out << YAML::Key << "Scene" << YAML::Value << name.c_str();
-    if (selected_entity) out << YAML::Key << "Selected Entity Id" << YAML::Value << selected_entity->id;
+    //if (selected_entity) out << YAML::Key << "Selected Entity Id" << YAML::Value << selected_entity->id;
 
     out << YAML::Key << "Current Camera Id" << YAML::Value << current_camera->id;
     if (player_camera) out << YAML::Key << "Player Camera Id" << YAML::Value << player_camera->id;
@@ -250,8 +264,8 @@ bool Scene::deserialize(YAML::Node& node)
     //Link Entities
     for (unsigned int i = 0; i < entities.size(); ++i)
     {
-        if (std::cmp_equal(entities.at(i)->id, selected_entity_id))
-            selected_entity = entities.at(i).get();
+        //if (std::cmp_equal(entities.at(i)->id, selected_entity_id))
+        //    selected_entity = entities.at(i).get();
 
         if (std::cmp_equal(entities.at(i)->id, player_cam_id))
             player_camera = entities.at(i).get();

@@ -1,10 +1,16 @@
-Project: Testing
-Scene paths:
-  - saved/Another.rain
-  - saved/Example.rain
-Texture Manager:
+Project:
+  Name: Example Project
+  Version: 0.2.14
+Directories:
+  Root: C:\Files\Code\C++\rainfall_engine\game\
+  Assets: assets
+  Scenes: scenes
+Scenes:
+  - MyScene.rain
+  - Example.rain
+Textures:
   ID Count: 63
-  Textures:
+  Paths:
     - [3, assets/chill_guy.jpg, 35905, 6407]
     - [4, assets/container_diffuse.png, 35907, 6408]
     - [5, assets/container_specular.png, 32856, 6408]

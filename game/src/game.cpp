@@ -10,7 +10,7 @@ int main()
 {
 	game::tools::printl_message("GAME", "Start");
 
-	engine::Run<game::ExampleGame>();
+	engine::run<game::ExampleGame>();
 
 	game::tools::printl_message("GAME", "End");
 	return 0;

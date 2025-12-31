@@ -1,16 +1,13 @@
 #include <iostream>
 
 #include "Editor.h"
-#include "EditorApplication.h"
 
 
 int main()
 {
     std::cout << "[EDITOR] START\n";
 
-    editor::Editor editor;
-    editor::EditorApplication app;
-    editor.run(app);
+    editor::run();
 
     std::cout << "[EDITOR] END\n";
 

@@ -1,14 +1,29 @@
 #include "TextureManager.h"
 
 #include "engine/utils/FileDialogs.h"
+#include <algorithm>
+#include <cstdlib>
+#include <limits>
+#include <iostream>
 
 TextureManager* TextureManager::instance_ptr_ = nullptr;
 
 TextureManager::TextureManager()
 {
-    select_scale_ = 100.0f;
-    load_as_srgb_ = false;
+    select_scale = 100.0f;
+    load_as_srgb = false;
     id_counter_ = 0;
+
+    load_prefix_ = "";
+}
+
+void TextureManager::reset()
+{
+    for (int i = 0; i < textures_.size(); ++i)
+    {
+        textures_.at(i)->delete_texture();
+    }
+    textures_.clear();
 }
 
 TextureManager* TextureManager::get_instance()
@@ -28,10 +43,16 @@ unsigned int TextureManager::get_new_id()
 void TextureManager::add_essential_texture(std::unique_ptr<Texture> texture)
 {
     essential_textures_.push_back(std::move(texture));
+    if (essential_textures_.back()->get_handle() == std::numeric_limits<unsigned int>::max())
+    {
+        std::cout << "[ENGINE] Essential texture didn't load properly\n";
+        std::exit(EXIT_FAILURE);
+    }
 }
 
 Texture* TextureManager::get_essential_texture(const int index)
 {
+    if (index < 0 || index >= essential_textures_.size()) return nullptr;
     return essential_textures_.at(index).get();
 }
 
@@ -39,6 +60,11 @@ Texture* TextureManager::add_texture(std::unique_ptr<Texture> texture)
 {
     textures_.push_back(std::move(texture));
     return textures_.back().get();
+}
+
+int TextureManager::get_texture_amount()
+{
+    return textures_.size();
 }
 
 Texture* TextureManager::add_texture_open_file(const bool is_srgb)
@@ -100,16 +126,24 @@ Cubemap* TextureManager::get_cubemap(const int index)
 }
 
 
+void TextureManager::set_load_prefix(const std::string& prefix)
+{
+    load_prefix_ = prefix;
+}
+
 void TextureManager::serialize(YAML::Emitter& out)
 {
-    out << YAML::Key << "Texture Manager" << YAML::Value << YAML::BeginMap;
+    out << YAML::Key << "Textures" << YAML::Value << YAML::BeginMap;
     out << YAML::Key << "ID Count" << YAML::Value << id_counter_;
 
-    out << YAML::Key << "Textures" << YAML::Value << YAML::BeginSeq;
+    out << YAML::Key << "Paths" << YAML::Value << YAML::BeginSeq;
     for (unsigned int i = 0; i < textures_.size(); ++i)
     {
+        std::string path = textures_.at(i)->get_path();
+        std::replace(path.begin(), path.end(), '/', '\\');
+
         out << YAML::Flow << YAML::BeginSeq;
-        out << textures_.at(i)->id << textures_.at(i)->get_path() << textures_.at(i)->internal_format << textures_.at(i)->format;
+        out << textures_.at(i)->id << path << textures_.at(i)->internal_format << textures_.at(i)->format;
         out << YAML::EndSeq;
     }
     out << YAML::EndSeq;
@@ -118,17 +152,12 @@ void TextureManager::serialize(YAML::Emitter& out)
 
 bool TextureManager::deserialize(YAML::Node& node)
 {
-    if (!node["Texture Manager"]) return false;
+    if (!node["Textures"]) return false;
+    YAML::Node manager = node["Textures"];
 
-    YAML::Node manager = node["Texture Manager"];
+    id_counter_ = manager["ID Count"].as<unsigned int>();
 
-    for (int i = 0; i < textures_.size(); ++i)
-    {
-        textures_.at(i)->delete_texture();
-    }
-    textures_.clear();
-
-    for (auto texture_des : manager["Textures"])
+    for (auto texture_des : manager["Paths"])
     {
         YAML::iterator cur_node = texture_des.begin();
         unsigned int id = cur_node->as<unsigned int>();
@@ -146,10 +175,10 @@ bool TextureManager::deserialize(YAML::Node& node)
 
         int in_for = (++cur_node)->as<int>();
         int format = (++cur_node)->as<int>();
-        add_texture(std::make_unique<Texture>(path, in_for, format));
+        add_texture(std::make_unique<Texture>(load_prefix_ + path, in_for, format));
         textures_.back()->id = id;
     }
-    id_counter_ = manager["ID Count"].as<unsigned int>();
+
 
     return true;
 }

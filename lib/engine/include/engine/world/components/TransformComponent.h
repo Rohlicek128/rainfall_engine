@@ -9,10 +9,6 @@ class CameraComponent;
 
 class TransformComponent : public Component
 {
-    float* pos_edit_;
-    float* rot_edit_;
-    float* sca_edit_;
-
 public:
     glm::vec3 position;
     glm::vec3 rotation;

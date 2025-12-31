@@ -11,9 +11,9 @@ class TextureManager : public ISerializable
     std::vector<std::unique_ptr<Texture>> essential_textures_;
     std::vector<std::unique_ptr<Texture>> textures_;
     std::vector<std::unique_ptr<Cubemap>> cubemaps_;
-    float select_scale_;
-    bool load_as_srgb_;
     unsigned int id_counter_;
+
+    std::string load_prefix_;
 
     static TextureManager* instance_ptr_;
 
@@ -21,8 +21,13 @@ class TextureManager : public ISerializable
 public:
     static TextureManager* get_instance();
 
+    float select_scale;
+    bool load_as_srgb;
+
     TextureManager(const TextureManager&) = default;
     ~TextureManager() override = default;
+
+    void reset();
 
     unsigned int get_new_id();
 
@@ -35,8 +40,12 @@ public:
     Texture* get_texture_by_handle(unsigned int);
     Texture* get_texture_by_id(unsigned int);
 
+    int get_texture_amount();
+
     void add_cubemap(std::unique_ptr<Cubemap>);
     Cubemap* get_cubemap(int);
+
+    void set_load_prefix(const std::string& prefix);
 
     void serialize(YAML::Emitter& out) override;
     bool deserialize(YAML::Node& node) override;

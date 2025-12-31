@@ -22,6 +22,8 @@ namespace engine
     public:
         SceneManager(ResourceManager& resource_manager);
 
+        void reset();
+
         Scene* get_current_scene();
 
         bool switch_to(const std::string& name);
@@ -29,6 +31,7 @@ namespace engine
         bool load_scene(std::unique_ptr<Scene> scene, bool make_current = false);
 
         Scene* get_scene(const std::string& name);
+        std::unordered_map<std::string, std::unique_ptr<Scene>>* get_all_scenes();
         Scene* create_scene(const std::string& name, bool make_current = false);
     };
 }

@@ -6,8 +6,6 @@ class Mesh;
 
 class MeshComponent : public Component
 {
-    Mesh* mesh_;
-    bool is_mesh_view_open_;
 public:
     int model_index;
 
@@ -15,6 +13,9 @@ public:
     bool is_inverted;
     bool is_culled;
     bool is_shaded;
+
+    bool is_mesh_view_open;
+    Mesh* mesh;
 
     MeshComponent(int, int = 4, Mesh* = nullptr);
     ~MeshComponent() override = default;

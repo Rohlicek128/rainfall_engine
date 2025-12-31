@@ -19,6 +19,8 @@ namespace engine
     public:
         ResourceManager();
 
+        void reset();
+
         Mesh* get_mesh_manager();
         TextureManager* get_texture_manager();
 

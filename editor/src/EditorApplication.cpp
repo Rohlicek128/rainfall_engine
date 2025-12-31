@@ -1,7 +1,9 @@
 #include "EditorApplication.h"
 
 #include "engine/rendering/Renderer.h"
+#include "engine/world/Entity.h"
 #include "gui/panels/PerformancePanel.h"
+#include "gui/panels/SceneGraphPanel.h"
 #include "gui/panels/ViewportPanel.h"
 
 #include <memory>
@@ -17,31 +19,19 @@ namespace editor
 {
     EditorApplication::EditorApplication()
     {
-        working_dir_ = "C:\\Files\\Code\\C++\\rainfall_engine\\game\\";
-
         viewport_panel_ = std::make_unique<ViewportPanel>();
         performance_panel_ = std::make_unique<PerformancePanel>();
-
+        project_modal_ = std::make_unique<ProjectsModalPanel>();
+        scene_graph_panel_ = std::make_unique<SceneGraphPanel>();
+        entity_inspector_panel_ = std::make_unique<EntityInspectorPanel>();
 
         show_imgui_demo_ = false;
+        show_projects_modal_ = true;
     }
 
     void EditorApplication::on_start()
     {
-        scene_manager->create_scene("editor", true);
-        //scene_manager->load_scene(working_dir_ + "saved\\Another.rain", true);
-
-        auto e = scene_manager->get_current_scene()->create_entity("Cube");
-        e->add_component<MeshComponent>(0, GL_TRIANGLES, resource_manager->get_mesh_manager());
-        e->add_component<MaterialComponent>(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f), 0.5f);
-
-        auto light = scene_manager->get_current_scene()->create_entity("Light");
-        light->transform->scale *= 0.2f;
-        light->transform->position = glm::vec3(3.0f, 2.0f, 2.5f);
-        light->add_component<MeshComponent>(0, 4, resource_manager->get_mesh_manager());
-        light->add_component<LightComponent>(lights::LIGHT_TYPE::POINT, glm::vec3(1.0f, 1.0f, 1.0f));
-        light->get_component<LightComponent>()->intensity = 5.0f;
-        scene_manager->get_current_scene()->add_light(light);
+        Scene* sample_scene = create_sample_scene();
     }
 
     void EditorApplication::on_update(const float delta_time)
@@ -53,13 +43,40 @@ namespace editor
     {
         draw_dockspace();
 
-        viewport_panel_->draw(*renderer.get_render_fbo());
+
+        project_modal_->draw(*this, &show_projects_modal_);
+
+        viewport_panel_->draw(renderer);
         performance_panel_->draw(viewport_panel_->pos, renderer);
+
+        scene_graph_panel_->draw(*scene_manager->get_current_scene());
+        entity_inspector_panel_->draw(scene_graph_panel_->selected_entity, *resource_manager->get_texture_manager());
 
 
         if (show_imgui_demo_) ImGui::ShowDemoWindow(&show_imgui_demo_);
     }
 
+
+    Scene* EditorApplication::create_sample_scene()
+    {
+        Scene* scene = scene_manager->create_scene("Untitled", true);
+
+        Entity* e = scene->create_entity("Cube");
+        e->add_component<MeshComponent>(0, GL_TRIANGLES, resource_manager->get_mesh_manager());
+        e->add_component<MaterialComponent>(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 0.75f);
+
+        std::unique_ptr<Entity> light = std::make_unique<Entity>("Light",
+            new TransformComponent(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f), glm::vec3(1.0f))
+        );
+        light->transform->scale *= 0.2f;
+        light->transform->position = glm::vec3(3.0f, 2.0f, 2.5f);
+        light->add_component<MeshComponent>(0, 4, resource_manager->get_mesh_manager());
+        light->add_component<LightComponent>(lights::LIGHT_TYPE::POINT, glm::vec3(1.0f, 1.0f, 1.0f));
+        light->get_component<LightComponent>()->intensity = 5.0f;
+        scene->add_entity(std::move(light));
+
+        return scene;
+    }
 
     void EditorApplication::draw_dockspace()
     {
@@ -78,8 +95,8 @@ namespace editor
                 if (ImGui::MenuItem("Open..", "CTRL+O"))
                 {
                     const std::string path = engine::FileDialogs::save_file("Rainfall Project (*.rainp)\0*.rainp\0");
-                    //if (!path.empty())
-                        //project.load(path);
+                    if (!path.empty())
+                        current_project->load(*this, path);
                 }
                 //if (ImGui::MenuItem("Save", "CTRL+S") && project.current_scene->save_path != "N/A")
                 //{
@@ -92,23 +109,27 @@ namespace editor
                         //project.save(path);
                 }
 
+                if (ImGui::MenuItem("Open Modal"))
+                {
+                    show_projects_modal_ = true;
+                }
+
                 ImGui::Separator();
 
                 if (ImGui::BeginMenu("Loaded scenes"))
                 {
-                    //for (unsigned int i = 0; i < project.scenes.size(); ++i)
-                    //{
-                    //    if (ImGui::Selectable(project.scenes.at(i)->name.c_str()))
-                    //        project.current_scene = project.scenes.at(i).get();
-                    //}
-
+                    for (const auto & [key, value] : *scene_manager->get_all_scenes())
+                    {
+                        if (ImGui::Selectable(key.c_str()))
+                            scene_manager->switch_to(key);
+                    }
                     ImGui::EndMenu();
                 }
 
                 ImGui::Separator();
 
-                //if (ImGui::MenuItem("Exit"))
-                    //stop();
+                if (ImGui::MenuItem("Exit"))
+                    stop();
 
                 ImGui::EndMenu();
             }

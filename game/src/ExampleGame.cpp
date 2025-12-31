@@ -14,6 +14,12 @@ namespace game
 {
     void ExampleGame::on_start()
     {
+        current_project->name = "Example Project";
+        current_project->project_dir = "C:\\Files\\Code\\C++\\rainfall_engine\\game\\";
+        current_project->assets_dir = "assets";
+        current_project->scenes_dir = "scenes";
+
+
         //scene_manager->load_scene("saved/Example.rain", true);
         //scene_manager->load_scene("saved/Another.rain");
 
@@ -33,9 +39,10 @@ namespace game
         light_->add_component<MeshComponent>(0, 4, resource_manager->get_mesh_manager());
         light_->add_component<LightComponent>(lights::LIGHT_TYPE::POINT, glm::vec3(1.0f, 1.0f, 0.0f));
         light_->get_component<LightComponent>()->intensity = 5.0f;
-        scene->add_light(light_);
 
 
+        current_project->save_scene(*scene);
+        current_project->save(*this, current_project->project_dir + "example.rainp");
         tools::printl_message("EXAMPLE", "OnStart");
     }
 

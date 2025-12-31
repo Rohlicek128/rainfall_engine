@@ -37,11 +37,6 @@ namespace engine
         textures_->add_essential_texture(std::make_unique<Texture>("engine/assets/black1x1.png", GL_RGBA8, GL_RGBA));
         textures_->add_essential_texture(std::make_unique<Texture>("engine/assets/missing_texture.png", GL_SRGB8_ALPHA8, GL_RGBA));
 
-        //std::vector<std::string> faces = {"assets/Skybox/0right.jpg", "assets/Skybox/1left.jpg", "assets/Skybox/2top.jpg",
-        //    "assets/Skybox/3bottom.jpg", "assets/Skybox/4front.jpg", "assets/Skybox/5back.jpg"};
-        //textures_->add_cubemap(std::make_unique<Cubemap>(faces, GL_SRGB8, GL_RGB, GL_UNSIGNED_BYTE));
-
-
         render_fbo_ = nullptr;
         if (render_to_fbo)
         {
@@ -122,10 +117,10 @@ namespace engine
     Renderer::~Renderer()
     {
         //Behaviors
-        for (int i = 0; i < current_scene_->entities.size(); ++i)
+        for (int i = 0; i < current_scene_->behaviors.size(); ++i)
         {
-            BehaviorComponent* behavior = current_scene_->entities.at(i)->get_enabled_component<BehaviorComponent>();
-            if (behavior) behavior->on_shutdown();
+            if (BehaviorComponent* behavior = current_scene_->behaviors.at(i)->get_enabled_component<BehaviorComponent>())
+                behavior->on_shutdown();
         }
     }
 
@@ -204,10 +199,9 @@ namespace engine
 
 
         //Behaviors
-        for (int i = 0; i < current_scene_->entities.size(); ++i)
+        for (int i = 0; i < current_scene_->behaviors.size(); ++i)
         {
-            BehaviorComponent* behavior = current_scene_->entities.at(i)->get_enabled_component<BehaviorComponent>();
-            if (behavior)
+            if (BehaviorComponent* behavior = current_scene_->behaviors.at(i)->get_enabled_component<BehaviorComponent>())
             {
                 if (!behavior->is_active()) behavior->start();
                 behavior->on_update(delta_time);
@@ -221,8 +215,8 @@ namespace engine
         cur_camera_comp->move(window_->engine_args.window, static_cast<float>(delta_time));
         if (!mouse_->is_visible) cur_camera_comp->mouse_move(*mouse_, static_cast<float>(delta_time));
 
-        const int cur_width = window_->engine_args.width;
-        const int cur_height = window_->engine_args.height;
+        const int cur_width = render_to_fbo_ ? render_fbo_->attached_textures.at(0)->get_width() : window_->engine_args.width;
+        const int cur_height = render_to_fbo_ ? render_fbo_->attached_textures.at(0)->get_height() : window_->engine_args.height;
 
         //Shadows
         const std::vector<Entity*> dir_lights = current_scene_->get_lights_by_type(lights::LIGHT_TYPE::DIRECTIONAL);
