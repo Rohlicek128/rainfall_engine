@@ -13,6 +13,7 @@ namespace engine
     Project::Project(const std::string name)
     {
         this->name = name;
+        this->save_path = "N/A";
         app_ = nullptr;
     }
 
@@ -68,7 +69,7 @@ namespace engine
         //Project
         out << YAML::Key << "Project" << YAML::BeginMap;
         out << YAML::Key << "Name" << YAML::Value << name.c_str();
-        out << YAML::Key << "Version" << YAML::Value << "0.2.14";
+        out << YAML::Key << "Version" << YAML::Value << "0.2.15";
         out << YAML::EndMap;
 
         //Directories
@@ -82,11 +83,13 @@ namespace engine
         out << YAML::Key << "Scenes" << YAML::Value << YAML::BeginSeq;
         for (const auto & [key, value] : *app_->scene_manager->get_all_scenes())
         {
+            value->save(value->save_path);
             out << YAML::Value << value->name + ".rain";
         }
         out << YAML::EndSeq;
 
         //Textures
+        app_->resource_manager->get_texture_manager()->set_load_prefix(project_dir + assets_dir + "\\");
         app_->resource_manager->get_texture_manager()->serialize(out);
 
         //Models
@@ -101,12 +104,12 @@ namespace engine
         if (!node["Project"]) return false;
 
         name = node["Project"]["Name"].as<std::string>();
-        
+
         project_dir = node["Directories"]["Root"].as<std::string>();
         assets_dir = node["Directories"]["Assets"].as<std::string>();
         scenes_dir = node["Directories"]["Scenes"].as<std::string>();
-        
-        app_->resource_manager->get_texture_manager()->set_load_prefix(project_dir);
+
+        app_->resource_manager->get_texture_manager()->set_load_prefix(project_dir + assets_dir + "\\");
         app_->resource_manager->get_texture_manager()->deserialize(node);
 
         if (YAML::Node scenes_des = node["Scenes"])

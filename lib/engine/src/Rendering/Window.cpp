@@ -45,7 +45,7 @@ namespace engine
         return glfwWindowShouldClose(engine_args.window);
     }
 
-    GLFWwindow* Window::init_window(const char* window_name, const int width, const int height)
+    GLFWwindow* Window::init_window(const char* window_name, int width, int height)
     {
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -71,11 +71,11 @@ namespace engine
         glfwSetScrollCallback(window, mouse_scroll_callback);
 
         glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+        glfwGetWindowSize(window, &width, &height);
         glViewport(0, 0, width, height);
         engine_args.width = width;
         engine_args.height = height;
-
-        //glfwSetWindowPos(window, 250, 50);
 
         return window;
     }

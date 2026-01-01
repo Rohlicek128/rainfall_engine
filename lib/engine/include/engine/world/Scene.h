@@ -52,14 +52,14 @@ public:
     void remove_entity(int);
 
     template<typename C>
-    void on_add_component(Entity* entity)
+    void on_add_component(Entity& entity)
     {
         if constexpr (std::is_same_v<C, MeshComponent>)
-            set_mesh_to_entity(entity);
+            set_mesh_to_entity(&entity);
         if constexpr (std::is_same_v<C, LightComponent>)
-            lights.push_back(entity);
-        if constexpr (std::is_same_v<C, BehaviorComponent>)
-            behaviors.push_back(entity);
+            lights.push_back(&entity);
+        if constexpr (std::is_base_of_v<BehaviorComponent, C>)
+            behaviors.push_back(&entity);
     }
 
     bool check_light(Entity*);

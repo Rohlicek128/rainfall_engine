@@ -20,4 +20,9 @@ namespace game
 
         if (material_) material_->roughness = std::sin(count_ / 2.0f);
     }
+    
+    std::string TestScript::get_name()
+    {
+        return typeid(*this).name();
+    }
 }

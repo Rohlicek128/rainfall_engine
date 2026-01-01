@@ -14,7 +14,7 @@ namespace engine
 
     class Window
     {
-        GLFWwindow* init_window(const char* window_name, const int width, const int height);
+        GLFWwindow* init_window(const char* window_name, int width, int height);
 
         static void framebuffer_size_callback(GLFWwindow*, int width, int height);
         static void mouse_callback(GLFWwindow*, double x, double y);

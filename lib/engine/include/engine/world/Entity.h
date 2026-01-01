@@ -64,10 +64,10 @@ void Entity::add_component(Args&&... args)
     static_assert(std::is_base_of_v<Component, C>, "C must derive from Component");
     components.push_back(std::make_unique<C>(std::forward<Args>(args)...));
 
-    if (std::is_base_of_v<BehaviorComponent, C>)
-        dynamic_cast<BehaviorComponent*>(components.back().get())->set_owner_entity(*this);
+    if constexpr (std::is_base_of_v<BehaviorComponent, C>)
+        static_cast<BehaviorComponent*>(components.back().get())->set_owner_entity(*this);
 
-    if (owner) owner->on_add_component<C>(this);
+    if (owner) owner->on_add_component<C>(*this);
 }
 
 template<typename C>
@@ -80,7 +80,7 @@ void Entity::insert_component(C& component)
     if (std::is_base_of_v<BehaviorComponent, C>)
         dynamic_cast<BehaviorComponent*>(components.back().get())->set_owner_entity(*this);
 
-    if (owner) owner->on_add_component<C>(this);
+    if (owner) owner->on_add_component<C>(*this);
 }
 
 template<typename C>

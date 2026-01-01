@@ -5,6 +5,7 @@
 #include "engine/world/Components/MaterialComponent.h"
 #include "engine/world/Components/TextureComponent.h"
 #include "engine/world/Components/MeshComponent.h"
+#include "engine/world/components/BehaviorComponent.h"
 
 unsigned int Entity::global_id_ = 0;
 
@@ -177,6 +178,13 @@ bool Entity::deserialize(YAML::Node& node)
                 LightComponent light(lights::LIGHT_TYPE::POINT, glm::vec3(1.0f));
                 light.deserialize(comp_node);
                 insert_component<LightComponent>(light);
+            }
+            else if (component_des["Behavior"])
+            {
+                YAML::Node comp_node = component_des["Behavior"];
+                BehaviorComponent behavior;
+                behavior.deserialize(comp_node);
+                insert_component<BehaviorComponent>(behavior);
             }
         }
     }

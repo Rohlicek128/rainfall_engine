@@ -24,8 +24,6 @@ namespace engine
         Application();
         void set_window(GLFWwindow* window);
 
-        void reset();
-
         bool is_running();
         void stop();
 
@@ -34,5 +32,7 @@ namespace engine
         virtual void on_start() {}
         virtual void on_update(const float delta_time) {}
         virtual void on_shutdown() {}
+        
+        virtual void reset();
     };
 }

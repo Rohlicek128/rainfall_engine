@@ -18,7 +18,7 @@ namespace editor
         char component_search_[64] = "";
 
         template<typename C>
-        C* component_header(Entity* entity)
+        C* component_header(Entity* entity, bool* opened)
         {
             static_assert(std::is_base_of_v<Component, C>, "C must derive from Component");
 
@@ -28,16 +28,17 @@ namespace editor
             ImGui::Checkbox(("##EnabledEC" + c->get_name()).c_str(), &c->is_enabled);
             ImGui::SameLine();
 
-            bool is_opened = true;
-            if (ImGui::CollapsingHeader((c->get_name() + " ##ComponentEC").c_str(), &is_opened, ImGuiTreeNodeFlags_DefaultOpen))
+            *opened = true;
+            if (ImGui::CollapsingHeader((c->get_name() + " ##ComponentEC").c_str(), opened, ImGuiTreeNodeFlags_DefaultOpen))
             {
                 return c;
             }
             return nullptr;
         }
 
-        bool check_search_string(const char*, const char*, int);
+        void remove_component(Entity& entity, Component* component);
 
+        bool check_search_string(const char*, const char*, int);
     public:
         EntityInspectorPanel();
 

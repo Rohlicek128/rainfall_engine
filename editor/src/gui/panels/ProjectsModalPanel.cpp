@@ -1,5 +1,4 @@
 #include "ProjectsModalPanel.h"
-#include "imgui.h"
 
 #include <engine/utils/FileDialogs.h>
 #include <engine/core/Application.h>
@@ -7,7 +6,7 @@
 
 namespace editor
 {
-    void ProjectsModalPanel::draw(engine::Application& app, bool* open)
+    void ProjectsModalPanel::draw(engine::Application& app, bool* open, bool* open_new)
     {
         if (*open) ImGui::OpenPopup("Open Project");
 
@@ -26,6 +25,8 @@ namespace editor
 
             if (ImGui::Button("New", ImVec2(120, 0)))
             {
+                *open_new = true;
+
                 ImGui::CloseCurrentPopup();
                 *open = false;
             }

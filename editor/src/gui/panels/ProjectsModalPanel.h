@@ -13,6 +13,6 @@ namespace editor
     class ProjectsModalPanel
     {
     public:
-        void draw(engine::Application& app, bool* open);
+        void draw(engine::Application& app, bool* open, bool* open_new);
     };
 }

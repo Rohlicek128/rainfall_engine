@@ -1,5 +1,4 @@
 Scene: Example
-Selected Entity Id: 9
 Current Camera Id: 2
 Player Camera Id: 4
 Editor Camera:
@@ -9,14 +8,14 @@ Editor Camera:
   Children Ids: []
   Components:
     - Transform:
-        Position: [2.075735, 7.7496195, -14.920072]
-        Rotation: [0.62223125, -0.31068355, 0.718543]
+        Position: [2.4700534, 11.246036, -13.780628]
+        Rotation: [0.5528981, -0.48022434, 0.68094665]
         Scale: [1, 1, 1]
     - Camera:
         Enabled: true
         Wireframe: false
-        Yaw: 2569.1086
-        Pitch: -18.10043
+        Yaw: 2570.925
+        Pitch: -28.700056
         Fov: 85
         Near Plane: 0.1
         Far Plane: 1000
@@ -29,7 +28,7 @@ Entities:
   - Entity: Player camera
     Id: 4
     Is Visible: true
-    Parent Id: 9
+    Parent Id: 18
     Children Ids: []
     Components:
       - Transform:
@@ -58,7 +57,7 @@ Entities:
   - Entity: Cube
     Id: 5
     Is Visible: true
-    Parent Id: 9
+    Parent Id: 18
     Children Ids: []
     Components:
       - Transform:
@@ -87,7 +86,7 @@ Entities:
   - Entity: "Cube #2"
     Id: 6
     Is Visible: true
-    Parent Id: 9
+    Parent Id: 18
     Children Ids: [7]
     Components:
       - Transform:
@@ -137,7 +136,7 @@ Entities:
   - Entity: Ground
     Id: 8
     Is Visible: true
-    Parent Id: 9
+    Parent Id: 18
     Children Ids: []
     Components:
       - Transform:
@@ -166,7 +165,7 @@ Entities:
   - Entity: Sun
     Id: 9
     Is Visible: true
-    Parent Id: 9
+    Parent Id: 18
     Children Ids: []
     Components:
       - Transform:
@@ -187,7 +186,7 @@ Entities:
   - Entity: Bulb
     Id: 10
     Is Visible: true
-    Parent Id: 9
+    Parent Id: 18
     Children Ids: []
     Components:
       - Transform:
@@ -209,7 +208,7 @@ Entities:
   - Entity: "Bulb #2"
     Id: 11
     Is Visible: true
-    Parent Id: 9
+    Parent Id: 18
     Children Ids: []
     Components:
       - Transform:
@@ -231,7 +230,7 @@ Entities:
   - Entity: Blue Light
     Id: 22
     Is Visible: true
-    Parent Id: 9
+    Parent Id: 18
     Children Ids: []
     Components:
       - Transform:
@@ -253,7 +252,7 @@ Entities:
   - Entity: Gold
     Id: 33
     Is Visible: true
-    Parent Id: 9
+    Parent Id: 18
     Children Ids: []
     Components:
       - Transform:
@@ -282,23 +281,31 @@ Entities:
   - Entity: Billboard
     Id: 23
     Is Visible: true
-    Parent Id: 9
+    Parent Id: 18
     Children Ids: []
     Components:
       - Transform:
           Position: [26.72, 5.91, 5.06]
           Rotation: [0, 151.1, -60.1]
-          Scale: [4.37, 1, 6.64]
+          Scale: [4.37, 1, 4.4]
       - Mesh:
           Enabled: true
           Model Id: 1
           Primitive: 4
           Is Culled: true
           Is Inverted: false
+      - Texture:
+          Enabled: true
+          Type: 3553
+          Scale: 1
+          Diffuse: 111
+          Roughness: 1
+          Metallic: 1
+          Normal: 0
   - Entity: Wall
     Id: 24
     Is Visible: true
-    Parent Id: 9
+    Parent Id: 18
     Children Ids: []
     Components:
       - Transform:

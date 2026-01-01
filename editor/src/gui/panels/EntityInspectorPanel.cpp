@@ -2,6 +2,7 @@
 #include "../inspectors/ElementInspector.h"
 
 #include "engine/src/Rendering/Buffers/Textures/TextureManager.h"
+#include "engine/world/components/BehaviorComponent.h"
 #include "engine/world/components/MeshComponent.h"
 #include "engine/world/components/CameraComponent.h"
 #include "engine/world/components/MaterialComponent.h"
@@ -9,6 +10,7 @@
 #include "engine/world/components/LightComponent.h"
 
 #include <engine/world/Entity.h>
+#include <algorithm>
 
 
 namespace editor
@@ -53,25 +55,48 @@ namespace editor
             {
                 ElementInspector::draw_transform_component(*entity->transform);
             }
-            if (MeshComponent* mesh = component_header<MeshComponent>(entity))
+            bool opened = true;
+            if (MeshComponent* mesh = component_header<MeshComponent>(entity, &opened))
             {
+                if (!mesh->is_enabled) ImGui::BeginDisabled();
                 ElementInspector::draw_mesh_component(*mesh);
+                if (!mesh->is_enabled) ImGui::EndDisabled();
+                if (!opened) remove_component(*entity, mesh);
             }
-            if (CameraComponent* camera = component_header<CameraComponent>(entity))
+            if (CameraComponent* camera = component_header<CameraComponent>(entity, &opened))
             {
+                if (!camera->is_enabled) ImGui::BeginDisabled();
                 ElementInspector::draw_camera_component(*camera);
+                if (!camera->is_enabled) ImGui::EndDisabled();
+                if (!opened) remove_component(*entity, camera);
             }
-            if (TextureComponent* texture = component_header<TextureComponent>(entity))
+            if (TextureComponent* texture = component_header<TextureComponent>(entity, &opened))
             {
+                if (!texture->is_enabled) ImGui::BeginDisabled();
                 ElementInspector::draw_texture_component(*texture, manager);
+                if (!texture->is_enabled) ImGui::EndDisabled();
+                if (!opened) remove_component(*entity, texture);
             }
-            if (MaterialComponent* material = component_header<MaterialComponent>(entity))
+            if (MaterialComponent* material = component_header<MaterialComponent>(entity, &opened))
             {
+                if (!material->is_enabled) ImGui::BeginDisabled();
                 ElementInspector::draw_material_component(*material);
+                if (!material->is_enabled) ImGui::EndDisabled();
+                if (!opened) remove_component(*entity, material);
             }
-            if (LightComponent* light = component_header<LightComponent>(entity))
+            if (LightComponent* light = component_header<LightComponent>(entity, &opened))
             {
+                if (!light->is_enabled) ImGui::BeginDisabled();
                 ElementInspector::draw_light_component(*light);
+                if (!light->is_enabled) ImGui::EndDisabled();
+                if (!opened) remove_component(*entity, light);
+            }
+            if (BehaviorComponent* behavior = component_header<BehaviorComponent>(entity, &opened))
+            {
+                if (!behavior->is_enabled) ImGui::BeginDisabled();
+                ElementInspector::draw_behavior_component(*behavior);
+                if (!behavior->is_enabled) ImGui::EndDisabled();
+                if (!opened) remove_component(*entity, behavior);
             }
 
 
@@ -115,6 +140,19 @@ namespace editor
             }
         }
         ImGui::End();
+    }
+
+    void EntityInspectorPanel::remove_component(Entity& entity, Component* component)
+    {
+        auto it = std::find_if(entity.components.begin(), entity.components.end(),
+            [component](const std::unique_ptr<Component>& ptr)
+            {
+                return ptr.get() == component;
+            });
+        if (it != entity.components.end())
+        {
+            entity.components.erase(it);
+        }
     }
 
     bool EntityInspectorPanel::check_search_string(const char* whole, const char* part, const int part_lenght)

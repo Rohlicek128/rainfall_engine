@@ -14,6 +14,7 @@ class MaterialComponent;
 class MeshComponent;
 class LightComponent;
 class TextureComponent;
+class BehaviorComponent;
 
 namespace editor
 {
@@ -35,5 +36,6 @@ namespace editor
         static void draw_material_component(MaterialComponent& material);
         static void draw_texture_component(TextureComponent&, TextureManager& manager);
         static void draw_light_component(LightComponent& light);
+        static void draw_behavior_component(BehaviorComponent& behavior);
     };
 }

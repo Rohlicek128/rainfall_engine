@@ -73,7 +73,7 @@ Texture* TextureManager::add_texture_open_file(const bool is_srgb)
     if (path.empty()) return nullptr;
 
     const bool is_png = !path.compare(path.length() - 3, 3, "png");
-    int i_format = is_png ? (is_srgb ? GL_SRGB8_ALPHA8 : GL_RGBA8) : GL_RGB8;
+    int i_format = is_png ? (is_srgb ? GL_SRGB8_ALPHA8 : GL_RGBA8) : (is_srgb ? GL_SRGB8 : GL_RGB8);
     int format = is_png ? GL_RGBA : GL_RGB;
     add_texture(std::make_unique<Texture>(path, i_format, format));
 
@@ -141,6 +141,8 @@ void TextureManager::serialize(YAML::Emitter& out)
     {
         std::string path = textures_.at(i)->get_path();
         std::replace(path.begin(), path.end(), '/', '\\');
+        path.erase(path.find(load_prefix_), load_prefix_.size());
+        std::cout << path << '\n';
 
         out << YAML::Flow << YAML::BeginSeq;
         out << textures_.at(i)->id << path << textures_.at(i)->internal_format << textures_.at(i)->format;

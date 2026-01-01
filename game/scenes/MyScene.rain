@@ -7,14 +7,14 @@ Editor Camera:
   Children Ids: []
   Components:
     - Transform:
-        Position: [2, 2, 0]
-        Rotation: [0, 0, 0]
+        Position: [4.49805, 3.6528301, -2.5108557]
+        Rotation: [-0.6965508, -0.47101158, 0.54126257]
         Scale: [1, 1, 1]
     - Camera:
         Enabled: true
         Wireframe: false
-        Yaw: 0
-        Pitch: 0
+        Yaw: 142.1506
+        Pitch: -28.099981
         Fov: 85
         Near Plane: 0.1
         Far Plane: 1000
@@ -27,7 +27,7 @@ Entities:
   - Entity: Sample
     Id: 4
     Is Visible: true
-    Parent Id: 1
+    Parent Id: 12
     Children Ids: []
     Components:
       - Transform:
@@ -44,14 +44,17 @@ Entities:
           Enabled: true
           Type: 3553
           Scale: 1
-          Diffuse: 8
-          Roughness: 0
+          Diffuse: 3
+          Roughness: 1
           Metallic: 1
           Normal: 0
+      - Behavior:
+          Enabled: true
+          Name: Behavior
   - Entity: Light
     Id: 5
     Is Visible: true
-    Parent Id: 1
+    Parent Id: 12
     Children Ids: []
     Components:
       - Transform:

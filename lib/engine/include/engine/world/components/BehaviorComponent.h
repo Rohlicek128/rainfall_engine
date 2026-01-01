@@ -13,6 +13,8 @@ protected:
     Entity* self;
 
 public:
+    std::string name;
+
     BehaviorComponent();
     ~BehaviorComponent() override = default;
 

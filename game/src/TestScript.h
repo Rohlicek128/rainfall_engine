@@ -14,5 +14,7 @@ namespace game
     public:
         void on_start() override;
         void on_update(const float delta_time) override;
+        
+        std::string get_name() override;
     };
 }

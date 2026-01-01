@@ -1,0 +1,13 @@
+Project:
+  Name: Example Project
+  Version: 0.2.15
+Directories:
+  Root: C:\Files\Code\C++\rainfall_engine\game\
+  Assets: assets
+  Scenes: scenes
+Scenes:
+  - MyScene.rain
+Textures:
+  ID Count: 4
+  Paths:
+    - [3, chill_guy.jpg, 35905, 6407]

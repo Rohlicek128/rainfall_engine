@@ -27,7 +27,7 @@ namespace game
         box_ = scene->create_entity("Sample");
         box_->add_component<MeshComponent>(0, GL_TRIANGLES, resource_manager->get_mesh_manager());
 
-        Texture* texture = resource_manager->load_texture("assets/chill_guy.jpg", "jpg");
+        Texture* texture = resource_manager->load_texture(current_project->project_dir + current_project->assets_dir + "\\chill_guy.jpg", "jpg");
         box_->add_component<TextureComponent>(texture);
         box_->add_component<TestScript>();
 
@@ -41,8 +41,7 @@ namespace game
         light_->get_component<LightComponent>()->intensity = 5.0f;
 
 
-        current_project->save_scene(*scene);
-        current_project->save(*this, current_project->project_dir + "example.rainp");
+        current_project->save(*this, current_project->project_dir + "examplegame.rainp");
         tools::printl_message("EXAMPLE", "OnStart");
     }
 

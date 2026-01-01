@@ -21,12 +21,14 @@ namespace editor
     {
         viewport_panel_ = std::make_unique<ViewportPanel>();
         performance_panel_ = std::make_unique<PerformancePanel>();
-        project_modal_ = std::make_unique<ProjectsModalPanel>();
         scene_graph_panel_ = std::make_unique<SceneGraphPanel>();
         entity_inspector_panel_ = std::make_unique<EntityInspectorPanel>();
+        project_modal_ = std::make_unique<ProjectsModalPanel>();
+        project_new_modal_ = std::make_unique<ProjectNewModal>();
 
         show_imgui_demo_ = false;
         show_projects_modal_ = true;
+        show_projects_new_modal_ = false;
     }
 
     void EditorApplication::on_start()
@@ -44,7 +46,8 @@ namespace editor
         draw_dockspace();
 
 
-        project_modal_->draw(*this, &show_projects_modal_);
+        project_modal_->draw(*this, &show_projects_modal_, &show_projects_new_modal_);
+        project_new_modal_->draw(*this, &show_projects_new_modal_);
 
         viewport_panel_->draw(renderer);
         performance_panel_->draw(viewport_panel_->pos, renderer);
@@ -54,6 +57,13 @@ namespace editor
 
 
         if (show_imgui_demo_) ImGui::ShowDemoWindow(&show_imgui_demo_);
+    }
+    
+    void EditorApplication::reset()
+    {
+        resource_manager.get()->reset();
+        scene_manager.get()->reset();
+        scene_graph_panel_->selected_entity = nullptr;
     }
 
 
@@ -88,25 +98,24 @@ namespace editor
             {
                 if (ImGui::MenuItem("New Project", "CTRL+N"))
                 {
-                    //project.reset();
-                    //project.add_empty_scene();
+                    show_projects_new_modal_ = true;
                 }
 
-                if (ImGui::MenuItem("Open..", "CTRL+O"))
+                if (ImGui::MenuItem("Open...", "CTRL+O"))
                 {
                     const std::string path = engine::FileDialogs::save_file("Rainfall Project (*.rainp)\0*.rainp\0");
                     if (!path.empty())
                         current_project->load(*this, path);
                 }
-                //if (ImGui::MenuItem("Save", "CTRL+S") && project.current_scene->save_path != "N/A")
-                //{
-                    //project.save(project.path);
-                //}
-                if (ImGui::MenuItem("Save As..", "CTRL+SHIFT+S"))
+                if (ImGui::MenuItem("Save", "CTRL+S") && current_project->save_path != "N/A")
+                {
+                    current_project->save(*this, current_project->save_path);
+                }
+                if (ImGui::MenuItem("Save As...", "CTRL+SHIFT+S"))
                 {
                     const std::string path = engine::FileDialogs::save_file("Rainfall Project (*.rainp)\0*.rainp\0");
-                    //if (!path.empty())
-                        //project.save(path);
+                    if (!path.empty())
+                        current_project->save(*this, path);
                 }
 
                 if (ImGui::MenuItem("Open Modal"))

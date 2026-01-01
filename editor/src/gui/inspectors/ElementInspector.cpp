@@ -10,6 +10,7 @@
 #include <engine/world/components/MeshComponent.h>
 #include <engine/world/components/CameraComponent.h>
 #include <engine/world/components/LightComponent.h>
+#include <engine/world/components/BehaviorComponent.h>
 
 #include <engine/managers/Mesh.h>
 
@@ -116,14 +117,14 @@ namespace editor
             else max_width = 0.0;
         }
         ImGui::NewLine();
-        if (ImGui::Button("  None  ")) return texture_manager.get_essential_texture(0);
+        if (ImGui::Button("None", ImVec2(120, 0))) return texture_manager.get_essential_texture(0);
 
 
-        if (ImGui::Button("  Add..  "))
+        if (ImGui::Button("Add...", ImVec2(120, 0)))
             texture_manager.add_texture_open_file(texture_manager.load_as_srgb);
 
         ImGui::SameLine();
-        ImGui::Checkbox("Load SRGB", &texture_manager.load_as_srgb);
+        ImGui::Checkbox("Load as SRGB", &texture_manager.load_as_srgb);
 
         return nullptr;
     }
@@ -314,5 +315,12 @@ namespace editor
             ImGui::DragFloat("Quadratic", &light.attenuation_params.z, 0.0001f, 0, 0, "%.4f");
             ImGui::PopItemWidth();
         }
+    }
+
+    void ElementInspector::draw_behavior_component(BehaviorComponent& behavior)
+    {
+        ImGui::Text("Name: ");
+        ImGui::SameLine();
+        ImGui::Text(behavior.name.c_str());
     }
 }

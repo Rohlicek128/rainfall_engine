@@ -2,6 +2,7 @@
 
 #include <glad.h>
 #include <memory>
+#include <iostream>
 
 #include "engine/rendering/Framebuffer.h"
 #include "engine/rendering/Window.h"
@@ -48,7 +49,7 @@ namespace engine
 
 
         viewport_ = new GLint[2]{window_->engine_args.width, window_->engine_args.height};
-        mouse_ = new Mouse(viewport_[0], viewport_[1], 5.0f, false);
+        mouse_ = new Mouse(viewport_[0], viewport_[1], 5.0f, render_to_fbo);
         if (mouse_->is_visible)
         {
             glfwSetInputMode(window_->engine_args.window, GLFW_CURSOR,  GLFW_CURSOR_NORMAL);
@@ -272,7 +273,6 @@ namespace engine
 
     Framebuffer* Renderer::get_render_fbo()
     {
-        if (!render_to_fbo_) return nullptr;
-        return render_fbo_.get();
+        return render_to_fbo_ ? render_fbo_.get() : nullptr;
     }
 }

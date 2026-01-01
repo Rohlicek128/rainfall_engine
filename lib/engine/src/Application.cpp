@@ -23,8 +23,8 @@ namespace engine
 
     void Application::reset()
     {
-        resource_manager->reset();
-        scene_manager->reset();
+        resource_manager.get()->reset();
+        scene_manager.get()->reset();
     }
 
     bool Application::is_running()
