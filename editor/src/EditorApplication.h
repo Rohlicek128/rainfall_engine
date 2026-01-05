@@ -34,6 +34,7 @@ namespace editor
         bool show_imgui_demo_;
         bool show_projects_modal_;
         bool show_projects_new_modal_;
+        bool show_performance_;
 
         void draw_dockspace();
     public:
@@ -42,7 +43,7 @@ namespace editor
         void on_start() override;
         void on_update(const float delta_time) override;
         void on_render(engine::Renderer& renderer);
-        
+
         void reset() override;
 
         Scene* create_sample_scene();

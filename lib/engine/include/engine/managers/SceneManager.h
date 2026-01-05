@@ -32,6 +32,6 @@ namespace engine
 
         Scene* get_scene(const std::string& name);
         std::unordered_map<std::string, std::unique_ptr<Scene>>* get_all_scenes();
-        Scene* create_scene(const std::string& name, bool make_current = false);
+        Scene* create_scene(const std::string& name = "Untitled", bool make_current = false);
     };
 }

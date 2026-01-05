@@ -29,6 +29,7 @@ namespace editor
         show_imgui_demo_ = false;
         show_projects_modal_ = true;
         show_projects_new_modal_ = false;
+        show_performance_ = true;
     }
 
     void EditorApplication::on_start()
@@ -50,7 +51,7 @@ namespace editor
         project_new_modal_->draw(*this, &show_projects_new_modal_);
 
         viewport_panel_->draw(renderer);
-        performance_panel_->draw(viewport_panel_->pos, renderer);
+        if (show_performance_) performance_panel_->draw(viewport_panel_->pos, renderer);
 
         scene_graph_panel_->draw(*scene_manager->get_current_scene());
         entity_inspector_panel_->draw(scene_graph_panel_->selected_entity, *resource_manager->get_texture_manager());
@@ -58,7 +59,7 @@ namespace editor
 
         if (show_imgui_demo_) ImGui::ShowDemoWindow(&show_imgui_demo_);
     }
-    
+
     void EditorApplication::reset()
     {
         resource_manager.get()->reset();
@@ -103,7 +104,7 @@ namespace editor
 
                 if (ImGui::MenuItem("Open...", "CTRL+O"))
                 {
-                    const std::string path = engine::FileDialogs::save_file("Rainfall Project (*.rainp)\0*.rainp\0");
+                    const std::string path = engine::FileDialogs::open_file("Rainfall Project (*.rainp)\0*.rainp\0");
                     if (!path.empty())
                         current_project->load(*this, path);
                 }
@@ -118,6 +119,8 @@ namespace editor
                         current_project->save(*this, path);
                 }
 
+                ImGui::Separator();
+
                 if (ImGui::MenuItem("Open Modal"))
                 {
                     show_projects_modal_ = true;
@@ -125,7 +128,37 @@ namespace editor
 
                 ImGui::Separator();
 
-                if (ImGui::BeginMenu("Loaded scenes"))
+                if (ImGui::MenuItem("Quit"))
+                    stop();
+
+                ImGui::EndMenu();
+            }
+
+            if (ImGui::BeginMenu("Scene"))
+            {
+                if (ImGui::MenuItem("New", "CTRL+N"))
+                    scene_manager->create_scene("Untitled", true);
+
+                if (ImGui::MenuItem("Open...", "CTRL+O"))
+                {
+                    const std::string path = engine::FileDialogs::open_file("Rainfall Scene (*.rain)\0*.rain\0");
+                    if (!path.empty())
+                        scene_manager->load_scene(path, true);
+                }
+
+                if (ImGui::MenuItem(("Save to /" + current_project->scenes_dir).c_str(), "CTRL+S"))
+                    current_project->save_scene(*this, scene_manager->get_current_scene()->name);
+
+                if (ImGui::MenuItem("Save As...", "CTRL+SHIFT+S"))
+                {
+                    const std::string path = engine::FileDialogs::save_file("Rainfall Scene (*.rain)\0*.rain\0");
+                    if (!path.empty())
+                        scene_manager->get_current_scene()->save(path);
+                }
+
+                ImGui::Separator();
+
+                if (ImGui::BeginMenu("Loaded"))
                 {
                     for (const auto & [key, value] : *scene_manager->get_all_scenes())
                     {
@@ -135,53 +168,24 @@ namespace editor
                     ImGui::EndMenu();
                 }
 
-                ImGui::Separator();
-
-                if (ImGui::MenuItem("Exit"))
-                    stop();
-
-                ImGui::EndMenu();
-            }
-
-            if (ImGui::BeginMenu("Scene"))
-            {
-                if (ImGui::MenuItem("New", "CTRL+N"))
-                    //project.current_scene->reset();
-
-                if (ImGui::MenuItem("Open..", "CTRL+O"))
-                {
-                    //project.load_scene_dialog();
-                }
-
-                //if (ImGui::MenuItem("Save", "CTRL+S") && project.current_scene->save_path != "N/A")
-                //{
-                    //project.current_scene->save(project.current_scene->save_path);
-                //}
-                if (ImGui::MenuItem("Save As..", "CTRL+SHIFT+S"))
-                {
-                    const std::string path = engine::FileDialogs::save_file("Rainfall Scene (*.rain)\0*.rain\0");
-                    //if (!path.empty())
-                        //project.current_scene->save(path);
-                }
-
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Options"))
             {
                 ImGui::SeparatorText("Editor Options");
-                //ImGui::SliderFloat("UI Scale", &imgui_io->FontGlobalScale, 1.0f, 3.0f, "%.1f");
+                ImGui::SliderFloat("UI Scale", &ImGui::GetIO().FontGlobalScale, 0.1f, 4.0f, "%.1f");
                 ImGui::ColorEdit4("Window Bg", (float*)&ImGui::GetStyle().Colors[ImGuiCol_WindowBg], ImGuiColorEditFlags_AlphaBar);
 
                 ImGui::EndMenu();
             }
-            if (ImGui::BeginMenu("Window"))
+            if (ImGui::BeginMenu("Windows"))
             {
                 ImGui::SeparatorText("Available Windows");
-                //ImGui::MenuItem("Show Statistics", "CTRL+P", &show_statistics);
+                ImGui::MenuItem("Performance", "CTRL+P", &show_performance_);
                 //ImGui::MenuItem("Show GBuffer Inspector", "CTRL+G", &show_g_buffer_inspector);
 
-                //ImGui::Separator();
-                ImGui::MenuItem("Show ImGui Demo", "CTRL+D", &show_imgui_demo_);
+                ImGui::Separator();
+                ImGui::MenuItem("ImGui Demo", "CTRL+D", &show_imgui_demo_);
 
                 ImGui::EndMenu();
             }

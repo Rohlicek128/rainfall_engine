@@ -8,6 +8,6 @@ Directories:
 Scenes:
   - MyScene.rain
 Textures:
-  ID Count: 4
+  ID Count: 9
   Paths:
-    - [3, chill_guy.jpg, 35905, 6407]
+    - [8, chill_guy.jpg, 35905, 6407]

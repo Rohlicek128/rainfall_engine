@@ -35,7 +35,7 @@ namespace editor
 
         ImGui::GetStyle().Colors[ImGuiCol_WindowBg] = {0.08f, 0.1f, 0.13f, 0.9f};
 
-        imgui_io->Fonts->AddFontFromFileTTF("editor/assets/fonts/CascadiaMono-SemiBold.ttf", 13);
+        imgui_io->Fonts->AddFontFromFileTTF("editor/assets/fonts/Inter_24pt-SemiBold.ttf", 14);
         set_red_style();
 
         //ImGuizmo::SetOrthographic(false);
@@ -72,7 +72,7 @@ namespace editor
     void ImGuiLayer::set_red_style()
     {
         ImVec4* colors = ImGui::GetStyle().Colors;
-        colors[ImGuiCol_TextDisabled]           = ImVec4(0.43f, 0.43f, 0.43f, 1.00f);
+        /*colors[ImGuiCol_TextDisabled]           = ImVec4(0.43f, 0.43f, 0.43f, 1.00f);
         colors[ImGuiCol_WindowBg]               = ImVec4(0.07f, 0.08f, 0.11f, 0.92f);
         colors[ImGuiCol_Border]                 = ImVec4(0.36f, 0.36f, 0.36f, 0.35f);
         colors[ImGuiCol_FrameBg]                = ImVec4(0.27f, 0.16f, 0.16f, 0.54f);
@@ -102,6 +102,16 @@ namespace editor
         colors[ImGuiCol_TabSelectedOverline]    = ImVec4(0.98f, 0.26f, 0.26f, 1.00f);
         colors[ImGuiCol_TabDimmed]              = ImVec4(0.15f, 0.07f, 0.07f, 0.97f);
         colors[ImGuiCol_TabDimmedSelected]      = ImVec4(0.42f, 0.14f, 0.14f, 1.00f);
-        colors[ImGuiCol_DockingPreview]         = ImVec4(0.98f, 0.26f, 0.26f, 0.70f);
+        colors[ImGuiCol_DockingPreview]         = ImVec4(0.98f, 0.26f, 0.26f, 0.70f);*/
+
+        colors[ImGuiCol_WindowBg]               = ImVec4(0.07f, 0.08f, 0.11f, 0.7f);
+
+
+        ImGui::GetStyle().WindowRounding = 10;
+        ImGui::GetStyle().ChildRounding = 10;
+        ImGui::GetStyle().FrameRounding = 8;
+        ImGui::GetStyle().PopupRounding = 12;
+        ImGui::GetStyle().GrabRounding = 4;
+
     }
 }

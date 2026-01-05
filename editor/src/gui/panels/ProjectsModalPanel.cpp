@@ -33,7 +33,7 @@ namespace editor
             ImGui::SameLine();
             if (ImGui::Button("Open...", ImVec2(120, 0)))
             {
-                const std::string path = engine::FileDialogs::save_file("Rainfall Project (*.rainp)\0*.rainp\0");
+                const std::string path = engine::FileDialogs::open_file("Rainfall Project (*.rainp)\0*.rainp\0");
                 if (!path.empty())
                     app.current_project->load(app, path);
 

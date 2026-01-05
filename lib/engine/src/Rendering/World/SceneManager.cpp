@@ -78,12 +78,21 @@ namespace engine
 
     Scene* SceneManager::create_scene(const std::string& name, bool make_current)
     {
-        std::unique_ptr<Scene> scene = std::make_unique<Scene>(name);
+        std::string available_name = name;
+        int count = 1;
+        while (scenes_.contains(available_name))
+        {
+            available_name = name + " (" + std::to_string(count) + ")";
+            count++;
+        }
+
+
+        std::unique_ptr<Scene> scene = std::make_unique<Scene>(available_name);
         scene->set_mesh(*resource_manager_->get_mesh_manager());
 
-        auto result = scenes_.emplace(name, std::move(scene));
-        if (make_current && result.second) switch_to(name);
+        auto result = scenes_.emplace(available_name, std::move(scene));
+        if (make_current && result.second) switch_to(available_name);
 
-        return get_scene(name);
+        return get_scene(available_name);
     }
 }
