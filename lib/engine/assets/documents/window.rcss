@@ -1,5 +1,5 @@
 body {
-    font-family: LatoLatin;
+    font-family: Lexend;
     font-size: 18px;
     color: #02475e;
     background: #fefecc;
@@ -19,7 +19,7 @@ h1 {
     margin-bottom: 0.7em;
 }
 
-p { 
+p {
     margin: 0.7em 0;
 }
 

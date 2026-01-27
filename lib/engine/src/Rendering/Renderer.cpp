@@ -1,14 +1,11 @@
 #include "engine/rendering/Renderer.h"
 
-#include <RmlUi/Core.h>
 
 #include <glad.h>
 #include <memory>
 #include <iostream>
-#include <RmlUi_Platform_GLFW.h>
 
-#include "RmlUi/Core/Core.h"
-#include "RmlUi_Renderer_GL3.h"
+
 #include "engine/rendering/Framebuffer.h"
 #include "engine/rendering/Window.h"
 #include "EngineArgs.h"
@@ -29,6 +26,7 @@
 #include "engine/world/Entity.h"
 #include "engine/managers/Mesh.h"
 #include "engine/world/components/BehaviorComponent.h"
+#include "glfw3.h"
 
 
 namespace engine
@@ -118,8 +116,6 @@ namespace engine
 
         glEnable(GL_PROGRAM_POINT_SIZE);
         glPointSize(5.0f);
-
-        init_rmlui();
     }
 
     Renderer::~Renderer()
@@ -130,31 +126,6 @@ namespace engine
             if (BehaviorComponent* behavior = current_scene_->behaviors.at(i)->get_enabled_component<BehaviorComponent>())
                 behavior->on_shutdown();
         }
-
-        Rml::Shutdown();
-    }
-
-    void Renderer::init_rmlui()
-    {
-        static SystemInterface_GLFW system_interface;
-        Rml::SetSystemInterface(&system_interface);
-        
-        render_interface_ = std::make_unique<RenderInterface_GL3>();
-
-        // Install the custom interfaces.
-        Rml::SetRenderInterface(render_interface_.get());
-
-        // Now we can initialize RmlUi.
-        Rml::Initialise();
-
-        // Create a context to display documents within.
-        context_ = Rml::CreateContext("main", Rml::Vector2i(window_->engine_args.width, window_->engine_args.height));
-
-        // Tell RmlUi to load the given fonts.
-        Rml::LoadFontFace("engine/assets/fonts/Lexend-Regular.ttf");
-
-        Rml::ElementDocument* document = context_->LoadDocument("engine/assets/documents/index.rml");
-        document->Show();
     }
 
 
@@ -193,6 +164,7 @@ namespace engine
         update_delta_time();
         mouse_->pos_x = window_->engine_args.mouse_x;
         mouse_->pos_y = window_->engine_args.mouse_y;
+
 
         if (viewport_[0] != window_->engine_args.width || viewport_[1] != window_->engine_args.height)
             resize(window_->engine_args.width, window_->engine_args.height);
@@ -285,13 +257,6 @@ namespace engine
         if (render_to_fbo_) render_fbo_->unbind();
 
         glViewport(0, 0, window_->engine_args.width, window_->engine_args.height);
-        
-        render_interface_->SetViewport(window_->engine_args.width, window_->engine_args.height);
-        glDisable(GL_DEPTH_TEST);
-        context_->Update();
-        context_->Render();
-        glEnable(GL_DEPTH_TEST);
-        glDepthMask(GL_TRUE);
     }
 
     void Renderer::swap_and_poll()

@@ -25,6 +25,9 @@ namespace engine
         Window(const std::string&, int, int);
         ~Window();
 
+        int get_width();
+        int get_height();
+
         GLFWwindow* get_glfw_window();
         bool should_close();
 

@@ -4,7 +4,6 @@ list(APPEND SRCS
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/glad/glad.c"
 )
 
-
 add_library(engine STATIC ${SRCS})
 TARGET_INCLUDE_DIRECTORIES(engine
     PUBLIC
@@ -32,10 +31,10 @@ target_compile_definitions(rmlui_backend_GLFW_GL3 INTERFACE
 	RMLUI_GL3_CUSTOM_LOADER=<glad.h>
 )
 
-
 target_link_libraries(engine PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/glfw/glfw3.lib"
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/yaml-cpp/yaml-cppd.lib"
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/RmlUi/rmlui_debugger.lib"
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/RmlUi/rmlui.lib"
     rmlui_backend_GLFW_GL3
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/freetype/freetyped.lib"

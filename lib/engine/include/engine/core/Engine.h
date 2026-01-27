@@ -2,6 +2,7 @@
 
 #include <engine/rendering/Window.h>
 #include <engine/rendering/Renderer.h>
+#include <engine/rendering/ui/RmlUiLayer.h>
 #include <engine/world/Scene.h>
 #include <engine/world/Entity.h>
 
@@ -20,6 +21,7 @@ namespace engine
         // Start
         Window window("Rainfall Engine", 1660, 1080);
         Renderer renderer(window);
+        RmlUiLayer rmlui_layer(window.get_width(), window.get_height());
 
         A app;
         app.set_window(window.get_glfw_window());
@@ -32,12 +34,14 @@ namespace engine
             renderer.set_current_scene(*app.scene_manager->get_current_scene());
 
             // Update
+            rmlui_layer.update();
             renderer.update();
             app.input_manager->set_delta_time(renderer.delta_time);
             app.on_update(renderer.delta_time);
 
             // Render
             renderer.render();
+            rmlui_layer.render(window.get_width(), window.get_height());
             renderer.swap_and_poll();
         }
 

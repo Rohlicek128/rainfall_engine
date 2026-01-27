@@ -828,11 +828,16 @@ RenderInterface_GL3::~RenderInterface_GL3()
 
 void RenderInterface_GL3::SetViewport(int width, int height, int offset_x, int offset_y)
 {
-	viewport_width = Rml::Math::Max(width, 1);
-	viewport_height = Rml::Math::Max(height, 1);
-	viewport_offset_x = offset_x;
-	viewport_offset_y = offset_y;
-	projection = Rml::Matrix4f::ProjectOrtho(0, (float)viewport_width, (float)viewport_height, 0, -10000, 10000);
+    viewport_width = Rml::Math::Max(width, 1);
+    viewport_height = Rml::Math::Max(height, 1);
+    viewport_offset_x = offset_x;
+    viewport_offset_y = offset_y;
+
+    // Change 'projection' to 'transform'
+    transform = Rml::Matrix4f::ProjectOrtho(0, (float)viewport_width, (float)viewport_height, 0, -10000, 10000);
+
+    // You MUST set the dirty bits so SubmitTransformUniform knows to call glUniform
+    program_transform_dirty.set();
 }
 
 void RenderInterface_GL3::BeginFrame()
@@ -2043,18 +2048,12 @@ int RenderInterface_GL3::GetUniformLocation(UniformId uniform_id) const
 
 void RenderInterface_GL3::SubmitTransformUniform(Rml::Vector2f translation)
 {
-	static_assert((size_t)ProgramId::Count < MaxNumPrograms, "Maximum number of programs exceeded.");
-	const size_t program_index = (size_t)active_program;
+    const size_t program_index = (size_t)active_program;
 
-	if (program_transform_dirty.test(program_index))
-	{
-		glUniformMatrix4fv(GetUniformLocation(UniformId::Transform), 1, false, transform.data());
-		program_transform_dirty.set(program_index, false);
-	}
+    if (program_transform_dirty.test(program_index))
+        glUniformMatrix4fv(GetUniformLocation(UniformId::Transform), 1, false, transform.data());
 
-	glUniform2fv(GetUniformLocation(UniformId::Translate), 1, &translation.x);
-
-	Gfx::CheckGLError("SubmitTransformUniform");
+    glUniform2fv(GetUniformLocation(UniformId::Translate), 1, &translation.x);
 }
 
 RenderInterface_GL3::RenderLayerStack::RenderLayerStack()

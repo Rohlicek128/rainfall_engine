@@ -40,6 +40,17 @@ namespace engine
         return engine_args.window;
     }
 
+    int Window::get_width()
+    {
+        return engine_args.width;
+    }
+
+    int Window::get_height()
+    {
+        return engine_args.height;
+    }
+
+
     bool Window::should_close()
     {
         return glfwWindowShouldClose(engine_args.window);
