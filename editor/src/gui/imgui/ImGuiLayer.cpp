@@ -12,6 +12,7 @@ namespace editor
 {
     ImGuiLayer::ImGuiLayer()
     {
+        glfwWindowHint(GLFW_TITLEBAR, false);
     }
 
     void ImGuiLayer::shutdown()

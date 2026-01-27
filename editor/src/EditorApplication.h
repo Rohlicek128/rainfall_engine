@@ -9,6 +9,7 @@
 #include "gui/panels/EntityInspectorPanel.h"
 #include "gui/panels/ProjectsModalPanel.h"
 #include "gui/panels/ProjectNewModal.h"
+#include "gui/panels/TitlebarPanel.h"
 
 
 class ImGuiIO;
@@ -38,6 +39,8 @@ namespace editor
 
         void draw_dockspace();
     public:
+        std::unique_ptr<TitlebarPanel> titlebar_panel;
+
         EditorApplication();
 
         void on_start() override;

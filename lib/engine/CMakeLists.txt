@@ -19,4 +19,5 @@ target_link_libraries(engine PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/glfw/glfw3.lib"
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/yaml-cpp/yaml-cppd.lib"
     "opengl32"
+    "dwmapi"
 )

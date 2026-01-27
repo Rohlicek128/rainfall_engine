@@ -15,7 +15,7 @@ namespace editor
         EditorApplication app;
 
         engine::Window window("Rainfall Editor", 1660, 1080);
-        window.set_icon("editor/assets/cdicon.jpg");
+        window.set_icon("editor/assets/rainfall_logo_icon.png");
 
         engine::Renderer renderer(window, true);
         ImGuiLayer layer;

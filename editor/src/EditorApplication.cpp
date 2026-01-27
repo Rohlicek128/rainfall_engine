@@ -4,6 +4,7 @@
 #include "engine/world/Entity.h"
 #include "gui/panels/PerformancePanel.h"
 #include "gui/panels/SceneGraphPanel.h"
+#include "gui/panels/TitlebarPanel.h"
 #include "gui/panels/ViewportPanel.h"
 
 #include <memory>
@@ -26,6 +27,8 @@ namespace editor
         project_modal_ = std::make_unique<ProjectsModalPanel>();
         project_new_modal_ = std::make_unique<ProjectNewModal>();
 
+        titlebar_panel = std::make_unique<TitlebarPanel>();
+
         show_imgui_demo_ = false;
         show_projects_modal_ = true;
         show_projects_new_modal_ = false;
@@ -45,6 +48,8 @@ namespace editor
     void EditorApplication::on_render(engine::Renderer& renderer)
     {
         draw_dockspace();
+
+        //titlebar_panel->draw()
 
 
         project_modal_->draw(*this, &show_projects_modal_, &show_projects_new_modal_);
