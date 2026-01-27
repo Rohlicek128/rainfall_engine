@@ -173,7 +173,7 @@ namespace editor
             if (ImGui::BeginMenu("Options"))
             {
                 ImGui::SeparatorText("Editor Options");
-                ImGui::SliderFloat("UI Scale", &ImGui::GetIO().FontGlobalScale, 0.1f, 4.0f, "%.1f");
+                ImGui::SliderFloat("UI Scale", &ImGui::GetIO().FontGlobalScale, 0.1f, 3.0f, "%.1f");
                 ImGui::ColorEdit4("Window Bg", (float*)&ImGui::GetStyle().Colors[ImGuiCol_WindowBg], ImGuiColorEditFlags_AlphaBar);
 
                 ImGui::EndMenu();

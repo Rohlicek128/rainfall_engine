@@ -1,5 +1,10 @@
 #pragma once
 
+#include "RmlUi/Core/ElementDocument.h"
+#define RMLUI_STATIC_LIB
+#include <RmlUi/Core.h>
+#include <RmlUi/Backends/RmlUi_Renderer_GL3.h>
+
 #include <glad.h>
 #include <glfw3.h>
 
@@ -66,7 +71,11 @@ namespace engine
         bool render_to_fbo_;
         std::unique_ptr<Framebuffer> render_fbo_;
 
+        std::unique_ptr<RenderInterface_GL3> render_interface_;
+        Rml::Context* context_;
+
         void update_delta_time();
+        void init_rmlui();
     public:
         double delta_time;
         int display_frame_count;
