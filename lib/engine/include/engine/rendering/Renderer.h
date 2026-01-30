@@ -60,9 +60,6 @@ namespace engine
         int last_uptime_;
         std::deque<int> fps_history_;
 
-        bool is_fullscreen_;
-        bool fullscreen_toggle_;
-        bool can_escape_;
 
         bool render_to_fbo_;
         std::unique_ptr<Framebuffer> render_fbo_;

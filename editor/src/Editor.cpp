@@ -20,7 +20,7 @@ namespace editor
         engine::Renderer renderer(window, true);
         ImGuiLayer layer;
 
-        app.set_window(window.get_glfw_window());
+        app.set_window(window);
         layer.init(window.get_glfw_window());
 
         app.on_start();
@@ -32,7 +32,7 @@ namespace editor
 
             // Update
             renderer.update();
-            app.input_manager->set_delta_time(renderer.delta_time);
+            app.input_manager->update(renderer.delta_time);
             app.on_update(renderer.delta_time);
 
             // Render

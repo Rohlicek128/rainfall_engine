@@ -1,13 +1,14 @@
 <rml>
 <head>
     <title>Hello world</title>
-    <link type="text/rcss" href="rml.rcss"/>
     <link type="text/rcss" href="window.rcss"/>
 </head>
 <body>
     <h1>RmlUi</h1>
-    <p>Hello <span id="world">world</span>!</p>
-    <p>The quick brown fox jumps over the lazy.</p>
-    <input type="text"/>
+    <div class="info">
+        <p>Hello <span id="world">world</span>!</p>
+        <p>Testings</p>
+        <input type="text"/>
+    </div>
 </body>
 </rml>

@@ -16,7 +16,7 @@ namespace engine
         input_manager = nullptr;
     }
 
-    void Application::set_window(GLFWwindow* window)
+    void Application::set_window(Window& window)
     {
         input_manager = std::make_unique<InputManager>(window);
     }

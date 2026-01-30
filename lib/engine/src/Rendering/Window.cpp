@@ -79,8 +79,8 @@ namespace engine
             throw "Initialize GLAD: FAILED";
         }
         glfwSetCursorPosCallback(window, mouse_callback);
+        glfwSetMouseButtonCallback(window, mouse_button_callback);
         glfwSetScrollCallback(window, mouse_scroll_callback);
-
         glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
         glfwGetWindowSize(window, &width, &height);
@@ -117,6 +117,13 @@ namespace engine
     {
         engine_args.mouse_x = static_cast<float>(x);
         engine_args.mouse_y = static_cast<float>(y);
+    }
+
+    void Window::mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+    {
+        engine_args.mouse_button = button;
+        engine_args.mouse_action = action;
+        engine_args.mouse_mods = mods;
     }
 
     void Window::mouse_scroll_callback(GLFWwindow*, double xoffset, double yoffset)

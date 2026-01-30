@@ -1,6 +1,7 @@
 #include "engine/world/components/CameraComponent.h"
 
-#include "../Mouse.h"
+#include "engine/managers/InputManager.h"
+#include "engine/managers/Mouse.h"
 
 #include <algorithm>
 #include <string>
@@ -33,32 +34,32 @@ CameraComponent::CameraComponent(TransformComponent* transform, const glm::vec4 
     key_value = 0.2f;
 }
 
-void CameraComponent::move(GLFWwindow* window, const float delta_time)
+void CameraComponent::default_move(engine::InputManager& input, const float delta_time)
 {
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) transform_->position += speed * delta_time * transform_->rotation;
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) transform_->position -= speed * delta_time * transform_->rotation;
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) transform_->position -= speed * delta_time * glm::normalize(glm::cross(transform_->rotation, up));
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) transform_->position += speed * delta_time * glm::normalize(glm::cross(transform_->rotation, up));
+    if (input.get_key_down(GLFW_KEY_W)) transform_->position += speed * delta_time * transform_->rotation;
+    if (input.get_key_down(GLFW_KEY_S)) transform_->position -= speed * delta_time * transform_->rotation;
+    if (input.get_key_down(GLFW_KEY_A)) transform_->position -= speed * delta_time * glm::normalize(glm::cross(transform_->rotation, up));
+    if (input.get_key_down(GLFW_KEY_D)) transform_->position += speed * delta_time * glm::normalize(glm::cross(transform_->rotation, up));
 
-    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) transform_->position.y -= speed * delta_time;
-    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) transform_->position.y += speed * delta_time;
-
-    transform_->update_pos_edit();
+    if (input.get_key_down(GLFW_KEY_Q)) transform_->position.y -= speed * delta_time;
+    if (input.get_key_down(GLFW_KEY_E)) transform_->position.y += speed * delta_time;
 }
 
-void CameraComponent::mouse_move(Mouse& mouse, const float delta_time)
+void CameraComponent::default_mouse_move(engine::InputManager& input, const float delta_time)
 {
-    if (mouse.first_move)
+    if (input.mouse->is_visible()) return;
+
+    if (input.mouse->first_move)
     {
-        mouse.last_x = mouse.pos_x;
-        mouse.last_y = mouse.pos_y;
-        mouse.first_move = false;
+        input.mouse->last_x = input.mouse->pos_x;
+        input.mouse->last_y = input.mouse->pos_y;
+        input.mouse->first_move = false;
     }
 
-    const float offset_x = (mouse.pos_x - mouse.last_x) * mouse.sensitivity / 100.0f;
-    const float offset_y = (mouse.last_y - mouse.pos_y) * mouse.sensitivity / 100.0f;
-    mouse.last_x = mouse.pos_x;
-    mouse.last_y = mouse.pos_y;
+    const float offset_x = (input.mouse->pos_x - input.mouse->last_x) * input.mouse->sensitivity / 100.0f;
+    const float offset_y = (input.mouse->last_y - input.mouse->pos_y) * input.mouse->sensitivity / 100.0f;
+    input.mouse->last_x = input.mouse->pos_x;
+    input.mouse->last_y = input.mouse->pos_y;
 
     set_yaw_pitch(yaw + offset_x, pitch + offset_y);
 }

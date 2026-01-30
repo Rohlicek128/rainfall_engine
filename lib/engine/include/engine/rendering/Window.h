@@ -18,6 +18,7 @@ namespace engine
 
         static void framebuffer_size_callback(GLFWwindow*, int width, int height);
         static void mouse_callback(GLFWwindow*, double x, double y);
+        static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
         static void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
     public:
         static EngineArgs engine_args;

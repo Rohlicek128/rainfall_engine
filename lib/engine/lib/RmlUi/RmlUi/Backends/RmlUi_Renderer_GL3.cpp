@@ -49,7 +49,7 @@
 	#define RMLUI_SHADER_HEADER_VERSION "#version 300 es\nprecision highp float;\n"
 	#include <GLES3/gl3.h>
 #elif defined RMLUI_GL3_CUSTOM_LOADER
-	#define RMLUI_SHADER_HEADER_VERSION "#version 330\n"
+	#define RMLUI_SHADER_HEADER_VERSION "#version 460\n"
 	#include RMLUI_GL3_CUSTOM_LOADER
 #else
 	#define RMLUI_SHADER_HEADER_VERSION "#version 330\n"

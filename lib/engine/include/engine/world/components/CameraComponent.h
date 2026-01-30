@@ -4,7 +4,10 @@
 
 #include <glfw3.h>
 
-class Mouse;
+namespace engine
+{
+    class InputManager;
+}
 
 class CameraComponent : public Component
 {
@@ -29,8 +32,8 @@ public:
     CameraComponent(TransformComponent*, glm::vec4 = {0.1f, 0.1f, 0.1f, 1.0f});
     ~CameraComponent() override = default;
 
-    void move(GLFWwindow*, float);
-    void mouse_move(Mouse&, float);
+    void default_move(engine::InputManager& input, float delta_time);
+    void default_mouse_move(engine::InputManager&, float delta_time);
     void set_yaw_pitch(float, float);
     glm::mat4 get_view_matrix();
     glm::mat4 get_projection_matrix(float);

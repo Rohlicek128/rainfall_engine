@@ -2,9 +2,11 @@
 #include "engine/world/Components/LightComponent.h"
 #include "engine/world/Components/MeshComponent.h"
 #include "engine/world/Components/TextureComponent.h"
+#include "engine/world/Components/CameraComponent.h"
 #include "glfw3.h"
 
 #include <cmath>
+#include <string>
 #include <utils.h>
 
 #include "TestScript.h"
@@ -63,5 +65,23 @@ namespace game
         {
             box_->transform->position.x -= delta_time;
         }
+
+        if (input_manager->mouse->get_button_down(GLFW_MOUSE_BUTTON_1))
+        {
+            //tools::printl_message("EXAMPLE", "MB1 Down");
+        }
+        if (input_manager->mouse->get_button_down(GLFW_MOUSE_BUTTON_2))
+        {
+            //tools::printl_message("EXAMPLE", "MB2 Down");
+        }
+
+        if (input_manager->mouse->is_scrolling_y())
+        {
+            tools::printl_message("EXAMPLE", std::to_string(input_manager->mouse->scroll_y_delta));
+        }
+
+        CameraComponent* cur_camera = scene_manager->get_current_scene()->current_camera->get_component<CameraComponent>();
+        cur_camera->default_move(*input_manager, delta_time);
+        cur_camera->default_mouse_move(*input_manager, delta_time);
     }
 }

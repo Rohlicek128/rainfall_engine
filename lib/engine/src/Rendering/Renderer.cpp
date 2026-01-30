@@ -3,7 +3,6 @@
 
 #include <glad.h>
 #include <memory>
-#include <iostream>
 
 
 #include "engine/rendering/Framebuffer.h"
@@ -12,7 +11,6 @@
 #include "engine/world/Scene.h"
 #include "Buffers/Textures/TextureManager.h"
 
-#include "Entities/Mouse.h"
 #include "Shaders/Programs/GeometryProgram.h"
 #include "Shaders/Programs/LightingProgram.h"
 #include "Shaders/Programs/PostProcessProgram.h"
@@ -52,17 +50,6 @@ namespace engine
 
 
         viewport_ = new GLint[2]{window_->engine_args.width, window_->engine_args.height};
-        mouse_ = new Mouse(viewport_[0], viewport_[1], 5.0f, render_to_fbo);
-        if (mouse_->is_visible)
-        {
-            glfwSetInputMode(window_->engine_args.window, GLFW_CURSOR,  GLFW_CURSOR_NORMAL);
-            //editor_->imgui_io->ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
-        }
-        else
-        {
-            glfwSetInputMode(window_->engine_args.window, GLFW_CURSOR,  GLFW_CURSOR_DISABLED);
-            //editor_->imgui_io->ConfigFlags |= ImGuiConfigFlags_NoMouse;
-        }
 
 
         g_buffer_ = std::make_unique<GBuffer>(window_->engine_args.width, window_->engine_args.height);
@@ -97,10 +84,8 @@ namespace engine
             {"ShadowDepth/shadow_depth.frag", GL_FRAGMENT_SHADER}});
         shadow_map_ = new ShadowMap(2048, 2048, 32.0f, -5.0f, 45.0f);
 
-        is_fullscreen_ = false;
-        fullscreen_toggle_ = true;
+
         camera_toggle_ = true;
-        can_escape_ = true;
 
         delta_time = 0.0f;
         last_time_ = 0.0;
@@ -162,45 +147,11 @@ namespace engine
     void Renderer::update()
     {
         update_delta_time();
-        mouse_->pos_x = window_->engine_args.mouse_x;
-        mouse_->pos_y = window_->engine_args.mouse_y;
-
 
         if (viewport_[0] != window_->engine_args.width || viewport_[1] != window_->engine_args.height)
             resize(window_->engine_args.width, window_->engine_args.height);
         viewport_[0] = window_->engine_args.width;
         viewport_[1] = window_->engine_args.height;
-
-
-        //END
-        if (glfwGetKey(window_->engine_args.window, GLFW_KEY_END) == GLFW_PRESS) glfwSetWindowShouldClose(window_->engine_args.window, true);
-
-        //ESCAPE
-        if (glfwGetKey(window_->engine_args.window, GLFW_KEY_ESCAPE) == GLFW_PRESS && can_escape_)
-        {
-            can_escape_ = false;
-            mouse_->is_visible = !mouse_->is_visible;
-            mouse_->first_move = true;
-            if (mouse_->is_visible)
-            {
-                glfwSetInputMode(window_->engine_args.window, GLFW_CURSOR,  GLFW_CURSOR_NORMAL);
-            }
-            else
-            {
-                glfwSetInputMode(window_->engine_args.window, GLFW_CURSOR,  GLFW_CURSOR_DISABLED);
-            }
-        }
-        else if (!can_escape_ && glfwGetKey(window_->engine_args.window, GLFW_KEY_ESCAPE) == GLFW_RELEASE) can_escape_ = true;
-
-        //F11
-        if (glfwGetKey(window_->engine_args.window, GLFW_KEY_F11) == GLFW_PRESS && fullscreen_toggle_)
-        {
-            fullscreen_toggle_ = false;
-            is_fullscreen_ = !is_fullscreen_;
-            if (is_fullscreen_) glfwSetWindowMonitor(window_->engine_args.window, glfwGetPrimaryMonitor(), 50, 50, window_->engine_args.width, window_->engine_args.height, GLFW_DONT_CARE);
-            else glfwSetWindowMonitor(window_->engine_args.window, nullptr, 50, 50, window_->engine_args.width, window_->engine_args.height, GLFW_DONT_CARE);
-        }
-        else if (!fullscreen_toggle_ && glfwGetKey(window_->engine_args.window, GLFW_KEY_F11) == GLFW_RELEASE) fullscreen_toggle_ = true;
 
 
         //Behaviors
@@ -217,8 +168,6 @@ namespace engine
     void Renderer::render()
     {
         CameraComponent* cur_camera_comp = current_scene_->current_camera->get_component<CameraComponent>();
-        cur_camera_comp->move(window_->engine_args.window, static_cast<float>(delta_time));
-        if (!mouse_->is_visible) cur_camera_comp->mouse_move(*mouse_, static_cast<float>(delta_time));
 
         const int cur_width = render_to_fbo_ ? render_fbo_->attached_textures.at(0)->get_width() : window_->engine_args.width;
         const int cur_height = render_to_fbo_ ? render_fbo_->attached_textures.at(0)->get_height() : window_->engine_args.height;
@@ -261,9 +210,6 @@ namespace engine
 
     void Renderer::swap_and_poll()
     {
-        window_->engine_args.scroll_x = 0.0f;
-        window_->engine_args.scroll_y = 0.0f;
-
         glfwSwapBuffers(window_->engine_args.window);
         glfwPollEvents();
     }

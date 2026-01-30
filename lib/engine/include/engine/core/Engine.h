@@ -21,10 +21,10 @@ namespace engine
         // Start
         Window window("Rainfall Engine", 1660, 1080);
         Renderer renderer(window);
-        RmlUiLayer rmlui_layer(window.get_width(), window.get_height());
+        RmlUiLayer rmlui_layer(window.get_width(), window.get_height(), true);
 
         A app;
-        app.set_window(window.get_glfw_window());
+        app.set_window(window);
 
         app.on_start();
         app.resource_manager->get_mesh_manager()->compile();
@@ -34,9 +34,9 @@ namespace engine
             renderer.set_current_scene(*app.scene_manager->get_current_scene());
 
             // Update
-            rmlui_layer.update();
+            rmlui_layer.update(*app.input_manager);
             renderer.update();
-            app.input_manager->set_delta_time(renderer.delta_time);
+            app.input_manager->update(renderer.delta_time);
             app.on_update(renderer.delta_time);
 
             // Render

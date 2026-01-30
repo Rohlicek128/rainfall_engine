@@ -1,24 +1,32 @@
 #pragma once
 
-#include <glfw3.h>
+#include <memory>
 #include <unordered_map>
 #include <unordered_set>
+
+#include "Mouse.h"
 
 
 namespace engine
 {
+    class Window;
+
     class InputManager
     {
-        GLFWwindow* window_;
+        Window* window_;
         float current_delta_time_;
 
         std::unordered_set<int> toggled_keys_;
         std::unordered_map<int, float> timeout_keys_;
 
-    public:
-        InputManager(GLFWwindow* window);
+        bool is_fullscreen_;
 
-        void set_delta_time(float delta_time);
+    public:
+        std::unique_ptr<Mouse> mouse;
+
+        InputManager(Window& window);
+
+        void update(float delta_time);
 
         bool get_key_up(int key);
         bool get_key_down(int key);
