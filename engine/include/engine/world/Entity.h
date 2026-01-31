@@ -39,8 +39,10 @@ public:
     template<typename C>
     void insert_component(C&);
     template<typename C>
+    void remove_component();
+    
+    template<typename C>
     C* get_component();
-
     template<typename C>
     C* contains_component();
     Component* contains_component_enum(const COMPONENTS_IDS&);
@@ -81,6 +83,25 @@ void Entity::insert_component(C& component)
         dynamic_cast<BehaviorComponent*>(components.back().get())->set_owner_entity(*this);
 
     if (owner) owner->on_add_component<C>(*this);
+}
+
+template<typename C>
+void Entity::remove_component()
+{
+    static_assert(std::is_base_of_v<Component, C>, "C must derive from Component");
+
+    auto itr = std::find_if(
+        components.begin(), components.end(),
+        [](const std::unique_ptr<Component>& ptr)
+        {
+            return dynamic_cast<C*>(ptr.get());
+        }
+    );
+    if (itr == components.end())
+        return;
+
+    components.erase(itr);
+    if (owner) owner->on_remove_component<C>(*this);
 }
 
 template<typename C>

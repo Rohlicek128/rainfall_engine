@@ -5,6 +5,7 @@
 
 
 #include "../core/ISerializable.h"
+#include "PhysicsWorld.h"
 
 namespace lights
 {
@@ -15,6 +16,7 @@ class Mesh;
 class MeshComponent;
 class LightComponent;
 class BehaviorComponent;
+class RidgidbodyComponent;
 
 
 class Scene : ISerializable
@@ -35,6 +37,8 @@ public:
     std::vector<Entity*> behaviors;
     Mesh* mesh;
 
+    std::unique_ptr<engine::physics::PhysicsWorld> physics;
+
     std::unique_ptr<Entity> editor_camera;
     Entity* player_camera;
     Entity* current_camera;
@@ -51,18 +55,9 @@ public:
     void remove_entity(Entity*);
     void remove_entity(int);
 
-    template<typename C>
-    void on_add_component(Entity& entity)
-    {
-        if constexpr (std::is_same_v<C, MeshComponent>)
-            set_mesh_to_entity(&entity);
-        if constexpr (std::is_same_v<C, LightComponent>)
-            lights.push_back(&entity);
-        if constexpr (std::is_base_of_v<BehaviorComponent, C>)
-            behaviors.push_back(&entity);
-    }
+    void remove_light(Entity* entity);
+    void remove_behavior(Entity* entity);
 
-    bool check_light(Entity*);
     Entity* find_entity_by_id(unsigned int);
     std::vector<Entity*> get_lights_by_type(lights::LIGHT_TYPE type);
 
@@ -71,4 +66,29 @@ public:
     void reset();
     void save(const std::string& path);
     bool load(const std::string& path);
+
+
+    template<typename C>
+    void on_add_component(Entity& entity)
+    {
+        if constexpr (std::is_same_v<C, MeshComponent>)
+            set_mesh_to_entity(&entity);
+        if constexpr (std::is_same_v<C, LightComponent>)
+            lights.push_back(&entity);
+        if constexpr (std::is_same_v<C, RidgidbodyComponent>)
+            physics->add_ridgidbody(&entity);
+        if constexpr (std::is_base_of_v<BehaviorComponent, C>)
+            behaviors.push_back(&entity);
+    }
+
+    template<typename C>
+    void on_remove_component(Entity& entity)
+    {
+        if constexpr (std::is_same_v<C, LightComponent>)
+            remove_light(&entity);
+        if constexpr (std::is_same_v<C, BehaviorComponent>)
+            remove_behavior(&entity);
+        if constexpr (std::is_same_v<C, RidgidbodyComponent>)
+            physics->remove_ridgidbody(&entity);
+    }
 };

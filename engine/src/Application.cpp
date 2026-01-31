@@ -47,4 +47,12 @@ namespace engine
     {
         return glfwGetTime();
     }
+
+
+    void Application::update(const float delta_time)
+    {
+        if (input_manager) input_manager->update(delta_time);
+        scene_manager->get_current_scene()->physics->step(delta_time);
+        on_update(delta_time);
+    }
 }

@@ -4,6 +4,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <utility>
 
 #include "engine/world/Entity.h"
@@ -13,7 +14,9 @@
 #include "engine/world/Components/LightComponent.h"
 #include "engine/world/Components/TextureComponent.h"
 #include "engine/world/Components/MeshComponent.h"
+#include "engine/world/PhysicsWorld.h"
 #include "engine/world/components/BehaviorComponent.h"
+#include "engine/world/components/RidgidbodyComponent.h"
 
 Scene::Scene(const std::string& name)
 {
@@ -35,6 +38,8 @@ Scene::Scene(const std::string& name)
         );
     //skybox->add_component<MeshComponent>(0, GL_TRIANGLES, this->mesh);
     skybox->add_component<TextureComponent>(0x8513, 1, 1);
+
+    physics = std::make_unique<engine::physics::PhysicsWorld>();
 }
 
 void Scene::set_mesh(Mesh& mesh)
@@ -59,6 +64,8 @@ void Scene::add_entity(std::unique_ptr<Entity> entity)
         lights.push_back(entities.back().get());
     if (entities.back()->contains_component<BehaviorComponent>())
         behaviors.push_back(entities.back().get());
+    if (entities.back()->contains_component<RidgidbodyComponent>())
+        physics->add_ridgidbody(entities.back().get());
 }
 
 Entity* Scene::create_entity(const std::string& name)
@@ -73,14 +80,9 @@ Entity* Scene::create_entity(const std::string& name)
 
 void Scene::remove_entity(Entity* entity)
 {
-    for (int i = 0; i < lights.size(); ++i)
-    {
-        if (entity == lights.at(i))
-        {
-            lights.erase(lights.begin() + i);
-            break;
-        }
-    }
+    entity->remove_component<LightComponent>();
+    entity->remove_component<BehaviorComponent>();
+    physics->remove_ridgidbody(entity);
 
     for (int i = 0; i < entities.size(); ++i)
     {
@@ -106,25 +108,20 @@ void Scene::remove_entity(const int index)
     entities.resize(entities.size() - 1);
 }
 
-bool Scene::check_light(Entity* light)
+void Scene::remove_light(Entity* entity)
 {
-    if (!light->contains_component<LightComponent>()) return false;
-
-    for (int i = 0; i < lights.size(); ++i)
-    {
-        if (!lights.at(i)->contains_component<LightComponent>())
-        {
-            lights.erase(lights.begin() + i);
-            return false;
-        }
-
-        if (lights.at(i)->id == light->id)
-            return false;
-    }
-
-    lights.push_back(light);
-    return true;
+    auto itr = std::find(lights.begin(), lights.end(), entity);
+    if (itr == lights.end()) return;
+    lights.erase(itr);
 }
+
+void Scene::remove_behavior(Entity* entity)
+{
+    auto itr = std::find(behaviors.begin(), behaviors.end(), entity);
+    if (itr == behaviors.end()) return;
+    behaviors.erase(itr);
+}
+
 
 Entity* Scene::find_entity_by_id(const unsigned int id)
 {

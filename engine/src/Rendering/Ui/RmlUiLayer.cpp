@@ -33,7 +33,7 @@ namespace engine
         context_ = Rml::CreateContext("main", Rml::Vector2i(width, height));
 
         Rml::Debugger::Initialise(context_);
-        Rml::Debugger::SetVisible(debug_);
+        Rml::Debugger::SetVisible(false);
 
         if (!Rml::LoadFontFace("engine/assets/fonts/Lexend-Regular.ttf"))
         {

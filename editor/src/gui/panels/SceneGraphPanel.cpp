@@ -106,8 +106,6 @@ namespace editor
                 if (i < children.size() && i >= 0) draw_graph_children(scene, children.at(i)->children, selected);
                 ImGui::TreePop();
             }
-
-            scene.check_light(children.at(i));
         }
     }
 }

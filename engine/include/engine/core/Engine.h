@@ -39,8 +39,7 @@ namespace engine
             // Update
             rmlui_layer.update(*app.input_manager);
             renderer.update();
-            app.input_manager->update(renderer.delta_time);
-            app.on_update(renderer.delta_time);
+            app.update(renderer.delta_time);
 
             // Render
             renderer.render();

@@ -40,8 +40,8 @@ namespace editor
     {
         Scene* sample_scene = create_sample_scene();
 
-        Rml::ElementDocument* document = ui->LoadDocument("engine/assets/documents/index.rml");
-        document->Show();
+        //Rml::ElementDocument* document = ui->LoadDocument("assets/documents/index.rml");
+        //document->Show();
     }
 
     void EditorApplication::on_update(const float delta_time)

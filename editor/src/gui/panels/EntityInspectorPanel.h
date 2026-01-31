@@ -36,8 +36,6 @@ namespace editor
             return nullptr;
         }
 
-        void remove_component(Entity& entity, Component* component);
-
         bool check_search_string(const char*, const char*, int);
     public:
         EntityInspectorPanel();

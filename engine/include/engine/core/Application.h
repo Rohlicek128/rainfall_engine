@@ -34,6 +34,8 @@ namespace engine
 
         float get_uptime();
 
+        void update(const float delta_time);
+
         virtual void on_start() {}
         virtual void on_update(const float delta_time) {}
         virtual void on_shutdown() {}

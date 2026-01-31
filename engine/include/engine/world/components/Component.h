@@ -10,7 +10,8 @@ enum COMPONENTS_IDS
     CAMERA,
     MATERIAL,
     TEXTURE,
-    LIGHT
+    LIGHT,
+    RIDGIDBODY
 };
 
 inline const char* to_string(const COMPONENTS_IDS e)
@@ -23,6 +24,7 @@ inline const char* to_string(const COMPONENTS_IDS e)
     case MATERIAL: return "MATERIAL";
     case TEXTURE: return "TEXTURE";
     case LIGHT: return "LIGHT";
+    case RIDGIDBODY: return "RIDGIDBODY";
     default: return "Unknown";
     }
 }

@@ -1,5 +1,7 @@
 #include "EntityInspectorPanel.h"
 #include "../inspectors/ElementInspector.h"
+#include "engine/world/components/Component.h"
+#include "engine/world/components/RidgidbodyComponent.h"
 
 #include <engine/managers/TextureManager.h>
 #include <engine/world/components/BehaviorComponent.h>
@@ -10,7 +12,6 @@
 #include <engine/world/components/LightComponent.h>
 
 #include <engine/world/Entity.h>
-#include <algorithm>
 
 
 namespace editor
@@ -61,42 +62,49 @@ namespace editor
                 if (!mesh->is_enabled) ImGui::BeginDisabled();
                 ElementInspector::draw_mesh_component(*mesh);
                 if (!mesh->is_enabled) ImGui::EndDisabled();
-                if (!opened) remove_component(*entity, mesh);
+                if (!opened) entity->remove_component<MeshComponent>();
             }
             if (CameraComponent* camera = component_header<CameraComponent>(entity, &opened))
             {
                 if (!camera->is_enabled) ImGui::BeginDisabled();
                 ElementInspector::draw_camera_component(*camera);
                 if (!camera->is_enabled) ImGui::EndDisabled();
-                if (!opened) remove_component(*entity, camera);
+                if (!opened) entity->remove_component<CameraComponent>();
             }
             if (TextureComponent* texture = component_header<TextureComponent>(entity, &opened))
             {
                 if (!texture->is_enabled) ImGui::BeginDisabled();
                 ElementInspector::draw_texture_component(*texture, manager);
                 if (!texture->is_enabled) ImGui::EndDisabled();
-                if (!opened) remove_component(*entity, texture);
+                if (!opened) entity->remove_component<TextureComponent>();
             }
             if (MaterialComponent* material = component_header<MaterialComponent>(entity, &opened))
             {
                 if (!material->is_enabled) ImGui::BeginDisabled();
                 ElementInspector::draw_material_component(*material);
                 if (!material->is_enabled) ImGui::EndDisabled();
-                if (!opened) remove_component(*entity, material);
+                if (!opened) entity->remove_component<MaterialComponent>();
             }
             if (LightComponent* light = component_header<LightComponent>(entity, &opened))
             {
                 if (!light->is_enabled) ImGui::BeginDisabled();
                 ElementInspector::draw_light_component(*light);
                 if (!light->is_enabled) ImGui::EndDisabled();
-                if (!opened) remove_component(*entity, light);
+                if (!opened) entity->remove_component<LightComponent>();
             }
             if (BehaviorComponent* behavior = component_header<BehaviorComponent>(entity, &opened))
             {
                 if (!behavior->is_enabled) ImGui::BeginDisabled();
                 ElementInspector::draw_behavior_component(*behavior);
                 if (!behavior->is_enabled) ImGui::EndDisabled();
-                if (!opened) remove_component(*entity, behavior);
+                if (!opened) entity->remove_component<BehaviorComponent>();
+            }
+            if (RidgidbodyComponent* ridgidbody = component_header<RidgidbodyComponent>(entity, &opened))
+            {
+                if (!ridgidbody->is_enabled) ImGui::BeginDisabled();
+                ElementInspector::draw_ridgidbody_component(*ridgidbody);
+                if (!ridgidbody->is_enabled) ImGui::EndDisabled();
+                if (!opened) entity->remove_component<RidgidbodyComponent>();
             }
 
 
@@ -109,7 +117,7 @@ namespace editor
 
                 if (ImGui::BeginChild("##SelectComponent", ImVec2(-FLT_MIN, 7 * ImGui::GetTextLineHeightWithSpacing()), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeY))
                 {
-                    for (int i = 1; i < 6; ++i)
+                    for (int i = 1; i < 7; ++i)
                     {
                         if (entity->contains_component_enum((COMPONENTS_IDS)i)) continue;
                         if (strcmp(component_search_, "") != 0 &&
@@ -135,24 +143,12 @@ namespace editor
                     case MATERIAL: entity->add_component<MaterialComponent>(glm::vec4(1.0)); break;
                     case TEXTURE: entity->add_component<TextureComponent>(GL_TEXTURE_2D); break;
                     case LIGHT: entity->add_component<LightComponent>(lights::LIGHT_TYPE::POINT, glm::vec3(1.0f)); break;
+                    case RIDGIDBODY: entity->add_component<RidgidbodyComponent>(*entity->transform); break;
                 }
                 add_selected_ = -1;
             }
         }
         ImGui::End();
-    }
-
-    void EntityInspectorPanel::remove_component(Entity& entity, Component* component)
-    {
-        auto it = std::find_if(entity.components.begin(), entity.components.end(),
-            [component](const std::unique_ptr<Component>& ptr)
-            {
-                return ptr.get() == component;
-            });
-        if (it != entity.components.end())
-        {
-            entity.components.erase(it);
-        }
     }
 
     bool EntityInspectorPanel::check_search_string(const char* whole, const char* part, const int part_lenght)

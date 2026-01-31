@@ -2,6 +2,7 @@
 
 #include "engine/managers/TextureManager.h"
 #include "engine/world/components/MeshComponent.h"
+#include "engine/world/components/RidgidbodyComponent.h"
 #include "imgui.h"
 #include <engine/rendering/Framebuffer.h>
 #include <engine/world/components/TransformComponent.h>
@@ -322,5 +323,12 @@ namespace editor
         ImGui::Text("Name: ");
         ImGui::SameLine();
         ImGui::Text(behavior.name.c_str());
+    }
+
+    void ElementInspector::draw_ridgidbody_component(RidgidbodyComponent& ridgidbody)
+    {
+        draw_vec3("Velocity", ridgidbody.velocity, 0.01f);
+        ImGui::DragFloat("Mass", &ridgidbody.mass, 0.01f, 0.01f, 0, "%.2f");
+        ridgidbody.mass = std::max(0.001f, ridgidbody.mass);
     }
 }
