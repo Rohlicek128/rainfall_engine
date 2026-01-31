@@ -1,5 +1,3 @@
-INCLUDE_DIRECTORIES("../lib")
-
 FILE(GLOB_RECURSE SRCS "src/*.cpp")
 ADD_EXECUTABLE("game" ${SRCS})
 
@@ -17,10 +15,10 @@ add_custom_command(
         "$<TARGET_FILE_DIR:game>/scenes"
 
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_SOURCE_DIR}/lib/engine/src/Rendering/Shaders/GLSL"
+        "${CMAKE_SOURCE_DIR}/engine/src/Rendering/Shaders/GLSL"
         "$<TARGET_FILE_DIR:game>/engine/shaders"
 
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_SOURCE_DIR}/lib/engine/assets"
+        "${CMAKE_SOURCE_DIR}/engine/assets"
         "$<TARGET_FILE_DIR:game>/engine/assets"
 )

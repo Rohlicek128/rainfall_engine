@@ -4,6 +4,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project("rainfall")
 
-add_subdirectory(lib)
+add_subdirectory(engine)
 add_subdirectory(game)
 add_subdirectory(editor)

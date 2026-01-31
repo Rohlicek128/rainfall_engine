@@ -1,13 +1,13 @@
 #include "EntityInspectorPanel.h"
 #include "../inspectors/ElementInspector.h"
 
-#include "engine/src/Rendering/Buffers/Textures/TextureManager.h"
-#include "engine/world/components/BehaviorComponent.h"
-#include "engine/world/components/MeshComponent.h"
-#include "engine/world/components/CameraComponent.h"
-#include "engine/world/components/MaterialComponent.h"
-#include "engine/world/components/TextureComponent.h"
-#include "engine/world/components/LightComponent.h"
+#include <engine/managers/TextureManager.h>
+#include <engine/world/components/BehaviorComponent.h>
+#include <engine/world/components/MeshComponent.h>
+#include <engine/world/components/CameraComponent.h>
+#include <engine/world/components/MaterialComponent.h>
+#include <engine/world/components/TextureComponent.h>
+#include <engine/world/components/LightComponent.h>
 
 #include <engine/world/Entity.h>
 #include <algorithm>

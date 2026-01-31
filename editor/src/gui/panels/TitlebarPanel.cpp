@@ -1,7 +1,7 @@
 #include "TitlebarPanel.h"
 
 #include <engine/rendering/Window.h>
-#include "../lib/engine/src/Rendering/EngineArgs.h"
+#include <engine/rendering/EngineArgs.h>
 #include "imgui_internal.h"
 #include <glfw3.h>
 

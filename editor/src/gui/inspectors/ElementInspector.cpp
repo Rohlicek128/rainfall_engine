@@ -1,6 +1,6 @@
 #include "ElementInspector.h"
 
-#include "engine/src/Rendering/Buffers/Textures/TextureManager.h"
+#include "engine/managers/TextureManager.h"
 #include "engine/world/components/MeshComponent.h"
 #include "imgui.h"
 #include <engine/rendering/Framebuffer.h>

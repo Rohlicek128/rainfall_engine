@@ -1,5 +1,3 @@
-INCLUDE_DIRECTORIES("../lib")
-
 FILE(GLOB_RECURSE SRCS "src/*.cpp")
 LIST(APPEND SRCS
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/Imgui/imgui.cpp"
@@ -29,10 +27,10 @@ add_custom_command(
         "$<TARGET_FILE_DIR:editor>/editor/assets"
 
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_SOURCE_DIR}/lib/engine/src/Rendering/Shaders/GLSL"
+        "${CMAKE_SOURCE_DIR}/engine/src/Rendering/Shaders/GLSL"
         "$<TARGET_FILE_DIR:editor>/engine/shaders"
 
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_SOURCE_DIR}/lib/engine/assets"
+        "${CMAKE_SOURCE_DIR}/engine/assets"
         "$<TARGET_FILE_DIR:editor>/engine/assets"
 )
