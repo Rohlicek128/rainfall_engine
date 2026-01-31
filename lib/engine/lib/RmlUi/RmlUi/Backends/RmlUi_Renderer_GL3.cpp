@@ -49,7 +49,7 @@
 	#define RMLUI_SHADER_HEADER_VERSION "#version 300 es\nprecision highp float;\n"
 	#include <GLES3/gl3.h>
 #elif defined RMLUI_GL3_CUSTOM_LOADER
-	#define RMLUI_SHADER_HEADER_VERSION "#version 460\n"
+	#define RMLUI_SHADER_HEADER_VERSION "#version 330\n"
 	#include RMLUI_GL3_CUSTOM_LOADER
 #else
 	#define RMLUI_SHADER_HEADER_VERSION "#version 330\n"
@@ -1058,7 +1058,7 @@ void RenderInterface_GL3::RenderGeometry(Rml::CompiledGeometryHandle handle, Rml
 
 	if (texture == TexturePostprocess)
 	{
-		// Do nothing.
+	    return;
 	}
 	else if (texture)
 	{

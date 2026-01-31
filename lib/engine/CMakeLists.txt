@@ -16,6 +16,7 @@ TARGET_INCLUDE_DIRECTORIES(engine
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/freetype"
 )
 
+target_compile_definitions(engine PUBLIC RMLUI_STATIC_LIB)
 
 set(RMLUI_BACKEND_PATH ${CMAKE_CURRENT_SOURCE_DIR}/lib/RmlUi/RmlUi/Backends)
 add_library(rmlui_backend_GLFW_GL3 INTERFACE)

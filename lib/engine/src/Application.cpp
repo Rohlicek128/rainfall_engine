@@ -14,11 +14,17 @@ namespace engine
         resource_manager = std::make_unique<ResourceManager>();
         scene_manager = std::make_unique<SceneManager>(*resource_manager);
         input_manager = nullptr;
+        ui = nullptr;
     }
 
     void Application::set_window(Window& window)
     {
         input_manager = std::make_unique<InputManager>(window);
+    }
+
+    void Application::set_ui_context(Rml::Context& context)
+    {
+        ui = &context;
     }
 
     void Application::reset()

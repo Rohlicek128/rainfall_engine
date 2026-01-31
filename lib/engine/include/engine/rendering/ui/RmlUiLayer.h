@@ -1,7 +1,7 @@
 #pragma once
 
+#include "RmlUi/Core/Context.h"
 #include "engine/managers/InputManager.h"
-#define RMLUI_STATIC_LIB
 #include <RmlUi/Core.h>
 #include <RmlUi/Debugger.h>
 
@@ -27,5 +27,7 @@ namespace engine
 
         void update(InputManager& input);
         void render(int width, int height);
+
+        Rml::Context* get_context();
     };
 }

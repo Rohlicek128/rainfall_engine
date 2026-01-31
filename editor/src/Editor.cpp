@@ -5,6 +5,7 @@
 
 #include <engine/rendering/Window.h>
 #include <engine/rendering/Renderer.h>
+#include <engine/rendering/ui/RmlUiLayer.h>
 
 
 namespace editor
@@ -15,13 +16,15 @@ namespace editor
         EditorApplication app;
 
         engine::Window window("Rainfall Editor", 1660, 1080);
-        window.set_icon("editor/assets/rainfall_logo_icon.png");
+        window.set_icon("engine/assets/rainfall_logo_icon.png");
 
         engine::Renderer renderer(window, true);
-        ImGuiLayer layer;
+        ImGuiLayer imgui_layer;
+        engine::RmlUiLayer rmlui_layer(window.get_width(), window.get_height(), true);
 
         app.set_window(window);
-        layer.init(window.get_glfw_window());
+        app.set_ui_context(*rmlui_layer.get_context());
+        imgui_layer.init(window.get_glfw_window());
 
         app.on_start();
         app.resource_manager->get_mesh_manager()->compile();
@@ -31,21 +34,23 @@ namespace editor
             renderer.set_current_scene(*app.scene_manager->get_current_scene());
 
             // Update
+            //rmlui_layer.update(*app.input_manager);
             renderer.update();
             app.input_manager->update(renderer.delta_time);
             app.on_update(renderer.delta_time);
 
             // Render
-            layer.on_begin_frame();
+            imgui_layer.on_begin_frame();
             renderer.render();
             app.on_render(renderer);
-            layer.on_end_frame();
+            imgui_layer.on_end_frame();
+            //rmlui_layer.render(window.get_width(), window.get_height());
 
             renderer.swap_and_poll();
         }
 
         // Shutdown
         app.on_shutdown();
-        layer.shutdown();
+        imgui_layer.shutdown();
     }
 }

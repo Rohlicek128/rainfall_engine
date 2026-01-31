@@ -1,0 +1,15 @@
+<rml>
+<head>
+    <title>Hello world</title>
+    <link type="text/rcss" href="rml.rcss"/>
+    <link type="text/rcss" href="window.rcss"/>
+</head>
+<body data-model="testing">
+    <h1>RmlUi</h1>
+    <div class="info">
+        <p>MOUSE: <span id="mouse"></span></p>
+    </div>
+    <p data-if="show">Testings</p>
+    <input type="text" data-value="text"/>
+</body>
+</rml>

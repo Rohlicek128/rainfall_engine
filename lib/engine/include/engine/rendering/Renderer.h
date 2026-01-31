@@ -82,6 +82,7 @@ namespace engine
         void render();
         void swap_and_poll();
 
+
         void resize(int, int);
     };
 }

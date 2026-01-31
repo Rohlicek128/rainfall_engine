@@ -12,6 +12,7 @@
 #include <engine/world/components/MeshComponent.h>
 #include <engine/world/components/MaterialComponent.h>
 #include <engine/world/components/LightComponent.h>
+#include <engine/world/components/CameraComponent.h>
 
 #include "imgui.h"
 
@@ -38,11 +39,16 @@ namespace editor
     void EditorApplication::on_start()
     {
         Scene* sample_scene = create_sample_scene();
+
+        Rml::ElementDocument* document = ui->LoadDocument("engine/assets/documents/index.rml");
+        document->Show();
     }
 
     void EditorApplication::on_update(const float delta_time)
     {
-
+        CameraComponent* cur_camera = scene_manager->get_current_scene()->current_camera->get_component<CameraComponent>();
+        cur_camera->default_move(*input_manager, delta_time);
+        cur_camera->default_mouse_move(*input_manager, delta_time);
     }
 
     void EditorApplication::on_render(engine::Renderer& renderer)

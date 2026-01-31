@@ -20,11 +20,14 @@ namespace engine
 
         // Start
         Window window("Rainfall Engine", 1660, 1080);
+        window.set_icon("engine/assets/rainfall_logo_icon.png");
+
         Renderer renderer(window);
         RmlUiLayer rmlui_layer(window.get_width(), window.get_height(), true);
 
         A app;
         app.set_window(window);
+        app.set_ui_context(*rmlui_layer.get_context());
 
         app.on_start();
         app.resource_manager->get_mesh_manager()->compile();

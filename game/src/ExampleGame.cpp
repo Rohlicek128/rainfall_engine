@@ -43,6 +43,17 @@ namespace game
         light_->get_component<LightComponent>()->intensity = 5.0f;
 
 
+        show_ = true;
+        text_ = "Something";
+        if (Rml::DataModelConstructor constructor = ui->CreateDataModel("testing"))
+        {
+            constructor.Bind("show", &show_);
+            constructor.Bind("text", &text_);
+        }
+
+        document_ = ui->LoadDocument("assets/documents/index.rml");
+        document_->Show();
+
         current_project->save(*this, current_project->project_dir + "examplegame.rainp");
         tools::printl_message("EXAMPLE", "OnStart");
     }
@@ -66,10 +77,14 @@ namespace game
             box_->transform->position.x -= delta_time;
         }
 
+
+        Rml::Element* element = document_->GetElementById("mouse");
         if (input_manager->mouse->get_button_down(GLFW_MOUSE_BUTTON_1))
         {
-            //tools::printl_message("EXAMPLE", "MB1 Down");
+            element->SetInnerRML("MB1 is Down");
         }
+        else element->SetInnerRML("MB1 is Up");
+
         if (input_manager->mouse->get_button_down(GLFW_MOUSE_BUTTON_2))
         {
             //tools::printl_message("EXAMPLE", "MB2 Down");
@@ -79,6 +94,7 @@ namespace game
         {
             tools::printl_message("EXAMPLE", std::to_string(input_manager->mouse->scroll_y_delta));
         }
+
 
         CameraComponent* cur_camera = scene_manager->get_current_scene()->current_camera->get_component<CameraComponent>();
         cur_camera->default_move(*input_manager, delta_time);

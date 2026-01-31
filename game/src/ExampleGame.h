@@ -1,6 +1,7 @@
 #pragma once
 
 #include <engine/core/Application.h>
+#include "RmlUi/Core/ElementDocument.h"
 
 
 namespace game
@@ -9,6 +10,10 @@ namespace game
     {
         Entity* box_;
         Entity* light_;
+
+        bool show_;
+        Rml::String text_;
+        Rml::ElementDocument* document_;
 
     public:
         void on_start() override;

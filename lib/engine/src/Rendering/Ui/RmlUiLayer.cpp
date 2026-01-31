@@ -1,4 +1,5 @@
 #include "engine/rendering/ui/RmlUiLayer.h"
+#include "RmlUi/Core/Context.h"
 #include "RmlUi/Core/Core.h"
 #include "RmlUi/Core/Math.h"
 #include "RmlUi/Debugger/Debugger.h"
@@ -38,21 +39,16 @@ namespace engine
         {
             std::cerr << "Could not load font! Check your working directory." << std::endl;
         }
-
-        Rml::ElementDocument* document = context_->LoadDocument("engine/assets/documents/index.rml");
-        if (document)
-        {
-            document->Show();
-        }
-        else
-        {
-            std::cerr << "Could not load document!" << std::endl;
-        }
     }
 
     RmlUiLayer::~RmlUiLayer()
     {
         Rml::Shutdown();
+    }
+
+    Rml::Context* RmlUiLayer::get_context()
+    {
+        return context_;
     }
 
 
@@ -71,7 +67,7 @@ namespace engine
         else context_->ProcessMouseButtonUp(2, 0);
 
         if (input.mouse->is_scrolling_x() || input.mouse->is_scrolling_y())
-            context_->ProcessMouseWheel(Rml::Vector2f(input.mouse->scroll_x_delta, input.mouse->scroll_y_delta), 0);
+            context_->ProcessMouseWheel(Rml::Vector2f(-input.mouse->scroll_x_delta, -input.mouse->scroll_y_delta), 0);
 
 
         if (debug_ && input.get_key_toggle(GLFW_KEY_F8))

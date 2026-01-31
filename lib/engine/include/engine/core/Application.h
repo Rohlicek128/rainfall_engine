@@ -1,10 +1,12 @@
 #pragma once
 
+#include "RmlUi/Core/Context.h"
 #include "engine/world/Project.h"
 #include "engine/managers/ResourceManager.h"
 #include "engine/managers/SceneManager.h"
 #include "engine/managers/InputManager.h"
 #include "engine/world/Entity.h"
+#include <RmlUi/Core.h>
 #include <memory>
 
 
@@ -21,8 +23,11 @@ namespace engine
         std::unique_ptr<SceneManager> scene_manager;
         std::unique_ptr<InputManager> input_manager;
 
+        Rml::Context* ui;
+
         Application();
         void set_window(Window& window);
+        void set_ui_context(Rml::Context& context);
 
         bool is_running();
         void stop();
