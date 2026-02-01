@@ -42,6 +42,8 @@ namespace editor
 
         //Rml::ElementDocument* document = ui->LoadDocument("assets/documents/index.rml");
         //document->Show();
+
+        input_manager->mouse->set_visibility(true);
     }
 
     void EditorApplication::on_update(const float delta_time)

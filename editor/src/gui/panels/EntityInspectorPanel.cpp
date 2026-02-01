@@ -2,6 +2,7 @@
 #include "../inspectors/ElementInspector.h"
 #include "engine/world/components/Component.h"
 #include "engine/world/components/RidgidbodyComponent.h"
+#include "engine/world/components/SphereCollider.h"
 
 #include <engine/managers/TextureManager.h>
 #include <engine/world/components/BehaviorComponent.h>
@@ -106,6 +107,13 @@ namespace editor
                 if (!ridgidbody->is_enabled) ImGui::EndDisabled();
                 if (!opened) entity->remove_component<RidgidbodyComponent>();
             }
+            if (engine::physics::SphereCollider* sphere = component_header<engine::physics::SphereCollider>(entity, &opened))
+            {
+                if (!sphere->is_enabled) ImGui::BeginDisabled();
+                ElementInspector::draw_sphere_collider_component(*sphere);
+                if (!sphere->is_enabled) ImGui::EndDisabled();
+                if (!opened) entity->remove_component<engine::physics::SphereCollider>();
+            }
 
 
             //Add Component
@@ -117,7 +125,7 @@ namespace editor
 
                 if (ImGui::BeginChild("##SelectComponent", ImVec2(-FLT_MIN, 7 * ImGui::GetTextLineHeightWithSpacing()), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeY))
                 {
-                    for (int i = 1; i < 7; ++i)
+                    for (int i = 1; i < 8; ++i)
                     {
                         if (entity->contains_component_enum((COMPONENTS_IDS)i)) continue;
                         if (strcmp(component_search_, "") != 0 &&
@@ -144,6 +152,7 @@ namespace editor
                     case TEXTURE: entity->add_component<TextureComponent>(GL_TEXTURE_2D); break;
                     case LIGHT: entity->add_component<LightComponent>(lights::LIGHT_TYPE::POINT, glm::vec3(1.0f)); break;
                     case RIDGIDBODY: entity->add_component<RidgidbodyComponent>(*entity->transform); break;
+                    case SPHERE_COLLIDER: entity->add_component<engine::physics::SphereCollider>(); break;
                 }
                 add_selected_ = -1;
             }

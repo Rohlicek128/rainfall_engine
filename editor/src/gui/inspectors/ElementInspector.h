@@ -17,6 +17,11 @@ class TextureComponent;
 class BehaviorComponent;
 class RidgidbodyComponent;
 
+namespace engine::physics
+{
+    class SphereCollider;
+}
+
 namespace editor
 {
     class ElementInspector
@@ -39,5 +44,6 @@ namespace editor
         static void draw_light_component(LightComponent& light);
         static void draw_behavior_component(BehaviorComponent& behavior);
         static void draw_ridgidbody_component(RidgidbodyComponent& ridgidbody);
+        static void draw_sphere_collider_component(engine::physics::SphereCollider& sphere_collider);
     };
 }

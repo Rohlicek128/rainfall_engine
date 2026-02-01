@@ -14,7 +14,7 @@
 #include "engine/world/Components/LightComponent.h"
 #include "engine/world/Components/TextureComponent.h"
 #include "engine/world/Components/MeshComponent.h"
-#include "engine/world/PhysicsWorld.h"
+#include "engine/world/physics/PhysicsWorld.h"
 #include "engine/world/components/BehaviorComponent.h"
 #include "engine/world/components/RidgidbodyComponent.h"
 

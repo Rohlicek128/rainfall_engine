@@ -1,6 +1,14 @@
-#include "engine/world/PhysicsWorld.h"
+#include "engine/world/physics/PhysicsWorld.h"
+
+#include "Detection/Collision.h"
 #include "engine/world/Entity.h"
 #include "engine/world/components/RidgidbodyComponent.h"
+#include "engine/world/physics/CollisionPoints.h"
+#include "engine/world/components/SphereCollider.h"
+#include "engine/world/components/Collider.h"
+
+#include <glfw3.h>
+//#include <iostream>
 
 
 namespace engine::physics
@@ -20,27 +28,74 @@ namespace engine::physics
         bodies_.erase(itr);
     }
 
+    std::vector<RidgidbodyCollider> PhysicsWorld::get_enabled_ridgidbodies()
+    {
+        std::vector<RidgidbodyCollider> results;
+
+        for (int i = 0; i < bodies_.size(); ++i)
+        {
+            RidgidbodyComponent* body = bodies_.at(i)->get_enabled_component<RidgidbodyComponent>();
+            Collider* collider = bodies_.at(i)->get_enabled_component<SphereCollider>();
+
+            results.push_back(RidgidbodyCollider(body, collider));
+        }
+
+        return results;
+    }
+
 
     void PhysicsWorld::step(float delta_time)
     {
-        for (int i = 0; i < bodies_.size(); ++i)
+        std::vector<RidgidbodyCollider> ridgidbodies = get_enabled_ridgidbodies();
+
+        resolve_collisions(delta_time, ridgidbodies);
+
+
+        for (RidgidbodyCollider body_collider : ridgidbodies)
         {
-            if (RidgidbodyComponent* body = bodies_.at(i)->get_enabled_component<RidgidbodyComponent>())
+            RidgidbodyComponent* body = body_collider.ridgidbody;
+            if (!body || !body->transform) continue;
+
+            body->force += body->mass * gravity_;
+            body->velocity += body->force / body->mass * delta_time;
+            body->transform->position += body->velocity * delta_time;
+
+            body->force = {0, 0, 0};
+
+            //if (body->transform->position.y < 0.0f)
+            //{
+            //    body->transform->position.y = 0.0f;
+            //    body->velocity = {0, 0, 0};
+            //}
+        }
+    }
+
+    void PhysicsWorld::resolve_collisions(float delta_time, const std::vector<RidgidbodyCollider>& ridgidbodies)
+    {
+        std::vector<Collision> collsisons;
+
+        for (RidgidbodyCollider body_a : ridgidbodies)
+        {
+            for (RidgidbodyCollider body_b : ridgidbodies)
             {
-                if (!body->transform) continue;
+                if (body_a.ridgidbody == body_b.ridgidbody) break;
 
-                body->force += body->mass * gravity_;
-                body->velocity += body->force / body->mass * delta_time;
-                body->transform->position += body->velocity * delta_time;
+                if (!body_a.collider || !body_b.collider) continue;
 
-                body->force = {0, 0, 0};
+                CollisionsPoints points = body_a.collider->test_collision(
+                    body_a.ridgidbody->transform,
+                    body_b.collider,
+                    body_b.ridgidbody->transform
+                );
 
-                if (body->transform->position.y < 0.0f)
+                if (points.has_collision)
                 {
-                    body->transform->position.y = 0.0f;
-                    body->velocity = {0, 0, 0};
+                    collsisons.emplace_back(&body_a, &body_b, points);
+                    //std::cout << "Collision! " << glfwGetTime() << '\n';
                 }
             }
         }
+
     }
+
 }

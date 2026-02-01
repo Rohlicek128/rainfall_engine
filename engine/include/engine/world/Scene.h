@@ -5,7 +5,7 @@
 
 
 #include "../core/ISerializable.h"
-#include "PhysicsWorld.h"
+#include "physics/PhysicsWorld.h"
 
 namespace lights
 {

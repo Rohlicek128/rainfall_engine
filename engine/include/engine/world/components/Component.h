@@ -11,7 +11,8 @@ enum COMPONENTS_IDS
     MATERIAL,
     TEXTURE,
     LIGHT,
-    RIDGIDBODY
+    RIDGIDBODY,
+    SPHERE_COLLIDER,
 };
 
 inline const char* to_string(const COMPONENTS_IDS e)
@@ -25,6 +26,7 @@ inline const char* to_string(const COMPONENTS_IDS e)
     case TEXTURE: return "TEXTURE";
     case LIGHT: return "LIGHT";
     case RIDGIDBODY: return "RIDGIDBODY";
+    case SPHERE_COLLIDER: return "SPHERE COLLIDER";
     default: return "Unknown";
     }
 }

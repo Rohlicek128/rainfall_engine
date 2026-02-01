@@ -3,6 +3,7 @@
 #include "engine/world/Components/MeshComponent.h"
 #include "engine/world/Components/TextureComponent.h"
 #include "engine/world/Components/CameraComponent.h"
+#include "engine/world/components/RidgidbodyComponent.h"
 #include "glfw3.h"
 
 #include <cmath>
@@ -77,13 +78,23 @@ namespace game
             box_->transform->position.x -= delta_time;
         }
 
+        if (input_manager->get_key_with_timeout(GLFW_KEY_INSERT, 50))
+        {
+            Entity* e = scene_manager->get_current_scene()->create_entity("Launched");
+            e->transform->position = {std::sin(get_uptime()), 0.0f, std::cos(get_uptime()) * 3.0f};
+            e->transform->scale = {0.2f, 0.2f, 0.2f};
+            e->add_component<MeshComponent>(0, GL_TRIANGLES, resource_manager->get_mesh_manager());
+            e->add_component<RidgidbodyComponent>(*e->transform, glm::vec3(5.0f, 15.0f, 0.0f), glm::vec3(0.0f), 10.0f);
+        }
+
 
         Rml::Element* element = document_->GetElementById("mouse");
-        if (input_manager->mouse->get_button_down(GLFW_MOUSE_BUTTON_1))
+        element->SetInnerRML("count: <h1>" + std::to_string(scene_manager->get_current_scene()->entities.size()) + "</h1>, " + std::to_string(1.0f / delta_time));
+        /*if (input_manager->mouse->get_button_down(GLFW_MOUSE_BUTTON_1))
         {
             element->SetInnerRML("MB1 is Down");
         }
-        else element->SetInnerRML("MB1 is Up");
+        else element->SetInnerRML("MB1 is Up");*/
 
         if (input_manager->mouse->get_button_down(GLFW_MOUSE_BUTTON_2))
         {

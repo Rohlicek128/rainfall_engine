@@ -12,6 +12,7 @@
 #include <engine/world/components/CameraComponent.h>
 #include <engine/world/components/LightComponent.h>
 #include <engine/world/components/BehaviorComponent.h>
+#include <engine/world/components/SphereCollider.h>
 
 #include <engine/managers/Mesh.h>
 
@@ -330,5 +331,11 @@ namespace editor
         draw_vec3("Velocity", ridgidbody.velocity, 0.01f);
         ImGui::DragFloat("Mass", &ridgidbody.mass, 0.01f, 0.01f, 0, "%.2f");
         ridgidbody.mass = std::max(0.001f, ridgidbody.mass);
+    }
+
+    void ElementInspector::draw_sphere_collider_component(engine::physics::SphereCollider& sphere_collider)
+    {
+        draw_vec3("Center", sphere_collider.center, 0.01f);
+        ImGui::DragFloat("Radius", &sphere_collider.radius, 0.01f, 0.01f, 0, "%.2f");
     }
 }
