@@ -1,8 +1,7 @@
 #pragma once
 
 #include "engine/world/physics/CollisionPoints.h"
-
-class RidgidbodyCollider;
+#include "RidgidbodyCollider.h"
 
 namespace engine::physics
 {

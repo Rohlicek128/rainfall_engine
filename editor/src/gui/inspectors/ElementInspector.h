@@ -20,6 +20,7 @@ class RidgidbodyComponent;
 namespace engine::physics
 {
     class SphereCollider;
+    class PlaneCollider;
 }
 
 namespace editor
@@ -45,5 +46,6 @@ namespace editor
         static void draw_behavior_component(BehaviorComponent& behavior);
         static void draw_ridgidbody_component(RidgidbodyComponent& ridgidbody);
         static void draw_sphere_collider_component(engine::physics::SphereCollider& sphere_collider);
+        static void draw_plane_collider_component(engine::physics::PlaneCollider& plane_collider);
     };
 }

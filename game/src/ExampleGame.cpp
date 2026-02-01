@@ -84,7 +84,7 @@ namespace game
             e->transform->position = {std::sin(get_uptime()), 0.0f, std::cos(get_uptime()) * 3.0f};
             e->transform->scale = {0.2f, 0.2f, 0.2f};
             e->add_component<MeshComponent>(0, GL_TRIANGLES, resource_manager->get_mesh_manager());
-            e->add_component<RidgidbodyComponent>(*e->transform, glm::vec3(5.0f, 15.0f, 0.0f), glm::vec3(0.0f), 10.0f);
+            e->add_component<RidgidbodyComponent>(*e->transform, 10.0f, glm::vec3(5.0f, 15.0f, 0.0f));
         }
 
 

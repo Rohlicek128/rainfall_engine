@@ -6,6 +6,7 @@
 #include "engine/world/Components/TextureComponent.h"
 #include "engine/world/Components/MeshComponent.h"
 #include "engine/world/components/BehaviorComponent.h"
+#include "engine/world/components/Collider.h"
 
 unsigned int Entity::global_id_ = 0;
 
@@ -86,6 +87,19 @@ glm::mat4 Entity::get_model_matrix()
 {
     if (parent != nullptr && !parent->is_root) return parent->get_model_matrix() * transform->get_model_matrix();
     return transform->get_model_matrix();
+}
+
+engine::physics::Collider* Entity::get_collider_component()
+{
+    for (int i = 0; i < components.size(); ++i)
+    {
+        if (engine::physics::Collider* component = dynamic_cast<engine::physics::Collider*>(components.at(i).get()))
+        {
+            if (component->is_enabled)
+                return component;
+        }
+    }
+    return nullptr;
 }
 
 

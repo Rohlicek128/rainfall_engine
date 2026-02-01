@@ -5,14 +5,14 @@
 
 namespace engine::physics
 {
-    class SphereCollider : public Collider
+    class PlaneCollider : public Collider
     {
     public:
-        glm::vec3 center;
-        float radius;
+        glm::vec3 plane;
+        float distance;
 
-        SphereCollider(glm::vec3 center = {0, 0, 0}, float radius = 1.0f);
-        ~SphereCollider() override = default;
+        PlaneCollider(glm::vec3 plane = {0, 0, 0}, float distance = 1.0f);
+        ~PlaneCollider() override = default;
 
         CollisionsPoints test_collision(
             const TransformComponent* transform,

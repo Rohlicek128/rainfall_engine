@@ -1,5 +1,6 @@
 #include "engine/world/physics/PhysicsWorld.h"
 
+#include "Detection/RidgidbodyCollider.h"
 #include "Detection/Collision.h"
 #include "engine/world/Entity.h"
 #include "engine/world/components/RidgidbodyComponent.h"
@@ -7,12 +8,25 @@
 #include "engine/world/components/SphereCollider.h"
 #include "engine/world/components/Collider.h"
 
-#include <glfw3.h>
-//#include <iostream>
+#include "Response/ImpulseSolver.h"
+#include "Response/SmoothPositionSolver.h"
+#include <memory>
+
+//#include <glfw3.h>
+#include <iostream>
 
 
 namespace engine::physics
 {
+    PhysicsWorld::PhysicsWorld()
+    {
+        auto impulse_solver = std::make_unique<ImpulseSolver>();
+        solvers_.push_back(std::move(impulse_solver));
+
+        //auto position_solver = std::make_unique<SmoothPositionSolver>();
+        //solvers_.push_back(std::move(position_solver));
+    }
+
     void PhysicsWorld::add_ridgidbody(Entity* entity)
     {
         if (!entity) return;
@@ -35,7 +49,7 @@ namespace engine::physics
         for (int i = 0; i < bodies_.size(); ++i)
         {
             RidgidbodyComponent* body = bodies_.at(i)->get_enabled_component<RidgidbodyComponent>();
-            Collider* collider = bodies_.at(i)->get_enabled_component<SphereCollider>();
+            Collider* collider = bodies_.at(i)->get_collider_component();
 
             results.push_back(RidgidbodyCollider(body, collider));
         }
@@ -51,10 +65,10 @@ namespace engine::physics
         resolve_collisions(delta_time, ridgidbodies);
 
 
-        for (RidgidbodyCollider body_collider : ridgidbodies)
+        for (RidgidbodyCollider& body_collider : ridgidbodies)
         {
             RidgidbodyComponent* body = body_collider.ridgidbody;
-            if (!body || !body->transform) continue;
+            if (!body || !body->transform || !body->is_simulated) continue;
 
             body->force += body->mass * gravity_;
             body->velocity += body->force / body->mass * delta_time;
@@ -70,13 +84,14 @@ namespace engine::physics
         }
     }
 
-    void PhysicsWorld::resolve_collisions(float delta_time, const std::vector<RidgidbodyCollider>& ridgidbodies)
+    void PhysicsWorld::resolve_collisions(float delta_time, std::vector<RidgidbodyCollider>& ridgidbodies)
     {
-        std::vector<Collision> collsisons;
+        std::vector<Collision> collisions;
 
-        for (RidgidbodyCollider body_a : ridgidbodies)
+        //Detection
+        for (RidgidbodyCollider& body_a : ridgidbodies)
         {
-            for (RidgidbodyCollider body_b : ridgidbodies)
+            for (RidgidbodyCollider& body_b : ridgidbodies)
             {
                 if (body_a.ridgidbody == body_b.ridgidbody) break;
 
@@ -90,12 +105,17 @@ namespace engine::physics
 
                 if (points.has_collision)
                 {
-                    collsisons.emplace_back(&body_a, &body_b, points);
+                    collisions.emplace_back(&body_a, &body_b, points);
                     //std::cout << "Collision! " << glfwGetTime() << '\n';
                 }
             }
         }
 
+        //Response
+        for (const std::unique_ptr<Solver>& solver : solvers_)
+        {
+            solver->solve(collisions, delta_time);
+        }
     }
 
 }

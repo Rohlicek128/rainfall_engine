@@ -1,12 +1,19 @@
 #include "engine/world/components/RidgidbodyComponent.h"
 #include <algorithm>
 
-RidgidbodyComponent::RidgidbodyComponent(TransformComponent& transform, glm::vec3 velocity, glm::vec3 force, float mass)
+RidgidbodyComponent::RidgidbodyComponent(TransformComponent& transform, float mass, glm::vec3 velocity)
 {
     this->transform = &transform;
     this->velocity = velocity;
-    this->force = force;
+    this->force = {0, 0, 0};
+
     this->mass = std::max(0.001f, mass);
+    this->restitution = 1.0f;
+    this->static_friction = 1.0f;
+    this->dynamic_friction = 1.0f;
+
+    this->is_simulated = true;
+    this->is_dynamic = true;
 }
 
 std::string RidgidbodyComponent::get_name()

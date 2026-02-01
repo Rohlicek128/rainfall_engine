@@ -1,17 +1,18 @@
-#include "engine/world/components/SphereCollider.h"
+#include "engine/world/components/PlaneCollider.h"
 
 #include "engine/world/components/TransformComponent.h"
 #include "TestCollisionsAlgorithms.h"
+#include "engine/world/physics/CollisionPoints.h"
 
 
 namespace engine::physics
 {
-    SphereCollider::SphereCollider(glm::vec3 center, float radius)
-    : center(center), radius(radius)
+    PlaneCollider::PlaneCollider(glm::vec3 plane, float distance)
+    : plane(plane), distance(distance)
     {
     }
 
-    CollisionsPoints SphereCollider::test_collision(
+    CollisionsPoints PlaneCollider::test_collision(
         const TransformComponent* transform,
         const Collider* collider,
         const TransformComponent* collider_transform) const
@@ -19,29 +20,29 @@ namespace engine::physics
         return collider->test_collision(collider_transform, this, transform);
     }
 
-    CollisionsPoints SphereCollider::test_collision(
+    CollisionsPoints PlaneCollider::test_collision(
         const TransformComponent* transform,
         const SphereCollider* sphere,
         const TransformComponent* sphere_transform) const
     {
-        return colls::find_sphere_sphere_collision_points(this, transform, sphere, sphere_transform);
+        return colls::find_plane_sphere_collision_points(this, transform, sphere, sphere_transform);
     }
 
-    CollisionsPoints SphereCollider::test_collision(
+    CollisionsPoints PlaneCollider::test_collision(
         const TransformComponent* transform,
         const PlaneCollider* plane,
         const TransformComponent* plane_transform) const
     {
-        return colls::find_sphere_plane_collision_points(this, transform, plane, plane_transform);
+        return CollisionsPoints(false);
     }
 
 
-    std::string SphereCollider::get_name()
+    std::string PlaneCollider::get_name()
     {
-        return "Sphere Collider";
+        return "Plane Collider";
     }
 
-    void SphereCollider::serialize(YAML::Emitter& out)
+    void PlaneCollider::serialize(YAML::Emitter& out)
     {
         out << YAML::BeginMap;
         out << YAML::Key << get_name() << YAML::Value << YAML::BeginMap;
@@ -52,7 +53,7 @@ namespace engine::physics
         out << YAML::EndMap;
     }
 
-    bool SphereCollider::deserialize(YAML::Node& node)
+    bool PlaneCollider::deserialize(YAML::Node& node)
     {
         is_enabled = node["Enabled"].as<bool>();
 

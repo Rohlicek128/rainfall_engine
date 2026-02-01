@@ -1,6 +1,7 @@
 #include "EntityInspectorPanel.h"
 #include "../inspectors/ElementInspector.h"
 #include "engine/world/components/Component.h"
+#include "engine/world/components/PlaneCollider.h"
 #include "engine/world/components/RidgidbodyComponent.h"
 #include "engine/world/components/SphereCollider.h"
 
@@ -114,6 +115,13 @@ namespace editor
                 if (!sphere->is_enabled) ImGui::EndDisabled();
                 if (!opened) entity->remove_component<engine::physics::SphereCollider>();
             }
+            if (engine::physics::PlaneCollider* plane = component_header<engine::physics::PlaneCollider>(entity, &opened))
+            {
+                if (!plane->is_enabled) ImGui::BeginDisabled();
+                ElementInspector::draw_plane_collider_component(*plane);
+                if (!plane->is_enabled) ImGui::EndDisabled();
+                if (!opened) entity->remove_component<engine::physics::PlaneCollider>();
+            }
 
 
             //Add Component
@@ -125,7 +133,7 @@ namespace editor
 
                 if (ImGui::BeginChild("##SelectComponent", ImVec2(-FLT_MIN, 7 * ImGui::GetTextLineHeightWithSpacing()), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeY))
                 {
-                    for (int i = 1; i < 8; ++i)
+                    for (int i = 1; i < 9; ++i)
                     {
                         if (entity->contains_component_enum((COMPONENTS_IDS)i)) continue;
                         if (strcmp(component_search_, "") != 0 &&
@@ -153,6 +161,7 @@ namespace editor
                     case LIGHT: entity->add_component<LightComponent>(lights::LIGHT_TYPE::POINT, glm::vec3(1.0f)); break;
                     case RIDGIDBODY: entity->add_component<RidgidbodyComponent>(*entity->transform); break;
                     case SPHERE_COLLIDER: entity->add_component<engine::physics::SphereCollider>(); break;
+                    case PLANE_COLLIDER: entity->add_component<engine::physics::PlaneCollider>(); break;
                 }
                 add_selected_ = -1;
             }

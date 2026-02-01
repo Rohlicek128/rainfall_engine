@@ -9,6 +9,7 @@ class TransformComponent;
 namespace engine::physics
 {
     class SphereCollider;
+    class PlaneCollider;
 
     class Collider : public Component
     {
@@ -22,5 +23,10 @@ namespace engine::physics
             const TransformComponent* transform,
             const SphereCollider* sphere,
             const TransformComponent* sphere_transform) const = 0;
+
+        virtual CollisionsPoints test_collision(
+            const TransformComponent* transform,
+            const PlaneCollider* plane,
+            const TransformComponent* plane_transform) const = 0;
     };
 }

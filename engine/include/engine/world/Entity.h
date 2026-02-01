@@ -7,6 +7,7 @@
 #include "components/TransformComponent.h"
 #include "engine/world/components/BehaviorComponent.h"
 #include "engine/world/Scene.h"
+#include "engine/world/components/Collider.h"
 
 class Mesh;
 
@@ -40,7 +41,7 @@ public:
     void insert_component(C&);
     template<typename C>
     void remove_component();
-    
+
     template<typename C>
     C* get_component();
     template<typename C>
@@ -48,6 +49,8 @@ public:
     Component* contains_component_enum(const COMPONENTS_IDS&);
     template<typename C>
     C* get_enabled_component();
+
+    engine::physics::Collider* get_collider_component();
 
     void set_mesh_to_component(Mesh&);
     std::vector<unsigned int> get_children_ids();
@@ -78,7 +81,7 @@ void Entity::insert_component(C& component)
     static_assert(std::is_base_of_v<Component, C>, "C must derive from Component");
     std::unique_ptr<C> comp = std::make_unique<C>(component);
     components.push_back(std::move(comp));
-    
+
     if (std::is_base_of_v<BehaviorComponent, C>)
         dynamic_cast<BehaviorComponent*>(components.back().get())->set_owner_entity(*this);
 

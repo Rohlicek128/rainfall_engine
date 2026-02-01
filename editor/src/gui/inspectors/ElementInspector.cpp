@@ -2,6 +2,7 @@
 
 #include "engine/managers/TextureManager.h"
 #include "engine/world/components/MeshComponent.h"
+#include "engine/world/components/PlaneCollider.h"
 #include "engine/world/components/RidgidbodyComponent.h"
 #include "imgui.h"
 #include <engine/rendering/Framebuffer.h>
@@ -241,11 +242,12 @@ namespace editor
         {
             if (ImGui::Begin("Select a Mesh", &mesh.is_mesh_view_open, ImGuiWindowFlags_NoDocking))
             {
-                const int selected = -1; //mesh.mesh->select_mesh_gui();
+                int selected = mesh.model_index; //mesh.mesh->select_mesh_gui();
+                ImGui::SliderInt("Select Model", &selected, 0, 10);
                 if (selected != -1)
                 {
                     mesh.model_index = selected;
-                    mesh.is_mesh_view_open = false;
+                    //mesh.is_mesh_view_open = false;
                 }
             }
             ImGui::End();
@@ -328,14 +330,28 @@ namespace editor
 
     void ElementInspector::draw_ridgidbody_component(RidgidbodyComponent& ridgidbody)
     {
+        ImGui::Checkbox("Is Simulated", &ridgidbody.is_simulated);
+        ImGui::Checkbox("Is Dynamic", &ridgidbody.is_dynamic);
+
         draw_vec3("Velocity", ridgidbody.velocity, 0.01f);
         ImGui::DragFloat("Mass", &ridgidbody.mass, 0.01f, 0.01f, 0, "%.2f");
         ridgidbody.mass = std::max(0.001f, ridgidbody.mass);
+
+        ImGui::DragFloat("Restitution", &ridgidbody.restitution, 0.01f, 0, 0, "%.2f");
+        ImGui::SeparatorText("Friction");
+        ImGui::DragFloat("Static", &ridgidbody.static_friction, 0.01f, 0, 0, "%.2f");
+        ImGui::DragFloat("Dynamic", &ridgidbody.dynamic_friction, 0.01f, 0, 0, "%.2f");
     }
 
     void ElementInspector::draw_sphere_collider_component(engine::physics::SphereCollider& sphere_collider)
     {
         draw_vec3("Center", sphere_collider.center, 0.01f);
         ImGui::DragFloat("Radius", &sphere_collider.radius, 0.01f, 0.01f, 0, "%.2f");
+    }
+
+    void ElementInspector::draw_plane_collider_component(engine::physics::PlaneCollider& plane_collider)
+    {
+        draw_vec3("Normal", plane_collider.plane, 0.01f);
+        ImGui::DragFloat("Distance", &plane_collider.distance, 0.01f, 0.01f, 0, "%.2f");
     }
 }

@@ -13,6 +13,7 @@ enum COMPONENTS_IDS
     LIGHT,
     RIDGIDBODY,
     SPHERE_COLLIDER,
+    PLANE_COLLIDER
 };
 
 inline const char* to_string(const COMPONENTS_IDS e)
@@ -27,6 +28,7 @@ inline const char* to_string(const COMPONENTS_IDS e)
     case LIGHT: return "LIGHT";
     case RIDGIDBODY: return "RIDGIDBODY";
     case SPHERE_COLLIDER: return "SPHERE COLLIDER";
+    case PLANE_COLLIDER: return "PLANE COLLIDER";
     default: return "Unknown";
     }
 }
