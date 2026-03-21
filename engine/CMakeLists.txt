@@ -14,6 +14,7 @@ TARGET_INCLUDE_DIRECTORIES(engine
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/yaml-cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/RmlUi"
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/freetype"
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/assimp"
 )
 
 target_compile_definitions(engine PUBLIC RMLUI_STATIC_LIB)
@@ -32,13 +33,15 @@ target_compile_definitions(rmlui_backend_GLFW_GL3 INTERFACE
 	RMLUI_GL3_CUSTOM_LOADER=<glad.h>
 )
 
-target_link_libraries(engine PRIVATE
+target_link_libraries(engine
+    PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/glfw/glfw3.lib"
-    "${CMAKE_CURRENT_SOURCE_DIR}/lib/yaml-cpp/yaml-cppd.lib"
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/RmlUi/rmlui_debugger.lib"
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/RmlUi/rmlui.lib"
     rmlui_backend_GLFW_GL3
-    "${CMAKE_CURRENT_SOURCE_DIR}/lib/freetype/freetyped.lib"
     "opengl32"
     "dwmapi"
+    PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/freetype/freetyped.lib"
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/yaml-cpp/yaml-cppd.lib"
 )

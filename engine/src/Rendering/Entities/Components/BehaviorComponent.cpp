@@ -29,7 +29,7 @@ void BehaviorComponent::start()
 
 std::string BehaviorComponent::get_name()
 {
-    return "Behavior";
+    return typeid(*this).name();
 }
 
 void BehaviorComponent::serialize(YAML::Emitter& out)

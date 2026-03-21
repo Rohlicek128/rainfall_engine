@@ -3,17 +3,14 @@
 #include "Detection/RidgidbodyCollider.h"
 #include "Detection/Collision.h"
 #include "engine/world/Entity.h"
+#include "engine/world/components/BehaviorComponent.h"
 #include "engine/world/components/RidgidbodyComponent.h"
 #include "engine/world/physics/CollisionPoints.h"
-#include "engine/world/components/SphereCollider.h"
 #include "engine/world/components/Collider.h"
 
 #include "Response/ImpulseSolver.h"
 #include "Response/SmoothPositionSolver.h"
 #include <memory>
-
-//#include <glfw3.h>
-#include <iostream>
 
 
 namespace engine::physics
@@ -30,15 +27,18 @@ namespace engine::physics
     void PhysicsWorld::add_ridgidbody(Entity* entity)
     {
         if (!entity) return;
+        auto itr = std::find(bodies_.begin(), bodies_.end(), entity);
+        if (itr != bodies_.end()) return;
+
         bodies_.push_back(entity);
     }
 
     void PhysicsWorld::remove_ridgidbody(Entity* entity)
     {
         if (!entity) return;
-
         auto itr = std::find(bodies_.begin(), bodies_.end(), entity);
         if (itr == bodies_.end()) return;
+
         bodies_.erase(itr);
     }
 
@@ -50,8 +50,9 @@ namespace engine::physics
         {
             RidgidbodyComponent* body = bodies_.at(i)->get_enabled_component<RidgidbodyComponent>();
             Collider* collider = bodies_.at(i)->get_collider_component();
+            if (!collider->is_enabled) collider = nullptr;
 
-            results.push_back(RidgidbodyCollider(body, collider));
+            results.push_back(RidgidbodyCollider(body, collider, bodies_.at(i)));
         }
 
         return results;
@@ -93,21 +94,24 @@ namespace engine::physics
         {
             for (RidgidbodyCollider& body_b : ridgidbodies)
             {
-                if (body_a.ridgidbody == body_b.ridgidbody) break;
+                if (body_a.owner == body_b.owner) break;
 
                 if (!body_a.collider || !body_b.collider) continue;
 
                 CollisionsPoints points = body_a.collider->test_collision(
-                    body_a.ridgidbody->transform,
+                    body_a.owner->transform,
                     body_b.collider,
-                    body_b.ridgidbody->transform
+                    body_b.owner->transform
                 );
 
-                if (points.has_collision)
-                {
+                if (!points.has_collision) continue;
+                if (body_a.ridgidbody && body_b.ridgidbody)
                     collisions.emplace_back(&body_a, &body_b, points);
-                    //std::cout << "Collision! " << glfwGetTime() << '\n';
-                }
+
+                if (BehaviorComponent* bc = body_a.owner->get_enabled_component<BehaviorComponent>())
+                    bc->on_trigger(*body_b.owner, points);
+                if (BehaviorComponent* bc = body_b.owner->get_enabled_component<BehaviorComponent>())
+                    bc->on_trigger(*body_a.owner, points);
             }
         }
 

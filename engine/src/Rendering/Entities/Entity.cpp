@@ -6,6 +6,8 @@
 #include "engine/world/Components/TextureComponent.h"
 #include "engine/world/Components/MeshComponent.h"
 #include "engine/world/components/BehaviorComponent.h"
+#include "engine/world/components/RidgidbodyComponent.h"
+#include "engine/world/components/SphereCollider.h"
 #include "engine/world/components/Collider.h"
 
 unsigned int Entity::global_id_ = 0;
@@ -199,6 +201,20 @@ bool Entity::deserialize(YAML::Node& node)
                 BehaviorComponent behavior;
                 behavior.deserialize(comp_node);
                 insert_component<BehaviorComponent>(behavior);
+            }
+            else if (component_des["Ridgidbody"])
+            {
+                YAML::Node comp_node = component_des["Ridgidbody"];
+                RidgidbodyComponent ridgidbody(*transform);
+                ridgidbody.deserialize(comp_node);
+                insert_component<RidgidbodyComponent>(ridgidbody);
+            }
+            else if (component_des["Sphere Collider"])
+            {
+                YAML::Node comp_node = component_des["Sphere Collider"];
+                engine::physics::SphereCollider sphere;
+                sphere.deserialize(comp_node);
+                insert_component<engine::physics::SphereCollider>(sphere);
             }
         }
     }

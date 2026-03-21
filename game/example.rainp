@@ -6,10 +6,10 @@ Directories:
   Assets: assets
   Scenes: scenes
 Scenes:
-  - Example.rain
   - MyScene.rain
+  - Example.rain
 Textures:
-  ID Count: 129
+  ID Count: 146
   Paths:
     - [3, chill_guy.jpg, 35905, 6407]
     - [4, container_diffuse.png, 35907, 6408]

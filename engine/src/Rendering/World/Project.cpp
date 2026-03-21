@@ -13,6 +13,9 @@ namespace engine
     Project::Project(const std::string name)
     {
         this->name = name;
+        this->assets_dir = "assets";
+        this->scenes_dir = "scenes";
+
         this->save_path = "N/A";
         app_ = nullptr;
     }

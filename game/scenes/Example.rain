@@ -28,7 +28,7 @@ Entities:
   - Entity: Player camera
     Id: 4
     Is Visible: true
-    Parent Id: 18
+    Parent Id: 46
     Children Ids: []
     Components:
       - Transform:
@@ -57,7 +57,7 @@ Entities:
   - Entity: Cube
     Id: 5
     Is Visible: true
-    Parent Id: 18
+    Parent Id: 46
     Children Ids: []
     Components:
       - Transform:
@@ -86,7 +86,7 @@ Entities:
   - Entity: "Cube #2"
     Id: 6
     Is Visible: true
-    Parent Id: 18
+    Parent Id: 46
     Children Ids: [7]
     Components:
       - Transform:
@@ -136,7 +136,7 @@ Entities:
   - Entity: Ground
     Id: 8
     Is Visible: true
-    Parent Id: 18
+    Parent Id: 46
     Children Ids: []
     Components:
       - Transform:
@@ -165,7 +165,7 @@ Entities:
   - Entity: Sun
     Id: 9
     Is Visible: true
-    Parent Id: 18
+    Parent Id: 46
     Children Ids: []
     Components:
       - Transform:
@@ -186,7 +186,7 @@ Entities:
   - Entity: Bulb
     Id: 10
     Is Visible: true
-    Parent Id: 18
+    Parent Id: 46
     Children Ids: []
     Components:
       - Transform:
@@ -208,7 +208,7 @@ Entities:
   - Entity: "Bulb #2"
     Id: 11
     Is Visible: true
-    Parent Id: 18
+    Parent Id: 46
     Children Ids: []
     Components:
       - Transform:
@@ -230,7 +230,7 @@ Entities:
   - Entity: Blue Light
     Id: 22
     Is Visible: true
-    Parent Id: 18
+    Parent Id: 46
     Children Ids: []
     Components:
       - Transform:
@@ -252,7 +252,7 @@ Entities:
   - Entity: Gold
     Id: 33
     Is Visible: true
-    Parent Id: 18
+    Parent Id: 46
     Children Ids: []
     Components:
       - Transform:
@@ -281,7 +281,7 @@ Entities:
   - Entity: Billboard
     Id: 23
     Is Visible: true
-    Parent Id: 18
+    Parent Id: 46
     Children Ids: []
     Components:
       - Transform:
@@ -305,7 +305,7 @@ Entities:
   - Entity: Wall
     Id: 24
     Is Visible: true
-    Parent Id: 18
+    Parent Id: 46
     Children Ids: []
     Components:
       - Transform:

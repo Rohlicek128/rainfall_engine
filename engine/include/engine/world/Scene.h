@@ -17,6 +17,10 @@ class MeshComponent;
 class LightComponent;
 class BehaviorComponent;
 class RidgidbodyComponent;
+namespace engine::physics
+{
+    class Collider;
+}
 
 
 class Scene : ISerializable
@@ -58,7 +62,8 @@ public:
     void remove_light(Entity* entity);
     void remove_behavior(Entity* entity);
 
-    Entity* find_entity_by_id(unsigned int);
+    Entity* get_entity(const unsigned int id);
+    Entity* get_entity(const std::string& name);
     std::vector<Entity*> get_lights_by_type(lights::LIGHT_TYPE type);
 
     void set_player_camera(Entity& camera);
@@ -76,6 +81,8 @@ public:
         if constexpr (std::is_same_v<C, LightComponent>)
             lights.push_back(&entity);
         if constexpr (std::is_same_v<C, RidgidbodyComponent>)
+            physics->add_ridgidbody(&entity);
+        if constexpr (std::is_base_of_v<engine::physics::Collider, C>)
             physics->add_ridgidbody(&entity);
         if constexpr (std::is_base_of_v<BehaviorComponent, C>)
             behaviors.push_back(&entity);

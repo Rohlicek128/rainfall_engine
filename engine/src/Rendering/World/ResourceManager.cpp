@@ -3,7 +3,12 @@
 #include "engine/managers/TextureManager.h"
 #include <memory>
 
+//#include "assimp/Importer.hpp"
+//#include "assimp/scene.h"
+//#include "assimp/postprocess.h"
+
 #include <glad.h>
+#include <vector>
 
 namespace engine
 {
@@ -55,4 +60,35 @@ namespace engine
     {
         return texture_manager_->get_texture_by_id(id);
     }
+
+
+    int ResourceManager::load_model(const std::string& path)
+    {
+        /*Assimp::Importer importer;
+        const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+
+        if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+        {
+            return -1;
+        }
+        processNode(scene->mRootNode, scene);*/
+
+        return 0;
+    }
+
+    /*void processNode(aiNode *node, const aiScene *scene)
+    {
+        //std::vector<>
+
+        for(unsigned int i = 0; i < node->mNumMeshes; i++)
+        {
+            aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
+            //meshes.push_back(processMesh(mesh, scene));
+        }
+
+        for(unsigned int i = 0; i < node->mNumChildren; i++)
+        {
+            processNode(node->mChildren[i], scene);
+        }
+    }*/
 }

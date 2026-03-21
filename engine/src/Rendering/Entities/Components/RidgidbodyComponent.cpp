@@ -36,6 +36,5 @@ bool RidgidbodyComponent::deserialize(YAML::Node& node)
 {
     is_enabled = node["Enabled"].as<bool>();
 
-
     return true;
 }

@@ -29,6 +29,7 @@ Scene::Scene(const std::string& name)
     editor_camera = std::make_unique<Entity>("__editor_camera",
         new TransformComponent(glm::vec3(2.0f, 2.0f, 0.0f), glm::vec3(0.0f), glm::vec3(1.0f))
         );
+    editor_camera->owner = this;
     editor_camera->add_component<CameraComponent>(editor_camera->transform, glm::vec4(0.25f, 0.25f, 0.25f, 1.0f));
     player_camera = nullptr;
     current_camera = editor_camera.get();
@@ -123,11 +124,22 @@ void Scene::remove_behavior(Entity* entity)
 }
 
 
-Entity* Scene::find_entity_by_id(const unsigned int id)
+Entity* Scene::get_entity(const unsigned int id)
 {
     for (int i = 0; i < entities.size(); ++i)
     {
-        if (entities.at(i)->id == id) return entities.at(i).get();
+        if (entities.at(i)->id == id)
+            return entities.at(i).get();
+    }
+    return nullptr;
+}
+
+Entity* Scene::get_entity(const std::string& name)
+{
+    for (int i = 0; i < entities.size(); ++i)
+    {
+        if (entities.at(i)->name == name)
+            return entities.at(i).get();
     }
     return nullptr;
 }

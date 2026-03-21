@@ -1,0 +1,101 @@
+Scene: PHTest
+Current Camera Id: 2
+Editor Camera:
+  Entity: __editor_camera
+  Id: 2
+  Is Visible: true
+  Children Ids: []
+  Components:
+    - Transform:
+        Position: [7.272143, 3.0621889, -4.8306174]
+        Rotation: [-0.7423812, -0.4067391, 0.53238463]
+        Scale: [1, 1, 1]
+    - Camera:
+        Enabled: true
+        Wireframe: false
+        Yaw: 144.35452
+        Pitch: -24.000153
+        Fov: 85
+        Near Plane: 0.1
+        Far Plane: 1000
+        Speed: 10
+        Gamma: 2.2
+        Exposure: 3
+        Clear Color: [0.25, 0.25, 0.25, 1]
+        Up Vector: [0, 1, 0]
+Entities:
+  - Entity: Cube
+    Id: 4
+    Is Visible: true
+    Parent Id: 1
+    Children Ids: []
+    Components:
+      - Transform:
+          Position: [0, 0, 0]
+          Rotation: [0, 0, 0]
+          Scale: [1, 1, 1]
+      - Mesh:
+          Enabled: true
+          Model Id: 0
+          Primitive: 4
+          Is Culled: true
+          Is Inverted: false
+      - Material:
+          Enabled: true
+          Color: [1, 1, 1, 1]
+          Roughness: 0.75
+          Metallic: 0
+  - Entity: Light
+    Id: 5
+    Is Visible: true
+    Parent Id: 1
+    Children Ids: []
+    Components:
+      - Transform:
+          Position: [3, 2, 2.5]
+          Rotation: [0, 0, 0]
+          Scale: [0.2, 0.2, 0.2]
+      - Mesh:
+          Enabled: true
+          Model Id: 0
+          Primitive: 4
+          Is Culled: true
+          Is Inverted: false
+      - Light:
+          Enabled: true
+          Type: 1
+          Color: [1, 1, 1]
+          Intensity: 5
+          Attenuation: [1, 0.5, 0.3]
+  - Entity: Empty
+    Id: 6
+    Is Visible: true
+    Parent Id: 1
+    Children Ids: []
+    Components:
+      - Transform:
+          Position: [0, -2, 0]
+          Rotation: [0, 0, 0]
+          Scale: [15, 1, 15]
+      - Mesh:
+          Enabled: true
+          Model Id: 1
+          Primitive: 4
+          Is Culled: true
+          Is Inverted: false
+  - Entity: Empty
+    Id: 7
+    Is Visible: true
+    Parent Id: 1
+    Children Ids: []
+    Components:
+      - Transform:
+          Position: [0.51, 0, -4.15]
+          Rotation: [0, 0, 0]
+          Scale: [1, 1, 1]
+      - Mesh:
+          Enabled: true
+          Model Id: 0
+          Primitive: 4
+          Is Culled: true
+          Is Inverted: false

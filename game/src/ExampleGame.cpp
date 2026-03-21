@@ -4,6 +4,7 @@
 #include "engine/world/Components/TextureComponent.h"
 #include "engine/world/Components/CameraComponent.h"
 #include "engine/world/components/RidgidbodyComponent.h"
+#include "engine/world/components/SphereCollider.h"
 #include "glfw3.h"
 
 #include <cmath>
@@ -19,8 +20,6 @@ namespace game
     {
         current_project->name = "Example Project";
         current_project->project_dir = "C:\\Files\\Code\\C++\\rainfall_engine\\game\\";
-        current_project->assets_dir = "assets";
-        current_project->scenes_dir = "scenes";
 
 
         //scene_manager->load_scene("saved/Example.rain", true);
@@ -29,9 +28,9 @@ namespace game
         Scene* scene = scene_manager->create_scene("MyScene", true);
         box_ = scene->create_entity("Sample");
         box_->add_component<MeshComponent>(0, GL_TRIANGLES, resource_manager->get_mesh_manager());
-
         Texture* texture = resource_manager->load_texture(current_project->project_dir + current_project->assets_dir + "\\chill_guy.jpg", "jpg");
         box_->add_component<TextureComponent>(texture);
+        box_->add_component<engine::physics::SphereCollider>();
         box_->add_component<TestScript>();
 
 
@@ -42,6 +41,8 @@ namespace game
         light_->add_component<MeshComponent>(0, 4, resource_manager->get_mesh_manager());
         light_->add_component<LightComponent>(lights::LIGHT_TYPE::POINT, glm::vec3(1.0f, 1.0f, 0.0f));
         light_->get_component<LightComponent>()->intensity = 5.0f;
+
+        scene->current_camera->add_component<engine::physics::SphereCollider>();
 
 
         show_ = true;
@@ -56,6 +57,7 @@ namespace game
         document_->Show();
 
         current_project->save(*this, current_project->project_dir + "examplegame.rainp");
+        scene->save(current_project->project_dir + current_project->scenes_dir + "\\" + scene->name + ".rain");
         tools::printl_message("EXAMPLE", "OnStart");
     }
 
@@ -81,10 +83,11 @@ namespace game
         if (input_manager->get_key_with_timeout(GLFW_KEY_INSERT, 50))
         {
             Entity* e = scene_manager->get_current_scene()->create_entity("Launched");
-            e->transform->position = {std::sin(get_uptime()), 0.0f, std::cos(get_uptime()) * 3.0f};
+            e->transform->position = {std::sin(get_uptime()), 3.0f, std::cos(get_uptime()) * 3.0f};
             e->transform->scale = {0.2f, 0.2f, 0.2f};
             e->add_component<MeshComponent>(0, GL_TRIANGLES, resource_manager->get_mesh_manager());
-            e->add_component<RidgidbodyComponent>(*e->transform, 10.0f, glm::vec3(5.0f, 15.0f, 0.0f));
+            e->add_component<RidgidbodyComponent>(*e->transform, 10.0f, glm::vec3(0.0f, 15.0f, 0.0f));
+            e->add_component<engine::physics::SphereCollider>();
         }
 
 

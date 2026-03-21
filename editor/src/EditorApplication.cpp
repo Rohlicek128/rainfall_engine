@@ -181,6 +181,12 @@ namespace editor
                     ImGui::EndMenu();
                 }
 
+                ImGui::Separator();
+
+                if (ImGui::MenuItem("Select Current Camera"))
+                    scene_graph_panel_->selected_entity = scene_manager->get_current_scene()->current_camera;
+
+
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Options"))

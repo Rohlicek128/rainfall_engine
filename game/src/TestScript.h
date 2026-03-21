@@ -14,7 +14,8 @@ namespace game
     public:
         void on_start() override;
         void on_update(const float delta_time) override;
-        
+        void on_trigger(Entity& other, const engine::physics::CollisionsPoints& points) override;
+
         std::string get_name() override;
     };
 }

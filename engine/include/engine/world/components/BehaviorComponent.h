@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Component.h"
-
+#include "engine/world/physics/CollisionPoints.h"
 
 class Entity;
 
@@ -25,6 +25,8 @@ public:
     virtual void on_start() {}
     virtual void on_update(const float delta_time) {}
     virtual void on_shutdown() {}
+
+    virtual void on_trigger(Entity& other, const engine::physics::CollisionsPoints& points) {}
 
     virtual std::string get_name() override;
     void serialize(YAML::Emitter& out) override;
