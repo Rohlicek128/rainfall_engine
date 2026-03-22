@@ -2,10 +2,11 @@
 
 #include "engine/managers/TextureManager.h"
 #include <memory>
+#include <iostream>
 
-//#include "assimp/Importer.hpp"
-//#include "assimp/scene.h"
-//#include "assimp/postprocess.h"
+#include "assimp/Importer.hpp"
+#include "assimp/scene.h"
+#include "assimp/postprocess.h"
 
 #include <glad.h>
 #include <vector>
@@ -23,6 +24,7 @@ namespace engine
     void ResourceManager::reset()
     {
         texture_manager_->reset();
+        mesh_manager_->reset();
     }
 
 
@@ -64,31 +66,78 @@ namespace engine
 
     int ResourceManager::load_model(const std::string& path)
     {
-        /*Assimp::Importer importer;
-        const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+        Assimp::Importer importer;
+        const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
 
-        if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+        if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
         {
+            std::cout << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
             return -1;
         }
-        processNode(scene->mRootNode, scene);*/
 
-        return 0;
+        std::vector<float> vertices;
+        std::vector<unsigned int> indices;
+
+        unsigned int index_offset = 0;
+
+        for (unsigned int m = 0; m < scene->mNumMeshes; m++)
+        {
+            process_loaded_mesh(vertices, indices, scene->mMeshes[m], &index_offset);
+        }
+
+        std::string name = path.substr(path.find_last_of("/\\") + 1);
+        name = name.substr(0, name.find_last_of('.'));
+
+        return mesh_manager_->add_model(name, vertices.data(), vertices.size(), indices.data(), indices.size(), path);
     }
 
-    /*void processNode(aiNode *node, const aiScene *scene)
+    void ResourceManager::process_loaded_mesh(std::vector<float>& vertices, std::vector<unsigned int>& indices, aiMesh* mesh, unsigned int* offset)
     {
-        //std::vector<>
-
-        for(unsigned int i = 0; i < node->mNumMeshes; i++)
+        // Vertices
+        for (unsigned int i = 0; i < mesh->mNumVertices; i++)
         {
-            aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-            //meshes.push_back(processMesh(mesh, scene));
+            // Position
+            vertices.push_back(mesh->mVertices[i].x);
+            vertices.push_back(mesh->mVertices[i].y);
+            vertices.push_back(mesh->mVertices[i].z);
+
+            // TexCoords
+            if (mesh->mTextureCoords[0])
+            {
+                vertices.push_back(mesh->mTextureCoords[0][i].x);
+                vertices.push_back(mesh->mTextureCoords[0][i].y);
+            }
+            else
+            {
+                vertices.push_back(0.0f);
+                vertices.push_back(0.0f);
+            }
+
+            // Normals
+            if (mesh->HasNormals())
+            {
+                vertices.push_back(mesh->mNormals[i].x);
+                vertices.push_back(mesh->mNormals[i].y);
+                vertices.push_back(mesh->mNormals[i].z);
+            }
+            else
+            {
+                vertices.push_back(0.0f);
+                vertices.push_back(0.0f);
+                vertices.push_back(0.0f);
+            }
         }
 
-        for(unsigned int i = 0; i < node->mNumChildren; i++)
+        // Indices
+        for (unsigned int i = 0; i < mesh->mNumFaces; i++)
         {
-            processNode(node->mChildren[i], scene);
+            aiFace face = mesh->mFaces[i];
+            for (unsigned int j = 0; j < face.mNumIndices; j++)
+            {
+                indices.push_back(face.mIndices[j] + *offset);
+            }
         }
-    }*/
+
+        *offset += mesh->mNumVertices;
+    }
 }

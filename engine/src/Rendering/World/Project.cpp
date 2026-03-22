@@ -72,7 +72,7 @@ namespace engine
         //Project
         out << YAML::Key << "Project" << YAML::BeginMap;
         out << YAML::Key << "Name" << YAML::Value << name.c_str();
-        out << YAML::Key << "Version" << YAML::Value << "0.2.15";
+        out << YAML::Key << "Version" << YAML::Value << "0.2.20";
         out << YAML::EndMap;
 
         //Directories
@@ -96,8 +96,8 @@ namespace engine
         app_->resource_manager->get_texture_manager()->serialize(out);
 
         //Models
-        //out << YAML::Key << "Models" << YAML::Value << YAML::BeginSeq;
-        //out << YAML::EndSeq;
+        app_->resource_manager->get_mesh_manager()->set_load_prefix(project_dir + assets_dir + "\\");
+        app_->resource_manager->get_mesh_manager()->serialize(out);
 
         out << YAML::EndMap;
     }
@@ -114,6 +114,19 @@ namespace engine
 
         app_->resource_manager->get_texture_manager()->set_load_prefix(project_dir + assets_dir + "\\");
         app_->resource_manager->get_texture_manager()->deserialize(node);
+
+        //app_->resource_manager->get_mesh_manager()->set_load_prefix(project_dir + assets_dir + "\\");
+        //app_->resource_manager->get_mesh_manager()->deserialize(node);
+
+        app_->resource_manager->get_mesh_manager()->set_default_models();
+        if (YAML::Node models_des = node["Models"])
+        {
+            for (auto model_des : models_des)
+            {
+                app_->resource_manager->load_model(project_dir + assets_dir + "\\" + model_des.as<std::string>());
+            }
+        }
+        app_->resource_manager->get_mesh_manager()->compile();
 
         if (YAML::Node scenes_des = node["Scenes"])
         {

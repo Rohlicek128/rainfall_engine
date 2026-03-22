@@ -20,6 +20,7 @@ Mesh::Mesh(const std::vector<VertexAttribute>& attribs, const bool tangent)
     stride_ = get_stride();
 
     selected_mesh_ = 0;
+    load_prefix_ = "";
 }
 
 void Mesh::bind()
@@ -66,10 +67,11 @@ int Mesh::get_stride()
     return stride;
 }
 
-void Mesh::add_model(const std::string& name, float verts[], const int v_length, unsigned int inds[], const int i_length)
+int Mesh::add_model(const std::string& name, float verts[], const int v_length, unsigned int inds[], const int i_length, const std::string& path)
 {
     std::unique_ptr<ModelData> model = std::make_unique<ModelData>();
     model->name = name;
+    model->path = path;
 
     if (!add_tangent_) model->vertices_length = v_length;
     else model->vertices_length = v_length + v_length / (get_stride() - 3) * 3;
@@ -81,6 +83,7 @@ void Mesh::add_model(const std::string& name, float verts[], const int v_length,
     std::copy_n(inds, i_length, model->indices);
 
     models_.push_back(std::move(model));
+    return models_.size() - 1;
 }
 
 ModelData* Mesh::get_model(const int index)
@@ -219,6 +222,57 @@ unsigned int Mesh::get_indices_length()
         length += model->indices_length;
     }
     return length;
+}
+
+void Mesh::reset()
+{
+    vbo_ = nullptr;
+    ebo_ = nullptr;
+    vao_ = nullptr;
+    models_.clear();
+
+    selected_mesh_ = 0;
+}
+
+
+void Mesh::set_load_prefix(const std::string& prefix)
+{
+    load_prefix_ = prefix;
+}
+
+void Mesh::serialize(YAML::Emitter& out)
+{
+    out << YAML::Key << "Models" << YAML::Value << YAML::BeginSeq;
+    for (unsigned int i = 0; i < models_.size(); ++i)
+    {
+        std::string path = models_.at(i)->path;
+        if (path == "N/A") continue;
+
+        std::replace(path.begin(), path.end(), '/', '\\');
+
+        size_t pos = path.find(load_prefix_);
+        if (pos != std::string::npos) path.erase(pos, load_prefix_.size());
+        std::cout << path << '\n';
+
+        out << YAML::Value << path;
+    }
+    out << YAML::EndSeq;
+}
+
+bool Mesh::deserialize(YAML::Node& node)
+{
+    if (!node["Models"]) return false;
+    YAML::Node manager = node["Models"];
+
+    if (YAML::Node models_des = node["Paths"])
+    {
+        for (auto model_des : models_des)
+        {
+
+        }
+    }
+
+    return true;
 }
 
 

@@ -8,12 +8,14 @@
 #include "ModelData.h"
 #include "VertexAttribute.h"
 
+#include "engine/core/ISerializable.h"
+
 
 class VertexArray;
 class VertexBuffer;
 class IndexBuffer;
 
-class Mesh
+class Mesh : public ISerializable
 {
     VertexArray* vao_;
     VertexBuffer* vbo_;
@@ -21,6 +23,8 @@ class Mesh
 
     std::vector<std::unique_ptr<ModelData>> models_;
     int selected_mesh_;
+
+    std::string load_prefix_;
 
     bool add_tangent_;
     int stride_;
@@ -37,10 +41,17 @@ public:
     void unbind();
     void compile();
 
+    void reset();
+
     int get_model_indices_offset(int);
     int get_stride();
-    void add_model(const std::string&, float[], int, unsigned int[], int);
+    int add_model(const std::string&, float[], int, unsigned int[], int, const std::string& path = "N/A");
     ModelData* get_model(int);
 
     void set_default_models();
+
+    void set_load_prefix(const std::string& prefix);
+
+    void serialize(YAML::Emitter& out) override;
+    bool deserialize(YAML::Node& node) override;
 };

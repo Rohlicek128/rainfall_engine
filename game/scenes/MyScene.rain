@@ -77,3 +77,19 @@ Entities:
           Color: [1, 1, 0]
           Intensity: 5
           Attenuation: [1, 0.5, 0.3]
+  - Entity: Model
+    Id: 6
+    Is Visible: true
+    Parent Id: 1
+    Children Ids: []
+    Components:
+      - Transform:
+          Position: [0, 0, 0]
+          Rotation: [0, 0, 0]
+          Scale: [1, 1, 1]
+      - Mesh:
+          Enabled: true
+          Model Id: 3
+          Primitive: 4
+          Is Culled: true
+          Is Inverted: false

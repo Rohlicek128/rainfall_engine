@@ -38,6 +38,7 @@ target_link_libraries(engine
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/glfw/glfw3.lib"
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/RmlUi/rmlui_debugger.lib"
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/RmlUi/rmlui.lib"
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/assimp/assimp-vc143-mtd.lib"
     rmlui_backend_GLFW_GL3
     "opengl32"
     "dwmapi"

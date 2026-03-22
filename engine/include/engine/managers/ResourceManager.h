@@ -9,8 +9,7 @@
 
 class TextureManager;
 
-//class aiNode;
-//class aiScene;
+class aiMesh;
 
 namespace engine
 {
@@ -18,7 +17,7 @@ namespace engine
     {
         std::unique_ptr<Mesh> mesh_manager_;
         TextureManager* texture_manager_;
-        //void processNode(aiNode *node, const aiScene *scene);
+        void process_loaded_mesh(std::vector<float>& vertices, std::vector<unsigned int>& indices, aiMesh* mesh, unsigned int* offset);
 
     public:
         ResourceManager();

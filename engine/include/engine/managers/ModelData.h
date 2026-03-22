@@ -4,6 +4,7 @@
 struct ModelData
 {
     std::string name;
+    std::string path = "N/A";
     float* vertices = nullptr;
     int vertices_length = 0;
     unsigned int* indices = nullptr;
@@ -15,10 +16,10 @@ struct ModelData
         delete[] vertices;
         delete[] indices;
     }
-    
+
     ModelData(const ModelData&) = delete;
     ModelData& operator=(const ModelData&) = delete;
-    
+
     ModelData(ModelData&& other) noexcept {
         *this = std::move(other);
     }

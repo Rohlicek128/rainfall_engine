@@ -44,6 +44,12 @@ namespace game
 
         scene->current_camera->add_component<engine::physics::SphereCollider>();
 
+        int model_s = resource_manager->load_model(current_project->project_dir + current_project->assets_dir + "\\models\\sibenik.obj");
+        int model_t = resource_manager->load_model(current_project->project_dir + current_project->assets_dir + "\\models\\teapot.obj");
+        auto obj = scene->create_entity("Model");
+        //obj->transform->scale *= 0.01f;
+        obj->add_component<MeshComponent>(model_s, GL_TRIANGLES, resource_manager->get_mesh_manager());
+
 
         show_ = true;
         text_ = "Something";

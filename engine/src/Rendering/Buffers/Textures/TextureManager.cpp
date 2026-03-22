@@ -142,7 +142,7 @@ void TextureManager::serialize(YAML::Emitter& out)
         std::string path = textures_.at(i)->get_path();
         std::replace(path.begin(), path.end(), '/', '\\');
         path.erase(path.find(load_prefix_), load_prefix_.size());
-        std::cout << path << '\n';
+        //std::cout << path << '\n';
 
         out << YAML::Flow << YAML::BeginSeq;
         out << textures_.at(i)->id << path << textures_.at(i)->internal_format << textures_.at(i)->format;

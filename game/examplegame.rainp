@@ -1,6 +1,6 @@
 Project:
   Name: Example Project
-  Version: 0.2.15
+  Version: 0.2.20
 Directories:
   Root: C:\Files\Code\C++\rainfall_engine\game\
   Assets: assets
@@ -11,3 +11,6 @@ Textures:
   ID Count: 9
   Paths:
     - [8, chill_guy.jpg, 35905, 6407]
+Models:
+  - models\sibenik.obj
+  - models\teapot.obj
