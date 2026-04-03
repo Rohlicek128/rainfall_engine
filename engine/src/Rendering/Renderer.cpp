@@ -179,11 +179,17 @@ namespace engine
             shadow_map_->render_depth_map(*dir_lights.front(), *current_scene_, *shadow_depth_program_);
         }
 
+        //Background stencil - ON
+        glEnable(GL_STENCIL_TEST);
+        glStencilMask(0xFF);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
         //Geometry Pass
         g_buffer_->bind();
         glViewport(0, 0, cur_width, cur_height);
         glClearColor(cur_camera_comp->clear_color[0], cur_camera_comp->clear_color[1], cur_camera_comp->clear_color[2], cur_camera_comp->clear_color[3]);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         if (cur_camera_comp->is_wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -192,15 +198,25 @@ namespace engine
         if (cur_camera_comp->is_wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         g_buffer_->unbind();
 
+        //Background stencil - COPY
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, g_buffer_->get_handle());
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, post_process_program_->framebuffer_->get_handle());
+        glBlitFramebuffer(0, 0, cur_width, cur_height, 0, 0, cur_width, cur_height, GL_STENCIL_BUFFER_BIT, GL_NEAREST);
+
+
         //Lighting Pass
         post_process_program_->bind_framebuffer();
-        //glClearColor(cur_camera_comp->clear_color[0], cur_camera_comp->clear_color[1], cur_camera_comp->clear_color[2], cur_camera_comp->clear_color[3]);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_STENCIL_TEST);
+        glStencilMask(0x00);
+        glStencilFunc(GL_EQUAL, 1, 0xFF);
+
         lighting_program_->draw(*current_scene_, *screen_mesh_, 0, *g_buffer_, *shadow_map_);
         post_process_program_->unbind_framebuffer();
 
 
         //Post Process Pass
+        glDisable(GL_STENCIL_TEST);
         if (render_to_fbo_) render_fbo_->bind();
         post_process_program_->draw(*screen_mesh_, 0, *cur_camera_comp, shadow_map_->is_debug_visible ? shadow_map_->get_depth_map()->attached_textures.at(0)->get_handle() : -1);
         if (render_to_fbo_) render_fbo_->unbind();

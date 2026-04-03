@@ -5,6 +5,9 @@ list(APPEND SRCS
 )
 
 add_library(engine STATIC ${SRCS})
+target_compile_definitions(engine PUBLIC RMLUI_STATIC_LIB)
+target_compile_definitions(engine PUBLIC ASSIMP_DLL_NOT_USED)
+
 TARGET_INCLUDE_DIRECTORIES(engine
     PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
@@ -16,8 +19,6 @@ TARGET_INCLUDE_DIRECTORIES(engine
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/freetype"
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/assimp"
 )
-
-target_compile_definitions(engine PUBLIC RMLUI_STATIC_LIB)
 
 set(RMLUI_BACKEND_PATH ${CMAKE_CURRENT_SOURCE_DIR}/lib/RmlUi/RmlUi/Backends)
 add_library(rmlui_backend_GLFW_GL3 INTERFACE)

@@ -19,7 +19,7 @@ GBuffer::GBuffer(int width, int height)
     framebuffer_->set_draw_buffers();
 
     //Renderbuffer
-    framebuffer_->attach_renderbuffer(std::make_unique<Renderbuffer>(width, height, GL_DEPTH_COMPONENT, GL_DEPTH_ATTACHMENT));
+    framebuffer_->attach_renderbuffer(std::make_unique<Renderbuffer>(width, height, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT));
     framebuffer_->check_completeness();
 
     selected_texture_ = -1;
@@ -45,6 +45,11 @@ void GBuffer::active_bind()
     position_texture->active_bind(0);
     albedo_rough_texture->active_bind(1);
     normal_metal_texture->active_bind(2);
+}
+
+unsigned int GBuffer::get_handle()
+{
+    return framebuffer_->get_handle();
 }
 
 void GBuffer::bind()

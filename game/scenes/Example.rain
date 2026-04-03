@@ -8,27 +8,27 @@ Editor Camera:
   Children Ids: []
   Components:
     - Transform:
-        Position: [2.4700534, 11.246036, -13.780628]
-        Rotation: [0.5528981, -0.48022434, 0.68094665]
+        Position: [1.4621891, 8.717762, -12.804327]
+        Rotation: [0.62062126, -0.34939387, 0.70196384]
         Scale: [1, 1, 1]
     - Camera:
         Enabled: true
         Wireframe: false
-        Yaw: 2570.925
-        Pitch: -28.700056
+        Yaw: 2568.5195
+        Pitch: -20.450245
         Fov: 85
         Near Plane: 0.1
         Far Plane: 1000
         Speed: 12.5
         Gamma: 2.2
         Exposure: 0.6014223
-        Clear Color: [0.25, 0.25, 0.25, 1]
+        Clear Color: [1, 1, 1, 1]
         Up Vector: [0, 1, 0]
 Entities:
   - Entity: Player camera
     Id: 4
     Is Visible: true
-    Parent Id: 46
+    Parent Id: 25
     Children Ids: []
     Components:
       - Transform:
@@ -57,7 +57,7 @@ Entities:
   - Entity: Cube
     Id: 5
     Is Visible: true
-    Parent Id: 46
+    Parent Id: 25
     Children Ids: []
     Components:
       - Transform:
@@ -86,7 +86,7 @@ Entities:
   - Entity: "Cube #2"
     Id: 6
     Is Visible: true
-    Parent Id: 46
+    Parent Id: 25
     Children Ids: [7]
     Components:
       - Transform:
@@ -136,7 +136,7 @@ Entities:
   - Entity: Ground
     Id: 8
     Is Visible: true
-    Parent Id: 46
+    Parent Id: 25
     Children Ids: []
     Components:
       - Transform:
@@ -165,7 +165,7 @@ Entities:
   - Entity: Sun
     Id: 9
     Is Visible: true
-    Parent Id: 46
+    Parent Id: 25
     Children Ids: []
     Components:
       - Transform:
@@ -186,7 +186,7 @@ Entities:
   - Entity: Bulb
     Id: 10
     Is Visible: true
-    Parent Id: 46
+    Parent Id: 25
     Children Ids: []
     Components:
       - Transform:
@@ -208,7 +208,7 @@ Entities:
   - Entity: "Bulb #2"
     Id: 11
     Is Visible: true
-    Parent Id: 46
+    Parent Id: 25
     Children Ids: []
     Components:
       - Transform:
@@ -230,7 +230,7 @@ Entities:
   - Entity: Blue Light
     Id: 22
     Is Visible: true
-    Parent Id: 46
+    Parent Id: 25
     Children Ids: []
     Components:
       - Transform:
@@ -252,7 +252,7 @@ Entities:
   - Entity: Gold
     Id: 33
     Is Visible: true
-    Parent Id: 46
+    Parent Id: 25
     Children Ids: []
     Components:
       - Transform:
@@ -281,7 +281,7 @@ Entities:
   - Entity: Billboard
     Id: 23
     Is Visible: true
-    Parent Id: 46
+    Parent Id: 25
     Children Ids: []
     Components:
       - Transform:
@@ -305,7 +305,7 @@ Entities:
   - Entity: Wall
     Id: 24
     Is Visible: true
-    Parent Id: 46
+    Parent Id: 25
     Children Ids: []
     Components:
       - Transform:

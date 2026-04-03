@@ -78,6 +78,9 @@ namespace editor
         resource_manager.get()->reset();
         scene_manager.get()->reset();
         scene_graph_panel_->selected_entity = nullptr;
+        
+        resource_manager->get_mesh_manager()->set_default_models();
+        resource_manager->get_mesh_manager()->compile();
     }
 
 
@@ -96,8 +99,12 @@ namespace editor
         light->transform->position = glm::vec3(3.0f, 2.0f, 2.5f);
         light->add_component<MeshComponent>(0, 4, resource_manager->get_mesh_manager());
         light->add_component<LightComponent>(lights::LIGHT_TYPE::POINT, glm::vec3(1.0f, 1.0f, 1.0f));
-        light->get_component<LightComponent>()->intensity = 5.0f;
+        light->get_component<LightComponent>()->intensity = 50.0f;
         scene->add_entity(std::move(light));
+
+        Entity* cam = scene_manager->get_current_scene()->editor_camera.get();
+        cam->transform->position = glm::vec3(1.0f, 1.0f, -1.0f) * 4.0f;
+        cam->get_component<CameraComponent>()->set_yaw_pitch(135.0f, -35.0f);
 
         return scene;
     }

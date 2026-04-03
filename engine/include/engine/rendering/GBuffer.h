@@ -17,6 +17,7 @@ public:
     Framebuffer& get_framebuffer();
     void blit_framebuffer();
     void active_bind();
+    unsigned int get_handle() override;
     void bind() override;
     void unbind() override;
 };
