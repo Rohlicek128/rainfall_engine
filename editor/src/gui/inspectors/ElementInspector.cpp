@@ -291,6 +291,13 @@ namespace editor
 
         ImGui::SeparatorText("Movement");
         ImGui::DragFloat("Speed", &camera.speed, 0.1f, 0.1f, 500.0f);
+
+
+        ImGui::SeparatorText("Fog");
+        ImGui::Checkbox("Enabled", &camera.is_fog_enabled);
+        draw_color3("Fog Color", camera.fog_color);
+        ImGui::DragFloat("End", &camera.fog_end, 0.1f, 0, 0, "%.1f");
+        ImGui::DragFloat("Density", &camera.fog_density, 0.001f, 0, 0, "%.3f");
     }
 
     void ElementInspector::draw_light_component(LightComponent& light)

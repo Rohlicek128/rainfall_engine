@@ -5,4 +5,13 @@ compile_commands.json
 .zed/
 .vscode/
 build_run.bat
-docs/
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.bbl
+*.blg
+op.pdf

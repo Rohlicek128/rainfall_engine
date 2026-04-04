@@ -112,12 +112,10 @@ namespace engine
         assets_dir = node["Directories"]["Assets"].as<std::string>();
         scenes_dir = node["Directories"]["Scenes"].as<std::string>();
 
-        app_->resource_manager->get_texture_manager()->set_load_prefix(project_dir + assets_dir + "\\");
-        app_->resource_manager->get_texture_manager()->deserialize(node);
-
         //app_->resource_manager->get_mesh_manager()->set_load_prefix(project_dir + assets_dir + "\\");
         //app_->resource_manager->get_mesh_manager()->deserialize(node);
 
+        app_->resource_manager.get()->reset();
         app_->resource_manager->get_mesh_manager()->set_default_models();
         if (YAML::Node models_des = node["Models"])
         {
@@ -127,6 +125,9 @@ namespace engine
             }
         }
         app_->resource_manager->get_mesh_manager()->compile();
+        
+        app_->resource_manager->get_texture_manager()->set_load_prefix(project_dir + assets_dir + "\\");
+        app_->resource_manager->get_texture_manager()->deserialize(node);
 
         if (YAML::Node scenes_des = node["Scenes"])
         {

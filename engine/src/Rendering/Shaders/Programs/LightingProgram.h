@@ -13,11 +13,6 @@ class LightingProgram : public Program
 {
     float* ambient_edit_;
 
-    bool is_fog_enabled_;
-    glm::vec3 fog_color_;
-    float* fog_color_edit_;
-    float fog_end_, fog_density_;
-
     void set_lights_uniforms(const Scene&, lights::LIGHT_TYPE, unsigned int);
 public:
     static constexpr unsigned int nr_directional_lights = 1;

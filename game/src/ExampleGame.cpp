@@ -18,7 +18,7 @@ namespace game
 {
     void ExampleGame::on_start()
     {
-        current_project->name = "Example Project";
+        current_project->name = "BH Project";
         current_project->project_dir = "C:\\Files\\Code\\C++\\rainfall_engine\\game\\";
 
 
@@ -45,9 +45,10 @@ namespace game
         scene->current_camera->add_component<engine::physics::SphereCollider>();
 
         int model_s = resource_manager->load_model(current_project->project_dir + current_project->assets_dir + "\\models\\sibenik.obj");
-        int model_t = resource_manager->load_model(current_project->project_dir + current_project->assets_dir + "\\models\\teapot.obj");
+        int model_t = resource_manager->load_model(current_project->project_dir + current_project->assets_dir + "\\models\\sphere.obj");
         auto obj = scene->create_entity("Model");
-        obj->add_component<MeshComponent>(model_s, GL_TRIANGLES, resource_manager->get_mesh_manager());
+        obj->add_component<MeshComponent>(model_t, GL_TRIANGLES, resource_manager->get_mesh_manager());
+        obj->transform->scale *= 3.0f;
 
 
         show_ = true;
@@ -61,7 +62,7 @@ namespace game
         document_ = ui->LoadDocument("assets/documents/index.rml");
         document_->Show();
 
-        current_project->save(*this, current_project->project_dir + "examplegame.rainp");
+        current_project->save(*this, current_project->project_dir + "bhg.rainp");
         scene->save(current_project->project_dir + current_project->scenes_dir + "\\" + scene->name + ".rain");
         tools::printl_message("EXAMPLE", "OnStart");
     }

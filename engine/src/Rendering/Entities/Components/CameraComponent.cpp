@@ -32,6 +32,12 @@ CameraComponent::CameraComponent(TransformComponent* transform, const glm::vec4 
     gamma = 2.2f;
     threshold = 3.0f;
     key_value = 0.2f;
+
+
+    is_fog_enabled = true;
+    fog_color = glm::vec3(1.0f);
+    fog_end = 90.0f;
+    fog_density = 0.2f;
 }
 
 void CameraComponent::default_move(engine::InputManager& input, const float delta_time)
@@ -120,6 +126,13 @@ void CameraComponent::serialize(YAML::Emitter& out)
     out << YAML::Key << "Up Vector" << YAML::Value;
     emit_out(out, up);
 
+
+    out << YAML::Key << "Fog Enabled" << YAML::Value << is_fog_enabled;
+    out << YAML::Key << "Fog Color" << YAML::Value;
+    emit_out(out, fog_color);
+    out << YAML::Key << "Fog End" << YAML::Value << fog_end;
+    out << YAML::Key << "Fog Density" << YAML::Value << fog_density;
+
     out << YAML::EndMap;
     out << YAML::EndMap;
 }
@@ -149,6 +162,13 @@ bool CameraComponent::deserialize(YAML::Node& node)
     }
     if (YAML::Node cur = node["Up Vector"])
         up = des_vec3(cur);
+
+
+    is_fog_enabled = node["Fog Enabled"].as<bool>();
+    if (YAML::Node cur = node["Fog Color"])
+        fog_color = des_vec3(cur);
+    fog_end = node["Fog End"].as<float>();
+    fog_density = node["Fog Density"].as<float>();
 
     return true;
 }

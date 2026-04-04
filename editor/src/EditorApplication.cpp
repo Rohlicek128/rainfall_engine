@@ -78,7 +78,7 @@ namespace editor
         resource_manager.get()->reset();
         scene_manager.get()->reset();
         scene_graph_panel_->selected_entity = nullptr;
-        
+
         resource_manager->get_mesh_manager()->set_default_models();
         resource_manager->get_mesh_manager()->compile();
     }

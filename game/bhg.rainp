@@ -1,0 +1,17 @@
+Project:
+  Name: BH Project
+  Version: 0.2.20
+Directories:
+  Root: C:\Files\Code\C++\rainfall_engine\game\
+  Assets: assets
+  Scenes: scenes
+Scenes:
+  - MyScene.rain
+Textures:
+  ID Count: 12
+  Paths:
+    - [10, mud_leaves\brown_mud_leaves_01_diff_1k.jpg, 35905, 6407]
+    - [11, mud_leaves\brown_mud_leaves_01_nor_gl_1k.jpg, 32849, 6407]
+Models:
+  - models\sibenik.obj
+  - models\sphere.obj

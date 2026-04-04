@@ -29,6 +29,12 @@ public:
 
     bool is_wireframe;
 
+
+    bool is_fog_enabled;
+    glm::vec3 fog_color;
+    float fog_end, fog_density;
+
+
     CameraComponent(TransformComponent*, glm::vec4 = {0.1f, 0.1f, 0.1f, 1.0f});
     ~CameraComponent() override = default;
 

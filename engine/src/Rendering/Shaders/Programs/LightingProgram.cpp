@@ -13,12 +13,6 @@ LightingProgram::LightingProgram(const std::vector<Shader>& shaders) : Program(s
 {
     ambient = glm::vec3(0.01f);
     ambient_edit_ = new float[] {ambient.x, ambient.y, ambient.z};
-
-    is_fog_enabled_ = true;
-    fog_color_ = glm::vec3(1.0f);
-    fog_color_edit_ = new float[] {fog_color_.x, fog_color_.y, fog_color_.z};
-    fog_end_ = 90.0f;
-    fog_density_ = 0.2f;
 }
 
 void LightingProgram::draw(const Scene& scene, Mesh& screen_mesh, const int quad_index, GBuffer& g_buffer, ShadowMap& shadow_map)
@@ -48,10 +42,11 @@ void LightingProgram::draw(const Scene& scene, Mesh& screen_mesh, const int quad
     set_uniform("is_shadow", shadow_map.is_visible);
 
     //Fog
-    set_uniform("fog.is_enabled", is_fog_enabled_);
-    set_uniform("fog.color", fog_color_);
-    set_uniform("fog.end", fog_end_);
-    set_uniform("fog.density", fog_density_);
+    CameraComponent* cam = scene.current_camera->get_component<CameraComponent>();
+    set_uniform("fog.is_enabled", cam->is_fog_enabled);
+    set_uniform("fog.color", cam->fog_color);
+    set_uniform("fog.end", cam->fog_end);
+    set_uniform("fog.density", cam->fog_density);
 
     if (const ModelData* model_data = screen_mesh.get_model(quad_index))
     {
