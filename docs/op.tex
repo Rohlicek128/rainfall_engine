@@ -14,7 +14,13 @@
 \usepackage{hyperref} % Odkazy v PDF
 \usepackage{amsmath}  % Matematika (matice)
 \usepackage{graphicx}
+\usepackage{wrapfig}
 \usepackage{float}
+
+
+\title{Rainfall Engine: Architektura a implementace herního enginu v C++}
+\author{Adam Švec}
+\date{\today}
 
 
 % --- Nastavení vzhledu kódu (C++) ---
@@ -42,14 +48,21 @@
 
 \begin{titlepage}
     \centering
-    \vspace*{1cm}
+
+    \includegraphics[width=6cm]{SPSE-Jecna_Logo.pdf}
+
+    \vspace*{0.25cm}
     {\huge\bfseries Střední průmyslová škola elektrotechnická, Ječná 30, 12 000, Praha 2 \par}
-    \vspace{3cm}
-    {\Large Odborná práce \par}
-    \vspace{1.5cm}
-    {\huge\bfseries Rainfall Engine: Architektura a implementace herního enginu v C++ \par}
+
     \vspace{2cm}
+    {\Large Odborná práce \par}
+
+    \vspace{2cm}
+    {\huge\bfseries Rainfall Engine: Architektura a implementace herního enginu v C++ \par}
+
+    \vspace{1.5cm}
     {\Large \textbf{Adam Švec} \par}
+
     \vfill
     {\Large \today \par}
 \end{titlepage}
@@ -97,28 +110,30 @@ uvod
 \section{Použité technologie}
 
 \subsection{C++}
-Pro naprogramování herního enginu je vhodný jazyk C++, díky jeho rychlosti a nízkoúrovňovému přístupu k paměti. Všechny grafické knihovny jako jsou OpenGL a DirectX jsou primárně vyvýjeny pro C++, tudíž nemusím používat verze třetích stran.
+Pro naprogramování herního enginu je vhodný jazyk \texttt{C++}, díky jeho rychlosti a nízkoúrovňovému přístupu k paměti. Všechny grafické knihovny jako jsou OpenGL a DirectX jsou primárně vyvýjeny pro C++, tudíž nemusím používat verze třetích stran.
 
 Většina veřejných a proprietárních enginů je primárně vytvářeno v C++ a protože bych jednou chtěl pracovat pro herní studio jako engine vývojář, zkušenost pracovat v C++ s herním enginem bude velmi užitečná.
 
 \subsection{OpenGL}
-OpenGL je grafické API (\textit{Appliaction Programming Interface}), které nám umožňuje vykreslovat trojúhelky na obrazovku. K vykreslování využívá grafickou kartu (\textit{GPU}), která byla pro tuto práci specificky stvořena, tudíž je několikanásobně rychlejší, než kdyby jsme vykreslovaly přes procesor (\textit{CPU}).
+\texttt{OpenGL} je grafické API (\textit{Appliaction Programming Interface}), které nám umožňuje vykreslovat trojúhelky na obrazovku. K vykreslování využívá grafickou kartu (\textit{GPU}), která byla pro tuto práci specificky stvořena, tudíž je několikanásobně rychlejší, než kdyby jsme vykreslovaly přes procesor (\textit{CPU}).
 
-Aby jsme se mohly dostat k funkcím OpenGL, musíme použít knihovnu, jako je GLAD, která nám je poskytne.
+Aby jsme se mohly dostat k funkcím \texttt{OpenGL}, musíme použít knihovnu, jako je \texttt{GLAD}, která nám je poskytne.
 
 \subsection{GLFW}
-Dovoluje vytvořit okno, do kterého lze následně cokoliv vykreslovat, pomocí OpenGL. Také umožňuje zachycovat uživatelský vstup, jako je klávesnice a myš. GLFW je knihovna, která je specificky mířena na OpenGL, tudíž vhodnou volbou.
+\texttt{GLFW} dovoluje vytvořit okno, do kterého lze následně cokoliv vykreslovat, pomocí OpenGL. Také umožňuje zachycovat uživatelský vstup, jako je klávesnice a myš. \texttt{GLFW} je knihovna, která je specificky mířena na \texttt{OpenGL}, tudíž vhodnou volbou.
 
 \subsection{CMake}
-CMake vytváří adresářovou strukturu a kompiluje za nás kód do knihoven a spustitelných souborů (\textit{.exe}).
+\texttt{CMake} vytváří adresářovou strukturu a kompiluje za nás kód do knihoven a spustitelných souborů (\textit{.exe}).
 
-\subsection{Uživatelské prostředí}
-Herní uživatelské prostředí (\textit{User Interface}) může uživatel enginu vytvářet pomocí knihovny RmlUi. RmlUi funguje na bázi HTML a CSS, což poskytuje povědomé prostředí pro většinu uživatlů a umožňuje velkou kreativitu ve vzhledu uživatelského prostředí.
+\subsection{Uživatelské prostředí} \label{sec:tech-ui}
+Herní uživatelské prostředí (\textit{User Interface}) může uživatel enginu vytvářet pomocí knihovny \texttt{RmlUi}. RmlUi funguje na bázi HTML a CSS, což poskytuje povědomé prostředí pro většinu uživatlů a umožňuje velkou kreativitu ve vzhledu uživatelského prostředí.
 
-Editor používá na uživatelské prostředí knihovnu Dear ImGui, kvůli její jednoduchosti a rychlé iteraci a úpravy jednotlivách elementů.
+Editor používá na uživatelské prostředí knihovnu \texttt{Dear ImGui}, kvůli její jednoduchosti a rychlé iteraci a úpravy jednotlivách elementů.
 
 \subsection{Načítání a ukládání}
+K načítání textur používá engine jednoheaderovou knihovnu \texttt{stb\_image.h}, která bohatě stačí k načítáná většiny populárních formátů. Podobně k načítání 3D modélů engine používá knihovnu Assimp, která podporuje řadu formátů. Tyto knihovny jsem vybral, díky jejich jednoduchosti a jejich přístupným návodům.
 
+Na ukládání a načítání scén a projektů do souborů jsem vybral formát YAML, který používá i Unity na ukládaní svých scén. Pro tento úkol používá engine knihovnu \texttt{yaml-cpp}.
 
 
 
@@ -134,24 +149,87 @@ Celý engine váže třída \texttt{engine::Engine}, která vše vlastní a spou
 
 
 \subsection{Window}
-Pomocí knihovny GLFW zajišťuje vytvoření okna a zachycuje uživatlký vstup, který následně použije Input Manager a RmlUi.
+Pomocí knihovny GLFW zajišťuje vytvoření okna a zachycuje uživatlký vstup, který následně používá Input Manager a RmlUi.
+
 
 \subsection{Renderování}
 Renderer vykresluje aktuální scénu, pomocí OpenGL.
 
-\subsubsection{RmlUi}
-RmlUi
+\subsubsection{Shadery a vykreslovací řetězec}
+\texttt{Shadery} pro OpenGL jsou psány v GLSL (\textit{OpenGL Shading Language}), který je založen na syntaxy jazyku \texttt{C}. Je to způsob jak psát kód na grafické kartě. Existuje spousta různých typů shaderů, některé dobré vždy na něco jiného. Dva nejdůležitější shadery jsou \textit{vertex} a \textit{fragment} shadery, bez kterých nemůžem nic vykreslovat na obrazovku.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{pipeline.png}
+    \caption{Nejdůležitěljší části vykreslovacího řetězece (modře vybarvené části jsou programovatelné)}
+    \label{fig:pipeline}
+\end{figure}
+
+Ve vykreslovacím řetězci (\textit{graphics pipeline}) je vertex shader jeden z prvních. Je spuštěň pro každý bod (\textit{Vertex}), který grafické kartě pošleme a spustí na něm kód, který napíšem. Používá se především na transformaci bodů v prostoru na obrazovku.
+
+Po složení trojúhelků z bodů a jejich následná rasterizace na pixely, se pro každý pixel spustí fragment shader a vykreslí výslednou barvu pixelu na obrazovku. Využívá se především na osvětlení.
+
+\subsubsection{Deferred renderování}
+V klasickém renderování se použává \texttt{forward renderování} (\textit{dopředného vykreslování}), kde pokaždě když zavoláme, aby byl objekt vykreslen, tak ho rovnou i osvěltíme, což znamená, když bude jinačí objekt ten první překrývat, tak jsme ztratili čas počítáním osvětlení na pixelu, který byl následně přepsán.
+
+Tento engine využívá techniku s názvem \texttt{deferred renderování} (\textit{odložené vykreslování}), která rozděluje vykreslování na geometry pass, do kterého vykreslíme čistá data objektů na obrazovce a následně v lighting passu všechno najednou osvětlíme. Tento postup urychluje výkon, při větším počtu světel, za cenu komplexity a různých grafických efektů, jako je průhlednost.
+
+
+\subsection{Herní UI}
+Jak bylo již řečno v kapitole~\ref{sec:tech-ui}, engine používá k hernímu uživatelkému prostředí knihovnu RmlUi. Engine nijak nezapouzdřuje RmlUi. Poskytuje vývojáři \texttt{Rml::Context}, se kterým může vytvářet uživatelké prostředí v HTML a CSS. Zapouzdření knihovny by vyžadovalo značné úsilý pro identické nebo možná i horší vývojářské pohodlý používání.
+
+ 
+\subsection{Appliaction}
+Tato třída je rozhraní, přes které uživatel komunikuje s enginem. Jak je patrné z diagramu na obrázku \ref{fig:architektura}, vlastní \texttt{Scene Manager}, \texttt{Resource Manager} a \texttt{Input Manager}. Uživatel oddědí třídu \texttt{engine::Application} a implementuje \texttt{on\_start} a \texttt{on\_update}.
+
+\subsection{Entity a scény}
+Engine spravavuje objekty, pomocí zjednodušeného návrhového vzoru ECS (\textit{Entity Component System}). ECS rozděluje funkčnost objektů na komponenty, které obsahují jenom samostatná data, následně na entity, které se zkládaj z komponent a naposled systémy, které zpracují data z komponenty a provedou určitou logiku.
+
+Jak již bylo řečeno, engine využívá zjednodušenou verzi ECS, kde komponenty jsou funkční samy o sobě. Toto řešní bylo zvloje, kvůli příliš velké komplexitě implementování rozdělenosti komponent a funkčnosti, pro minimální užitek.
+
+\subsubsection{Entita}
+Hlavní účel \texttt{entit} je uchovávat list komponent a umožnit vývojáři jednoduché operace s nimi, jako jsou \textit{add}, \textit{remove} a \textit{contains}.
+
+\subsubsection{Komponenty}
+Komponentu, kterou má každá entita je \texttt{Transform}, která uchovává pozici, rotaci a velikost entity. Engine tyto vlastnoti následně využije v počítání modelové matice.
+
+Důležitá, ale dobrovolná komponenta je \texttt{Mesh}, která je převážně zodpovědná za to, jaký model má engine vykreslit.
+
+Na úpravu vzhledu entity existují \texttt{Material} a \texttt{Texture} komponety.
+
+Další důležité komponenty jsou \texttt{Camera}, \texttt{Light} a \texttt{Collidery}.
+
+\subsubsection{Scéna}
+Primární práce \texttt{scény} je evidovat a vlastnit entity, které od ní uživatel přidá. Vlastní také třídu zodpovědnou za kolize.
+
+\subsubsection{Scene Manager}
+\texttt{Scene Manager} je zodpovědný za evidenci a vlastnění scén. Poskytuje funkce k přepínání mezi scénami dle jména a načítání scény ze souboru.
+
+
+\subsection{Resource Manager}
+K jednoduché práci s texturama a modelama, poskytuje třída \texttt{engine::Application} \texttt{Resource Manager}, který je dovoluje jednoduše načítat a získávat. 
+
+\subsubsection{Texture Manager}
+Primární práce \texttt{Texture Manageru} je uchovávání ukazatelů na textury, uložené na grafické kartě. Obsahuje také i takzvaně nezbytné textury, bez kterých se engine nespustí. Jsou to textury hlavně na správnou funkčnost renderování a textura, která bude zobrazena, pokud se učitou texturu nepovede načíst.
+
+\subsubsection{Mesh Manager}
+\texttt{Mesh Manager} je abstakce nad OpenGL objekty (\textit{VBO}, \textit{EBO} a \textit{VAO}), které jsou zodpovědné za nahrávání dat modelů na grafickou kartu. Umožňuje přidání modelů ze souboru, ale poté co začne hra (skončí funkce \texttt{on\_start}), aby byl model přidán na grafickou kartu, musí být Mesh Manager rekompilován, pomocí funkce \texttt{compile()}.
+
+\subsection{Input Manager}
+
 
 
 
 \section{Implementace enginu}
-engine
 
 \subsection{Inicializace a hlavní herní smyčka}
 
 Vstupním bodem každé aplikace založené na Rainfall Enginu je funkce \texttt{engine::run}, které dáte vaši třídu, která dedí z \texttt{engine::Appliaction}.
 
 \begin{lstlisting}[caption={Vstupní bod aplikace}]
+#include <engine/core/Engine.h>
+#include "ExampleGame.h"
+
 int main()
 {
     engine::run<ExampleGame>();
@@ -163,12 +241,38 @@ int main()
 První věc co nastane je inicializace, kde se vytvoří okno, RmlUi, renderovací systém a instance vaší odděděné 
 
 
+\subsection{Renderování}
+\subsubsection{Stíny}
+K vytváření stínů engine využívá techniku \texttt{Shadow mapping}. Z ortografického podledu směrového světla (\textit{directional light}) vyrenderuje hloubkovou mapu aktuální scény do textury, kterou následně použije osvětlovací systém, aby spočítal, kde světlo vidí a kam ne. Tento způsob vytváření stínů je relativně rychlý a vypadá dostatečně dobře.
+
+\subsubsection{Geometry pass}
+V této části renderování se podle každé entity v aktuální scéně nastavý různé proměné, dle koponent, co entita vlastní, a pak se zavolá vykreslení dané entity.
+
+Každý vertex, co jsme poslaly grafické kartě na vykreslení, musí projít vertex shaderem, kde ho převedel z \textit{localního prostoru} na \textit{clip} prostor, pomocí součinu několika matic.
+
+\begin{equation}
+    V_{clip} = M_{projection} \times M_{view} \times M_{model} \times V_{local}
+\end{equation}
+
+Výsledkem je bod, který je na správné relativní pozici vůči kameře. Tuto rovnici paralelně spočítá pro každý vertex.
+
+Následně se data, užitečná pro osvětlení, každé entity vykreslí do několika textur. Například pozice modelu na každém pixelu a nebo barva (materiál nebo textura) entity na každém pixelu. Dohromady těmto texturám se nazývá \texttt{G-Buffer}, který následně použije \texttt{Lighting pass} k vypočítání nasvícení.
+
+\subsubsection{Lighting pass}
+\subsubsection{Post process pass}
+
+
 
 
 \section{Editor}
 Editor
 
-
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{editor.png}
+    \caption{Vzhled editoru a Dear ImGui UI}
+    \label{fig:editor}
+\end{figure}
 
 
 \section{Ukázková hra}

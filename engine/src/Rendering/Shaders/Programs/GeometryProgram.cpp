@@ -10,7 +10,6 @@
 #include "engine/managers/Mesh.h"
 #include "engine/world/Scene.h"
 
-#include <iostream>
 
 GeometryProgram::GeometryProgram(const std::vector<Shader>& shaders) : Program(shaders)
 {

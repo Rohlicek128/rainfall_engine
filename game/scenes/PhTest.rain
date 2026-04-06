@@ -23,6 +23,10 @@ Editor Camera:
         Exposure: 3
         Clear Color: [0.25, 0.25, 0.25, 1]
         Up Vector: [0, 1, 0]
+        Fog Enabled: true
+        Fog Color: [1, 1, 1]
+        Fog End: 381
+        Fog Density: 0.41
 Entities:
   - Entity: Cube
     Id: 4
