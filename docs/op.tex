@@ -17,6 +17,8 @@
 \usepackage{wrapfig}
 \usepackage{float}
 
+\usepackage{url}
+
 
 \title{Rainfall Engine: Architektura a implementace herního enginu v C++}
 \author{Adam Švec}
@@ -69,6 +71,7 @@
 
 
 % Anotace
+\pagenumbering{roman}
 \renewenvironment{abstract}{
   \small
   \begin{center}
@@ -103,8 +106,11 @@
 
 
 
+\pagenumbering{arabic}
 \section{Úvod}
-uvod
+Hlavní motivací pro vznik této práce a samotného projektu Rainfall Engine byla touha do hloubky pochopit, jak herní enginy reálně fungují, jak spravují paměť a jakým způsobem komunikují s grafickou kartou. Celý projekt původně odstartoval pouze jako osobní experiment a koníček pramenící z mé vášně pro počítačovou grafiku a vizuální tvorbu.
+
+Mým dlouhodobým profesním cílem je působit v herním průmyslu na pozici vývojáře enginů (\textit{Engine Developer}) s úzkou specializací na počítačovou grafiku. Vytvoření vlastního enginu od úplných základů v jazyce C++ tak představuje nezbytný a logický krok k dosažení tohoto cíle. Nejedná se o pokus vytvořit konkurenci zavedeným komerčním řešením, ale spíše o funkční demonstraci schopnosti navrhnout a naimplementovat vlastní škálovatelnou architekturu.
 
 
 \section{Použité technologie}
@@ -216,7 +222,7 @@ Primární práce \texttt{Texture Manageru} je uchovávání ukazatelů na textu
 \texttt{Mesh Manager} je abstakce nad OpenGL objekty (\textit{VBO}, \textit{EBO} a \textit{VAO}), které jsou zodpovědné za nahrávání dat modelů na grafickou kartu. Umožňuje přidání modelů ze souboru, ale poté co začne hra (skončí funkce \texttt{on\_start}), aby byl model přidán na grafickou kartu, musí být Mesh Manager rekompilován, pomocí funkce \texttt{compile()}.
 
 \subsection{Input Manager}
-
+Aby hra mohla být interaktivní, potřebuje vývojář, nějak přistupovat k vstupu uživatele. Třída \texttt{Input Manager} je udělaná pro jednoduchý a rychlý přístup ke vstupu od klávesnice a myši.
 
 
 
@@ -238,28 +244,107 @@ int main()
 \end{lstlisting}
 
 Životní cyklus každé aplikace je rozdělen na inicializaci (\textit{start}), herní smyčku a vypnutí (\textit{shutdown}).
-První věc co nastane je inicializace, kde se vytvoří okno, RmlUi, renderovací systém a instance vaší odděděné 
+První věc co nastane je inicializace, kde se vytvoří okno, RmlUi, renderovací systém a instance vaší odděděné aplikace.
+
+\subsubsection{Herní smyčka}
+Po inicializaci se spustí hlavní herní smyčka, která je zodpovědná za neustálý běh aplikace, dokud ji uživatel nebo popřípadě vývojář neukončí.
+
+\begin{lstlisting}[caption={Herní smyčka}]
+while (app.is_running() && !window.should_close())
+{
+    // Update
+    rmlui_layer.update(*app.input_manager);
+    renderer.update();
+    app.update(renderer.delta_time);
+    // Render
+    renderer.render();
+    rmlui_layer.render(window.get_width(), window.get_height());
+    renderer.swap_and_poll();
+}
+\end{lstlisting}
+
+Nejdříve se spustí update funkce pro renderer a aplikaci vývojáře, až pak se spustí renderování.
 
 
 \subsection{Renderování}
 \subsubsection{Stíny}
-K vytváření stínů engine využívá techniku \texttt{Shadow mapping}. Z ortografického podledu směrového světla (\textit{directional light}) vyrenderuje hloubkovou mapu aktuální scény do textury, kterou následně použije osvětlovací systém, aby spočítal, kde světlo vidí a kam ne. Tento způsob vytváření stínů je relativně rychlý a vypadá dostatečně dobře.
+K vytváření stínů engine využívá techniku \texttt{Shadow mapping}. Z ortografického podledu směrového světla (\textit{directional light}) vyrenderuje hloubkovou mapu aktuální scény do textury, kterou následně použije osvětlovací systém, aby spočítal, kam světlo vidí a kam ne. Tento způsob vytváření stínů je relativně rychlý a vypadá dostatečně dobře.
 
 \subsubsection{Geometry pass}
 V této části renderování se podle každé entity v aktuální scéně nastavý různé proměné, dle koponent, co entita vlastní, a pak se zavolá vykreslení dané entity.
 
-Každý vertex, co jsme poslaly grafické kartě na vykreslení, musí projít vertex shaderem, kde ho převedel z \textit{localního prostoru} na \textit{clip} prostor, pomocí součinu několika matic.
+Každý vertex, co jsme poslaly grafické kartě na vykreslení, musí projít vertex shaderem, kde ho převede z \textit{localního prostoru} do \textit{clip prostoru}, pomocí součinu několika matic.
 
 \begin{equation}
     V_{clip} = M_{projection} \times M_{view} \times M_{model} \times V_{local}
 \end{equation}
 
-Výsledkem je bod, který je na správné relativní pozici vůči kameře. Tuto rovnici paralelně spočítá pro každý vertex.
+Výsledkem je bod, který je na správné relativní pozici vůči kameře. Tuto rovnici spočítá pro každý vertex paralelně.
 
-Následně se data, užitečná pro osvětlení, každé entity vykreslí do několika textur. Například pozice modelu na každém pixelu a nebo barva (materiál nebo textura) entity na každém pixelu. Dohromady těmto texturám se nazývá \texttt{G-Buffer}, který následně použije \texttt{Lighting pass} k vypočítání nasvícení.
+Následně se data, užitečná pro osvětlení, každé entity vykreslí do několika textur. Například pozice modelu na každém pixelu a nebo barva (materiál nebo textura) entity na každém pixelu. Dohromady těmto texturám se nazývá \texttt{G-Buffer}.
 
 \subsubsection{Lighting pass}
+Po nahrání dat do G-Bufferu, je nařadě \texttt{Lighting pass}, aby spočítal jak má být každý pixel nasvícen. Nejdříve nastaví globální proměnné, jako je pozice kamery, specifikace mlhy a hlavně nastaví data světel.
+
+K osvětlení engine používá \texttt{physically based rendering} (\textit{PBR}), který se snaží imitovat světlo, aby dodržovalo zákony fyziky. Narozdíl od mnohem jednoduší techniky Blinn-Phong, vypadá mnohlem lépe a dovoluje větší svobodu v možnostech materiálů.
+
+Physically based rendering k renderování používá specializovanou verzi render equation (\textit{zobrazovací rovnice}) s názvem reflectance equation.
+
+\begin{equation} \label{eq:reflectance}
+L_o(p, \omega_o) = \int_{\Omega} f_r(p, \omega_i, \omega_o) L_i(p, \omega_i) (n \cdot \omega_i) \, d\omega_i
+\end{equation}
+
+\noindent kde:
+\begin{itemize}
+    \item[$L_o(p, \omega_o)$] je výsledné odražené záření (\textit{outgoing radiance}),
+    \item[$f_r$] představuje funkci BRDF (\textit{Bidirectional Reflectance Distribution Function}),
+    \item[$L_i(p, \omega_i)$] je přicházející záření ze směru $\omega_i$,
+    \item[$(n \cdot \omega_i)$] je kosinusový úhel mezi normálou plochy a směrem dopadajícího světla,
+    \item[$d\omega_i$] je diferenciální prostorový úhel integrace.
+\end{itemize}
+
+Logika výpočtu reflectance equation je implementována v GLSL shaderu\footnote{\href{https://github.com/Rohlicek128/rainfall_engine/blob/master/engine/src/Rendering/Shaders/GLSL/Lighting/pbr\_lighting.frag}{pbr\_lighting.frag}}.
+
 \subsubsection{Post process pass}
+Výsledek z lighting passu je vyrenderován do textury, kterou následně použije \texttt{post process pass}, k spočítání různých grafických efektů.
+
+Jeden z těchto efektů je \texttt{HDR} (\textit{High Dynamic Range}), která umožňuje správně vykreslovat velmi silná a slabá světla v jednom obraze, bez toho aby barvy přesahovaly limit 1.0 a ukazovaly se jako bílá, což by znamonalo ztráta informací v obraze.
+
+Pro dosažení realistického vizuálního výstupu implementuje engine systém automatické expozice, který simuluje adaptaci lidského oka na světelné podmínky scény.
+
+\begin{equation}
+C_{out} = \left( C_{in} \cdot \frac{k}{Y_{avg} \cdot 2^t} \right)^{\frac{1}{\gamma}}
+\end{equation}
+
+\noindent kde:
+\begin{itemize}
+    \item[$C_{out}$] je výsledná barva v prostoru LDR (\textit{Low Dynamic Range}),
+    \item[$C_{in}$] je barva v HDR prostoru (\textit{High Dynamic Range}),
+    \item[Y] zastupuje průměrný jas scény (\textit{Average Luminance}),
+    \item[k] je parametr \textit{Key Value} (cílový jas scény),
+    \item[t] je \textit{Threshold} (posun expozice),
+    \item[$\gamma$] je hodnota gama korekce (obvykle 2.2).
+\end{itemize}
+
+V posledním kroku je barva transformována z lineárního prostoru do prostoru s gama korekcí, což zajišťuje správné zobrazení na běžných monitorech.
+
+Logika výpočtu automatické expozice a gamy je implementována v GLSL shaderu\footnote{\href{https://github.com/Rohlicek128/rainfall_engine/blob/master/engine/src/Rendering/Shaders/GLSL/Screen/screen.frag}{screen.frag}}.
+
+
+
+\section{Tvorba obsahu v enginu}
+Celá tvorba aplikace nebo hry se odehrává v odděděné třídě \texttt{engine::Application}.
+
+\begin{lstlisting}[caption={Vytvoření ukázkové aplikace}]
+#include <engine/core/Application.h>
+
+class ExampleGame : public engine::Application
+{
+public:
+    void on_start() override;
+    void on_update(const float delta_time) override;
+};
+\end{lstlisting}
 
 
 
@@ -267,12 +352,17 @@ Následně se data, užitečná pro osvětlení, každé entity vykreslí do ně
 \section{Editor}
 Editor
 
+\subsection{Integrace knihovny Dear ImGui}
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{editor.png}
     \caption{Vzhled editoru a Dear ImGui UI}
     \label{fig:editor}
 \end{figure}
+
+
+\subsection{Nástroje editoru}
 
 
 \section{Ukázková hra}
