@@ -221,7 +221,7 @@ Primární práce \texttt{Texture Manageru} je uchovávání ukazatelů na textu
 \subsubsection{Mesh Manager}
 \texttt{Mesh Manager} je abstakce nad OpenGL objekty (\textit{VBO}, \textit{EBO} a \textit{VAO}), které jsou zodpovědné za nahrávání dat modelů na grafickou kartu. Umožňuje přidání modelů ze souboru, ale poté co začne hra (skončí funkce \texttt{on\_start}), aby byl model přidán na grafickou kartu, musí být Mesh Manager rekompilován, pomocí funkce \texttt{compile()}.
 
-\subsection{Input Manager}
+\subsection{Input Manager} \label{sec:input-manager}
 Aby hra mohla být interaktivní, potřebuje vývojář, nějak přistupovat k vstupu uživatele. Třída \texttt{Input Manager} je udělaná pro jednoduchý a rychlý přístup ke vstupu od klávesnice a myši.
 
 
@@ -333,7 +333,7 @@ Logika výpočtu automatické expozice a gamy je implementována v GLSL shaderu\
 
 
 \section{Tvorba obsahu v enginu}
-Celá tvorba aplikace nebo hry se odehrává v odděděné třídě \texttt{engine::Application}.
+Celý vývoj aplikace nebo hry se odehrává primárně v odděděné třídě \texttt{engine::Application}.
 
 \begin{lstlisting}[caption={Vytvoření ukázkové aplikace}]
 #include <engine/core/Application.h>
@@ -346,6 +346,127 @@ public:
 };
 \end{lstlisting}
 
+
+\subsection{Registrace vstupu hráče}
+K registaci vstupu hráče, jde jak již bylo zmíněno v kapitole~\ref{sec:input-manager} dosáhnout pomocí třídy \texttt{Input Manager}, která je zodpovědná za vstup klávesnice a myši.
+
+\subsubsection{Vstup klávesnice}
+
+\begin{lstlisting}[caption={Ukázkové získání vstupu klávesnice}]
+void ExampleGame::on_update(const float delta_time)
+{
+    if (input_manager->get_key_up(GLFW_KEY_R))
+    {
+        // logika
+    }
+    if (input_manager->get_key_down(GLFW_KEY_S))
+    {
+        // logika
+    }
+    if (input_manager->get_key_toggle(GLFW_KEY_T))
+    {
+        // logika
+    }
+    if (input_manager->get_key_with_timeout(GLFW_KEY_U, 1000))
+    {
+        // logika
+    }
+}
+\end{lstlisting}
+
+\begin{itemize}
+    \item \textbf{Get key up:} Spustí se, jen pokud je klávesa \textit{GLFW\_KEY\_R} nezmáčknutá.
+    
+    \item \textbf{Get key down:} Spustí se, jen pokud je klávesa \textit{GLFW\_KEY\_S} zmáčknutá.
+    
+    \item \textbf{Get key toggle:} Spustí se, po stisknutí klávesy \textit{GLFW\_KEY\_T}, ale aby se tato část spustila znovu musí klávasu nejdříve pustit, a pak znova stisknout.
+
+    \item \textbf{Get key with timeout:} Spustí se, po stisknutí klávesy \textit{GLFW\_KEY\_U}, ale aby se tato část spustila znovu musí počkat 1000 milisekund, než bude klávesa znovu spustitelná.
+\end{itemize}
+
+\subsubsection{Vstup myši}
+
+\begin{lstlisting}[caption={Ukázkové získání vstupu myši}]
+void ExampleGame::on_update(const float delta_time)
+{
+    if (input_manager->mouse->get_button_up(GLFW_MOUSE_BUTTON_1))
+    {
+        // logika
+    }
+    if (input_manager->mouse->get_button_down(GLFW_MOUSE_BUTTON_2))
+    {
+        // logika
+    }
+    if (input_manager->mouse->is_scrolling_y())
+    {
+        // logika
+    }
+}
+\end{lstlisting}
+
+\begin{itemize}
+    \item \textbf{Get button up:} Spustí se, jen pokud je \textit{GLFW\_MOUSE\_BUTTON\_1} (levé tlačítko myši) nezmáčknuté.
+    
+    \item \textbf{Get button down:} Spustí se, jen pokud je \textit{GLFW\_MOUSE\_BUTTON\_2} (pravé tlačítko myši) zmáčknuté.
+    
+    \item \textbf{Is scrolling y:} Spustí se, jen když se otáči kolečko u myši. K získání o kolik se kolečko otočilo, použijte \textit{input\_manager->mouse->scroll\_y\_delta}.
+\end{itemize}
+
+K získání aktuální pozice myši na obrazovce v pixelech, lze získat proměnné \textit{input\_manager->mouse->pos\_x} a \textit{input\_manager->mouse->pos\_y}.
+
+
+
+\subsection{Vlastní logika entit}
+Pro vytvoření vlastní logiky pro entity, je možné použít \texttt{Behaviour} komponentu k vlastnímu skiptování. Stejně jako \texttt{engine::Appliaction}, má vlastní funkce \texttt{on\_start}, \texttt{on\_update} a \texttt{on\_shutdown}.
+
+Pokud by jsme chtěli, aby se daná entita s touto kompenentou točila do kola, musíme v \texttt{on\_update} funkci použít proměnnou \textit{self}, která ukazuje na vlastnící enitu komponenty. Také si budem ukládat i proměnnou \textit{count}, která se pokaždém spuštění \texttt{on\_update} zvedne o \textit{delta time}. Tuto proměnnou použijeme k plynulé rotaci entity.
+
+\begin{lstlisting}[caption={Vytvoření ukázkového behaviour skriptu v TestScript.h}]
+#include <engine/world/components/BehaviorComponent.h>
+
+class TestScript : public BehaviorComponent
+{
+public:
+    void on_start() override;
+    void on_update(const float delta_time) override;
+private:
+    float count_;
+};
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Rotace objěktu v skriptu TestScript.cpp}]
+#include "TestScript.h"
+#include <engine/world/Entity.h>
+#include <cmath>
+
+void TestScript::on_start()
+{
+    count_ = 0.0f;
+}
+
+void TestScript::on_update(const float delta_time)
+{
+    count_ += delta_time;
+    self->transform->position.x = std::sin(count_) * 2.0f;
+    self->transform->position.z = std::cos(count_) * 2.0f;
+}
+\end{lstlisting}
+
+K vytvořerní komplexnější logiky, můžem vytvořit \textit{trigger}, což je entita s kolizní komponentou, co po dotyku s ostatní entitou, také s kolizní komponentou, se spustí kus kódu.
+
+Například kdybychom, chtěli posunout, každou enitu co se dotkne entity s \textit{TestScript} komponentou, tak se posune o 10 jednotek nahoru. V \textit{TestScript.h} přepíšeme funkci (\textit{function overriding}) \texttt{on\_trigger} a v \textit{TestScript.cpp} dopíšem logiku.
+
+\begin{lstlisting}[caption={Přidání on\_trigger v TestScript.h}]
+public:
+    void on_trigger(Entity& other, const engine::physics::CollisionsPoints& points) override;
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Logika on\_trigger v TestScript.cpp}]
+void TestScript::on_trigger(Entity& other, const engine::physics::CollisionsPoints& points)
+{
+    other.transform->position.y += 10.0f;
+}
+\end{lstlisting}
 
 
 
@@ -370,13 +491,23 @@ Hra
 
 
 \section{Závěr}
+Cílem této odborné práce bylo navrhnout a implementovat vlastní 3D herní engine v jazyce C++, pochopit vnitřní mechanismy komerčních systémů a vytvořit plně funkční ukázkovou aplikaci. Výsledkem je projekt Rainfall Engine, který tento cíl úspěšně naplňuje a tvoří stabilní základ pro budoucí vývoj.
 
 \subsection{Zhodnocení výsledků}
-Podařilo se naplnit zadání? Co funguje nejlépe?
+Během vývoje se podařilo vytvořit robustní architekturu, která propojuje správu paměti, herní logiku a moderní grafické API OpenGL. Engine disponuje vlastním systémem pro správu entit a komponent, systémem pro načítání 3D modelů a textur a implementuje pokročilé grafické techniky. Zvláštní důraz byl kladen na vizuální kvalitu, čehož bylo dosaženo integrací Deferred renderingu, modelu osvětlení PBR a automatické expozice v rámci HDR post-processingu.
 
 \subsection{Možnosti dalšího rozvoje}
-Co bys přidal (fyzika, stíny, podpora více platforem).
+Architektura enginu byla navržena tak, aby umožňovala snadnou integraci nových systémů. V nejbližší budoucnosti se vývoj zaměří na následující klíčové oblasti:
 
+\begin{itemize}
+    \item \textbf{Pokročilý fyzikální systém:} Současná implementace podporuje pouze základní detekci sférických kolizí. Dalším krokem bude vývoj nebo integrace plnohodnotného fyzikálního enginu, který umožní simulaci dynamiky tuhých těles (\textit{Rigid Body Dynamics}) a detekci kolizí pro komplexní tvary (např. přes AABB nebo konvexní trupy).
+    
+    \item \textbf{Rozšíření renderování stínů:} Aktuální verze enginu využívá základní variantu algoritmu Shadow mapping pro směrová světla. Pro eliminaci vizuálních artefaktů a zlepšení kvality stínů v otevřených scénách je plánována implementace techniky \textit{Cascaded Shadow Maps} (CSM), která dynamicky přizpůsobuje rozlišení stínové mapy dle vzdálenosti od kamery.
+    
+    \item \textbf{Dokončení PBR pipeline:} Physically based rendering bude obohaceno o \textit{Image-Based Lighting} (IBL). Pomocí environmentálních HDRI map engine získá podporu pro realistické globální osvětlení a přesné odrazy na materiálech, což vizuální kvalitu posune na úroveň moderních komerčních enginů.
+\end{itemize}
+
+Projekt Rainfall Engine mi dokázal, že i přes vysokou komplexitu moderní grafiky lze s odhodláním vyvinout vlastní funkční řešení, na kterém mohu dále stavět své profesní portfolio.
 
 
 % --- Přílohy ---

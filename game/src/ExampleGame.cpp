@@ -18,37 +18,23 @@ namespace game
 {
     void ExampleGame::on_start()
     {
-        current_project->name = "BH Project";
-        current_project->project_dir = "C:\\Files\\Code\\C++\\rainfall_engine\\game\\";
+        current_project->load(*this, "C:\\Files\\Code\\C++\\rainfall_engine\\game\\sr_game.rainp");
 
-
-        //scene_manager->load_scene("saved/Example.rain", true);
-        //scene_manager->load_scene("saved/Another.rain");
-
-        Scene* scene = scene_manager->create_scene("MyScene", true);
-        box_ = scene->create_entity("Sample");
-        box_->add_component<MeshComponent>(0, GL_TRIANGLES, resource_manager->get_mesh_manager());
-        Texture* texture = resource_manager->load_texture(current_project->project_dir + current_project->assets_dir + "\\chill_guy.jpg", "jpg");
-        box_->add_component<TextureComponent>(texture);
+        Scene* scene = scene_manager->get_current_scene();
+        box_ = scene->get_entity("Cube");
         box_->add_component<engine::physics::SphereCollider>();
         box_->add_component<TestScript>();
 
+        light_ = scene->get_entity("Sun");
 
-        light_ = scene->create_entity("Light");
-        light_->transform->scale *= 0.2f;
-        light_->transform->position.x = 3.0f;
-        light_->transform->position.z = 2.0f;
-        light_->add_component<MeshComponent>(0, 4, resource_manager->get_mesh_manager());
-        light_->add_component<LightComponent>(lights::LIGHT_TYPE::POINT, glm::vec3(1.0f, 1.0f, 0.0f));
-        light_->get_component<LightComponent>()->intensity = 5.0f;
-
+        scene->current_camera = scene->get_entity("Player");
         scene->current_camera->add_component<engine::physics::SphereCollider>();
 
-        int model_s = resource_manager->load_model(current_project->project_dir + current_project->assets_dir + "\\models\\sibenik.obj");
-        int model_t = resource_manager->load_model(current_project->project_dir + current_project->assets_dir + "\\models\\sphere.obj");
-        auto obj = scene->create_entity("Model");
-        obj->add_component<MeshComponent>(model_t, GL_TRIANGLES, resource_manager->get_mesh_manager());
-        obj->transform->scale *= 3.0f;
+        //int model_s = resource_manager->load_model(current_project->project_dir + current_project->assets_dir + "\\models\\sibenik.obj");
+        //int model_t = resource_manager->load_model(current_project->project_dir + current_project->assets_dir + "\\models\\sphere.obj");
+        //auto obj = scene->create_entity("Model");
+        //obj->add_component<MeshComponent>(model_t, GL_TRIANGLES, resource_manager->get_mesh_manager());
+        //obj->transform->scale *= 3.0f;
 
 
         show_ = true;
@@ -62,8 +48,6 @@ namespace game
         document_ = ui->LoadDocument("assets/documents/index.rml");
         document_->Show();
 
-        current_project->save(*this, current_project->project_dir + "bhg.rainp");
-        scene->save(current_project->project_dir + current_project->scenes_dir + "\\" + scene->name + ".rain");
         tools::printl_message("EXAMPLE", "OnStart");
     }
 
@@ -91,7 +75,7 @@ namespace game
             Entity* e = scene_manager->get_current_scene()->create_entity("Launched");
             e->transform->position = {std::sin(get_uptime()), 3.0f, std::cos(get_uptime()) * 3.0f};
             e->transform->scale = {0.2f, 0.2f, 0.2f};
-            e->add_component<MeshComponent>(0, GL_TRIANGLES, resource_manager->get_mesh_manager());
+            e->add_component<MeshComponent>(0);
             e->add_component<RidgidbodyComponent>(*e->transform, 10.0f, glm::vec3(0.0f, 15.0f, 0.0f));
             e->add_component<engine::physics::SphereCollider>();
         }

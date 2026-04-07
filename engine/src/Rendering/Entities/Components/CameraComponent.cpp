@@ -119,6 +119,7 @@ void CameraComponent::serialize(YAML::Emitter& out)
 
     out << YAML::Key << "Gamma" << YAML::Value << gamma;
     out << YAML::Key << "Exposure" << YAML::Value << threshold;
+    out << YAML::Key << "Key Value" << YAML::Value << key_value;
 
     out << YAML::Key << "Clear Color" << YAML::Value << YAML::Flow << YAML::BeginSeq;
     out << clear_color[0] << clear_color[1] << clear_color[2] << clear_color[3] << YAML::EndSeq;
@@ -151,6 +152,8 @@ bool CameraComponent::deserialize(YAML::Node& node)
 
     gamma = node["Gamma"].as<float>();
     threshold = node["Exposure"].as<float>();
+    if (YAML::Node cur = node["Key Value"])
+        key_value = cur.as<float>();
 
     if (YAML::Node cur = node["Clear Color"])
     {
