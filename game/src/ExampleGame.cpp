@@ -3,6 +3,7 @@
 #include "engine/world/Components/MeshComponent.h"
 #include "engine/world/Components/TextureComponent.h"
 #include "engine/world/Components/CameraComponent.h"
+#include "engine/world/components/MaterialComponent.h"
 #include "engine/world/components/RidgidbodyComponent.h"
 #include "engine/world/components/SphereCollider.h"
 #include "glfw3.h"
@@ -11,30 +12,35 @@
 #include <string>
 #include <utils.h>
 
-#include "TestScript.h"
+#include "scripts/BulletScript.h"
+#include "scripts/CameraScript.h"
+#include "scripts/EnemyScript.h"
+
+#include <random>
 
 
 namespace game
 {
     void ExampleGame::on_start()
     {
-        current_project->load(*this, "C:\\Files\\Code\\C++\\rainfall_engine\\game\\sr_game.rainp");
+        current_project->load(*this, "sr_game.rainp");
+
+        std::srand(time(0));
 
         Scene* scene = scene_manager->get_current_scene();
-        box_ = scene->get_entity("Cube");
-        box_->add_component<engine::physics::SphereCollider>();
-        box_->add_component<TestScript>();
-
-        light_ = scene->get_entity("Sun");
 
         scene->current_camera = scene->get_entity("Player");
         scene->current_camera->add_component<engine::physics::SphereCollider>();
+        scene->current_camera->add_component<CameraScript>();
+        scene->current_camera->get_component<CameraScript>()->set_input_manager(input_manager.get());
+        scene->current_camera->transform->position.y = 1.0f;
 
-        //int model_s = resource_manager->load_model(current_project->project_dir + current_project->assets_dir + "\\models\\sibenik.obj");
-        //int model_t = resource_manager->load_model(current_project->project_dir + current_project->assets_dir + "\\models\\sphere.obj");
-        //auto obj = scene->create_entity("Model");
-        //obj->add_component<MeshComponent>(model_t, GL_TRIANGLES, resource_manager->get_mesh_manager());
-        //obj->transform->scale *= 3.0f;
+        firerate_ = 0.1f;
+        firerate_count_ = 0.0f;
+        spawnrate_ = 0.5f;
+        spawnrate_count_ = 0.0f;
+
+        sphere_model_ = resource_manager->load_model("assets\\models\\sphere.obj");
 
 
         show_ = true;
@@ -53,55 +59,53 @@ namespace game
 
     void ExampleGame::on_update(const float delta_time)
     {
-        light_->transform->position.y = std::sin(get_uptime()) * 3;
-
-        if (input_manager->get_key_with_timeout(GLFW_KEY_R, 100))
-        {
-            box_->transform->position.x += 0.5f;
-            //tools::printl_message("EXAMPLE", "R");
-        }
-        if (input_manager->get_key_toggle(GLFW_KEY_T))
-        {
-            box_->transform->position.x -= 1.0f;
-            tools::printl_message("EXAMPLE", "T");
-        }
-        if (input_manager->get_key_down(GLFW_KEY_Y))
-        {
-            box_->transform->position.x -= delta_time;
-        }
-
-        if (input_manager->get_key_with_timeout(GLFW_KEY_INSERT, 50))
-        {
-            Entity* e = scene_manager->get_current_scene()->create_entity("Launched");
-            e->transform->position = {std::sin(get_uptime()), 3.0f, std::cos(get_uptime()) * 3.0f};
-            e->transform->scale = {0.2f, 0.2f, 0.2f};
-            e->add_component<MeshComponent>(0);
-            e->add_component<RidgidbodyComponent>(*e->transform, 10.0f, glm::vec3(0.0f, 15.0f, 0.0f));
-            e->add_component<engine::physics::SphereCollider>();
-        }
-
-
         Rml::Element* element = document_->GetElementById("mouse");
-        element->SetInnerRML("count: <h1>" + std::to_string(scene_manager->get_current_scene()->entities.size()) + "</h1>, " + std::to_string(1.0f / delta_time));
-        /*if (input_manager->mouse->get_button_down(GLFW_MOUSE_BUTTON_1))
+        element->SetInnerRML("count: <h1>" +
+            std::to_string(scene_manager->get_current_scene()->current_camera->get_component<CameraScript>()->health) + "</h1>, " +
+            std::to_string(scene_manager->get_current_scene()->entities.size()));
+
+        spawnrate_count_ += delta_time;
+        if (spawnrate_count_ >= spawnrate_)
         {
-            element->SetInnerRML("MB1 is Down");
-        }
-        else element->SetInnerRML("MB1 is Up");*/
+            spawnrate_count_ = 0.0f;
 
-        if (input_manager->mouse->get_button_down(GLFW_MOUSE_BUTTON_2))
+            Entity* e = scene_manager->get_current_scene()->create_entity("Enemy");
+            e->transform->position = {
+                (float)(std::rand()) / (float)(RAND_MAX) * 50.0f - 25.0f,
+                0.0f,
+                (float)(std::rand()) / (float)(RAND_MAX) * 50.0f - 25.0f
+            };
+            e->transform->scale = {0.7f, 0.7f, 0.7f};
+            e->add_component<MeshComponent>(0);
+            e->add_component<MaterialComponent>(glm::vec4(1.0));
+            e->add_component<engine::physics::SphereCollider>();
+            e->add_component<EnemyScript>();
+            e->get_component<EnemyScript>()->scene_manager = scene_manager.get();
+            e->get_component<EnemyScript>()->target = scene_manager->get_current_scene()->current_camera->transform;
+        }
+
+
+        firerate_count_ += delta_time;
+        if (firerate_count_ >= firerate_)
+            firerate_count_ = 0.0f;
+
+        if (input_manager->mouse->get_button_down(GLFW_MOUSE_BUTTON_1) && firerate_count_ <= 0.0f)
         {
-            //tools::printl_message("EXAMPLE", "MB2 Down");
+            Entity* e = scene_manager->get_current_scene()->create_entity("Bullet");
+            e->transform->position = scene_manager->get_current_scene()->current_camera->transform->position;
+            e->transform->scale = {0.1f, 0.1f, 0.1f};
+            e->add_component<MeshComponent>(0);
+            e->add_component<engine::physics::SphereCollider>();
+            e->add_component<BulletScript>();
+            e->get_component<BulletScript>()->set_forward(scene_manager->get_current_scene()->current_camera->transform->rotation);
+
+            bullets_.push(e);
         }
 
-        if (input_manager->mouse->is_scrolling_y())
+        if (bullets_.size() >= 50)
         {
-            tools::printl_message("EXAMPLE", std::to_string(input_manager->mouse->scroll_y_delta));
+            scene_manager->get_current_scene()->remove_entity(bullets_.front());
+            bullets_.pop();
         }
-
-
-        CameraComponent* cur_camera = scene_manager->get_current_scene()->current_camera->get_component<CameraComponent>();
-        cur_camera->default_move(*input_manager, delta_time);
-        cur_camera->default_mouse_move(*input_manager, delta_time);
     }
 }

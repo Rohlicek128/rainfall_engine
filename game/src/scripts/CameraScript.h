@@ -1,21 +1,22 @@
 #pragma once
 
-#include "engine/world/components/MaterialComponent.h"
+#include <engine/managers/InputManager.h>
 #include <engine/world/components/BehaviorComponent.h>
-
 
 namespace game
 {
-    class TestScript : public BehaviorComponent
+    class CameraScript : public BehaviorComponent
     {
-        float count_;
-        MaterialComponent* material_;
+        engine::InputManager* input_ = nullptr;
+        float speed_;
 
     public:
+        int max_health, health;
+
         void on_start() override;
         void on_update(const float delta_time) override;
         void on_trigger(Entity& other, const engine::physics::CollisionsPoints& points) override;
 
-        std::string get_name() override;
+        void set_input_manager(engine::InputManager* input);
     };
 }
