@@ -9,6 +9,9 @@ namespace game
         glm::vec3 forward_;
 
     public:
+        int damage;
+        bool entered;
+
         void on_start() override;
         void on_update(const float delta_time) override;
 

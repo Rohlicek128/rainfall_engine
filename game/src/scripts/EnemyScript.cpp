@@ -13,7 +13,7 @@ namespace game
     {
         max_health = 100;
         health = 100;
-        speed_ = 11.0f;
+        speed_ = 6.0f;
     }
 
     void EnemyScript::on_update(const float delta_time)
@@ -40,9 +40,13 @@ namespace game
 
     void EnemyScript::on_trigger(Entity& other, const engine::physics::CollisionsPoints& points)
     {
-        if (other.contains_component<BulletScript>())
+        if (BulletScript* bullet = other.get_component<BulletScript>())
         {
-            health -= 3;
+            if (bullet->entered) return;
+            bullet->entered = true;
+            bullet->set_forward(glm::vec3(0.0f, -1.0f, 0.0f));
+
+            health -= bullet->damage;
             if (health <= 0)
             {
                 if (MaterialComponent* mat = self->get_component<MaterialComponent>())

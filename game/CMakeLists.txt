@@ -23,7 +23,11 @@ add_custom_command(
         "$<TARGET_FILE_DIR:game>/engine/assets"
 
 
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/game/lib/engine"
+        "$<TARGET_FILE_DIR:game>/"
+
     COMMAND ${CMAKE_COMMAND} -E copy
-        "${CMAKE_SOURCE_DIR}/engine/lib/assimp/assimp-vc143-mtd.dll"
-        "$<TARGET_FILE_DIR:game>/assimp-vc143-mtd.dll"
+        "${CMAKE_SOURCE_DIR}/game/sr_game.rainp"
+        "$<TARGET_FILE_DIR:game>/sr_game.rainp"
 )

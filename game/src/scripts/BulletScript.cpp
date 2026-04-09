@@ -9,6 +9,8 @@ namespace game
 {
     void BulletScript::on_start()
     {
+        damage = 10;
+        entered = false;
         speed_ = 100.0f;
         self->transform->position += forward_ * 0.5f;
     }

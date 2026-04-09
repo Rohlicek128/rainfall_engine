@@ -11,8 +11,8 @@ namespace game
     void CameraScript::on_start()
     {
         speed_ = 10.0f;
-        max_health = 100;
-        health = 100;
+        max_health = 2500;
+        health = 2500;
     }
 
     void CameraScript::on_update(const float delta_time)
