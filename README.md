@@ -1,4 +1,4 @@
-<img src="docs/rainfall_logo_white.png">
+<img src="docs/rainfall_logo_black_readme.png">
 
 # RAINFALL ENGINE
 
@@ -32,7 +32,7 @@ To build the engine, you will need a C++20 compatible compiler and [CMake / Visu
 
 ## Project Setup & Integration
 
-If you want to build a game using the RainFall Engine without compiling the entire source code, you can use the pre-compiled `engine.lib` from the [GitHub Releases](https://github.com/Rohlicek128/rainfall_engine/releases).
+If you want to build a game using the Rainfall Engine without compiling the entire source code, you can use the pre-compiled `engine.lib` from the [GitHub Releases](https://github.com/Rohlicek128/rainfall_engine/releases).
 
 ### 1. Recommended Directory Structure
 To ensure the engine finds your assets and libraries correctly, organize your project as follows:
@@ -116,7 +116,7 @@ add_custom_command(
 
 ## User Manual: How to Use the Engine
 
-RainFall Engine consists of two main parts: the **Visual Editor** and the **C++ API** for writing game logic.
+Rainfall Engine consists of two main parts: the **Visual Editor** and the **C++ API** for writing game logic.
 
 ### 1. Using the Visual Editor
 The editor acts as a visual interface for YAML data serialization. It allows you to build levels without hardcoding entity positions.
