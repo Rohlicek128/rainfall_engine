@@ -4,6 +4,8 @@
 
 Rainfall Game Engine is a custom 3D game engine and visual editor built from scratch in C++ and OpenGL. It was developed with a focus on modern software architecture (Entity-Component-System), physically based rendering (PBR), and providing a user-friendly visual editor.
 
+<img src="docs/editor.png" height=450>
+
 ## Key Features
 * **Entity-Component-System (ECS):** Flexible architecture for managing game objects and logic.
 * **Visual Editor:** A comprehensive scene editor powered by Dear ImGui with dockspace support, a scene graph, and a real-time entity inspector.
